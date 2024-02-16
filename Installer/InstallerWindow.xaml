@@ -1,0 +1,28 @@
+﻿<Window x:Class="Installer.InstallerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Installer"
+        mc:Ignorable="d"
+        Title="MSFS2020_AutoFPS Installer" Height="600" Width="600" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
+    <Grid>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <Label HorizontalContentAlignment="Center" Margin="12,0,12,0">This App installs/updates MSFS__AutoFPS for your current User.</Label>
+            <Label HorizontalContentAlignment="Center" Margin="12,-8,12,0">Software Requirements will be automatically checked and installed.</Label>
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                <CheckBox Name="chkDesktopLink" IsChecked="True" HorizontalAlignment="Left" Margin="0,12,12,0" Click="chkDesktopLink_Click">Create Link on Desktop</CheckBox>
+                <RadioButton Name="radioRemove" GroupName="AutoStart" HorizontalAlignment="Left" Margin="0,13,0,0" Click="radio_Click" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" ToolTip="Remove existing Auto-Start Entries (FSUIPC and MSFS).">Remove Auto-Start</RadioButton>
+                <RadioButton Name="radioNone" GroupName="AutoStart" IsChecked="True" HorizontalAlignment="Left" Margin="0,1,0,0" Click="radio_Click" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" ToolTip="The Installer does not touch anything.&#x0a;You have to take Care of Adding/Updating/Removing the Auto-Start Entries.">Do not configure Auto-Start</RadioButton>
+                <RadioButton Name="radioFsuipc" GroupName="AutoStart" HorizontalAlignment="Left" Margin="0,1,0,0" Click="radio_Click" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" ToolTip="MSFS2020_AutoFPS will be started by FSUIPC - it will modify your FSUIPC7.ini File.&#x0a;An existing Entry will automatically be updated, else a new Entry is inserted.&#x0a;An existing Auto-Start Entry in your FSUIPC7.ini will automatically be removed!&#x0a;A Backup of the Files is not created!">Auto-Start with FSUIPC</RadioButton>
+                <RadioButton Name="radioExe" GroupName="AutoStart" HorizontalAlignment="Left" Margin="0,1,0,0" Click="radio_Click" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" ToolTip="MSFS2020_AutoFPS will be started by MSFS - it will modify your EXE.xml File.&#x0a;An existing Entry will automatically be updated, else a new Entry is inserted.&#x0a;An existing Auto-Start Entry in your FSUIPC7.ini will automatically be removed!&#x0a;A Backup of the Files is not created!">Auto-Start with MSFS</RadioButton>
+            </StackPanel>
+            <TextBlock Name="txtMessages" MinHeight="0" Margin="12,16,12,0"></TextBlock>
+            <Label Name="lblResult" HorizontalContentAlignment="Center" FontWeight="DemiBold" Margin="12,0,12,0"></Label>
+            <Label Name="lblAvWarning" HorizontalContentAlignment="Center" FontWeight="DemiBold" Margin="12,0,12,0" Visibility="Collapsed">Remember to set/update your Anti-Virus Exclusion, if necessary.</Label>
+            <Label Name="lblRebootWarning" HorizontalContentAlignment="Center" FontWeight="DemiBold" Margin="12,-8,12,0" Visibility="Collapsed">If you have installed MSFS2020_AutoFPS for the first Time, reboot your PC after Installation has finished!</Label>
+            <Button Name="btnInstall" FontWeight="DemiBold" Width="128" MinHeight="24" Margin="12,16,12,12" Click="btnInstall_Click">Install!</Button>
+            <Button Name="btnRemove" FontWeight="DemiBold" Width="128" MinHeight="24" Margin="12,4,12,12" Foreground="Red" Click="btnRemove_Click" ToolTip="Attention: Will remove the whole App including its current Configuration. Does also remove Auto-Start Entries for it from FSUIPC and MSFS.">Remove!</Button>
+        </StackPanel>
+    </Grid>
+</Window>

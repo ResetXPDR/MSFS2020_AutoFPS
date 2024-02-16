@@ -1,0 +1,39 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:tb="clr-namespace:H.NotifyIcon;assembly=H.NotifyIcon.Wpf"
+    xmlns:local="clr-namespace:MSFS2020_AutoFPS">
+
+    <ContextMenu
+        x:Shared="false"
+        x:Key="SysTrayMenu"
+        >
+        <MenuItem
+            Header="Show Window"
+            Command="{Binding ShowWindowCommand}"
+            />
+        <MenuItem
+            Header="Hide Window"
+            Command="{Binding HideWindowCommand}"
+            />
+        <Separator />
+        <MenuItem
+            Header="Exit"
+            Command="{Binding ExitApplicationCommand}"
+            />
+    </ContextMenu>
+
+
+    <tb:TaskbarIcon
+        x:Key="NotifyIcon"
+        ToolTipText="Left-click to show Window, Right-click for Menu"
+        LeftClickCommand="{Binding ShowWindowCommand}"
+        NoLeftClickDelay="True"
+        ContextMenu="{StaticResource SysTrayMenu}">
+
+        <tb:TaskbarIcon.DataContext>
+            <local:NotifyIconViewModel />
+        </tb:TaskbarIcon.DataContext>
+    </tb:TaskbarIcon>
+
+</ResourceDictionary>

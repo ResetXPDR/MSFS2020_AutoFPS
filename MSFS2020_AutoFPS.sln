@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSFS2020_AutoFPS", "MSFS2020_AutoFPS\MSFS2020_AutoFPS.csproj", "{8841C1AB-3A51-473C-B0F9-8705650478B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Installer", "Installer\Installer.csproj", "{BF3DD08A-7547-4352-B1DD-9A343D757421}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8841C1AB-3A51-473C-B0F9-8705650478B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8841C1AB-3A51-473C-B0F9-8705650478B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8841C1AB-3A51-473C-B0F9-8705650478B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8841C1AB-3A51-473C-B0F9-8705650478B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF3DD08A-7547-4352-B1DD-9A343D757421}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF3DD08A-7547-4352-B1DD-9A343D757421}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF3DD08A-7547-4352-B1DD-9A343D757421}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF3DD08A-7547-4352-B1DD-9A343D757421}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3AB5D6B8-BCDB-4095-ADB1-FFBE9D42D76B}
+	EndGlobalSection
+EndGlobal
