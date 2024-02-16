@@ -2,7 +2,7 @@
 
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
 
-This utility is new development that is a simplification DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing the TLOD and OLOD based on the current AGL and an easy to use GUI. It provides features such as:<br/>
+This utility is a new development that is a simplification DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing the TLOD and OLOD based on the current AGL and an easy to use GUI. It provides features such as:<br/>
 - Adjusting TLOD automatically to achieve a user-defined target FPS band based on user-defined maximum and minimum LODs,<br/>
 - Simultaneous PC and VR mode compatibilty,<br>
 - Cloud quality decrease option for when FPS can't be achieved at the lowest desired TLOD,<br/>
