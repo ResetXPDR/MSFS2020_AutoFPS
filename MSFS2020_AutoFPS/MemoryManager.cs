@@ -181,7 +181,7 @@ namespace MSFS2020_AutoFPS
         [DllImport("user32.dll")]
         static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
 
-        private bool IsActiveWindowMSFS()
+        public bool IsActiveWindowMSFS()
         {
             const int nChars = 256;
             string activeWindowTitle;
@@ -196,11 +196,16 @@ namespace MSFS2020_AutoFPS
             }
             return false;
         }
+ 
+        public bool IsDX12()
+        {
+            return isDX12;
+        }
         public bool IsFgModeActive()
         {
             try
             {
-                if (isDX12 && !Model.MemoryAccess.IsVrModeActive() && IsActiveWindowMSFS()) 
+                if (isDX12 && !Model.MemoryAccess.IsVrModeActive()) 
                     return MemoryInterface.ReadMemory<byte>(addrFgMode) == 1;
                 else return false;
             }

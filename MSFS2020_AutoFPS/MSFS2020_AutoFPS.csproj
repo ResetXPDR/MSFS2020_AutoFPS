@@ -25,7 +25,6 @@ Work</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Dev Notes.txt" />
     <None Remove="icon.ico" />
   </ItemGroup>
 

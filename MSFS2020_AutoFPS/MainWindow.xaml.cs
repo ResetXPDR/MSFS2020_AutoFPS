@@ -40,10 +40,10 @@ namespace MSFS2020_AutoFPS
             assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')];
             Title += " (" + assemblyVersion + (serviceModel.TestVersion ? "-concept_demo" : "")+ ")";
 
-            //FillIndices(dgTlodPairs);
-            //FillIndices(dgOlodPairs);
+            if (serviceModel.UseExpertOptions) stkpnlMSFSSettings.Visibility = Visibility.Visible;
+            else stkpnlMSFSSettings.Visibility = Visibility.Collapsed;
 
-             timer = new DispatcherTimer
+            timer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1)
             };
@@ -58,26 +58,22 @@ namespace MSFS2020_AutoFPS
                 { 
                     if ((serviceModel.TestVersion && LatestAppVersion >= currentAppVersion) || LatestAppVersion > currentAppVersion)
                     {
-                        lblsimCompatible.Content = "Newer app version " + (latestAppVersionStr) + " now available";
-                        lblsimCompatible.Foreground = new SolidColorBrush(Colors.Green);
-                        lblappUrl.Visibility = Visibility.Visible;
+                        lblStatusMessage.Content = "Newer app version " + (latestAppVersionStr) + " now available";
+                        lblStatusMessage.Foreground = new SolidColorBrush(Colors.Green);
                     }
                     else
                     {
-                        if (serviceModel.TestVersion)
-                        {
-                            lblsimCompatible.Content = latestAppVersionStr + " version is latest formal release. Check link works";
-                            lblsimCompatible.Foreground = new SolidColorBrush(Colors.Green);
-                            lblappUrl.Visibility = Visibility.Visible;
-                        }
-                        else
-                        {
-                            lblsimCompatible.Content = "Latest app version is installed";
-                            lblsimCompatible.Foreground = new SolidColorBrush(Colors.Green);
-                        }
+                        lblStatusMessage.Content = "Latest app version is installed";
+                        lblStatusMessage.Foreground = new SolidColorBrush(Colors.Green);
                     }
                 }   
             }
+            if (serviceModel.TestVersion)
+            {
+                lblStatusMessage.Content = "Concept demo version";
+                lblStatusMessage.Foreground = new SolidColorBrush(Colors.Green);
+            }
+
         }
         public static string GetFinalRedirect(string url)
         {
@@ -142,41 +138,14 @@ namespace MSFS2020_AutoFPS
         protected void LoadSettings()
         {
             chkOpenWindow.IsChecked = serviceModel.OpenWindow;
-            //chkUseTargetFPS.IsChecked = serviceModel.UseTargetFPS;
-            //cbProfile.SelectedIndex = serviceModel.SelectedProfile;
-            //dgTlodPairs.ItemsSource = serviceModel.PairsTLOD[serviceModel.SelectedProfile].ToDictionary(x => x.Item1, x => x.Item2);
-            //dgOlodPairs.ItemsSource = serviceModel.PairsOLOD[serviceModel.SelectedProfile].ToDictionary(x => x.Item1, x => x.Item2);
+            chkUseExpertOptions.IsChecked = serviceModel.UseExpertOptions;
             txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS, CultureInfo.CurrentUICulture);
             txtFPSTolerance.Text = Convert.ToString(serviceModel.FPSTolerance, CultureInfo.CurrentUICulture);
-            //txtDecreaseTlod.Text = Convert.ToString(serviceModel.DecreaseTLOD, CultureInfo.CurrentUICulture);
-            //txtDecreaseOlod.Text = Convert.ToString(serviceModel.DecreaseOLOD, CultureInfo.CurrentUICulture);
             txtMinTLod.Text = Convert.ToString(serviceModel.MinTLOD, CultureInfo.CurrentUICulture);
             txtMaxTLod.Text = Convert.ToString(serviceModel.MaxTLOD, CultureInfo.CurrentUICulture);
-            //txtConstraintTicks.Text = Convert.ToString(serviceModel.ConstraintTicks, CultureInfo.CurrentUICulture);
-            //txtConstraintDelayTicks.Text = Convert.ToString(serviceModel.ConstraintDelayTicks, CultureInfo.CurrentUICulture);
             chkDecCloudQ.IsChecked = serviceModel.DecCloudQ;
+            chkGroundTLODChanges.IsChecked = serviceModel.GroundTLODChanges;
             txtCloudRecoveryTLOD.Text = Convert.ToString(serviceModel.CloudRecoveryTLOD, CultureInfo.CurrentUICulture);
-            txtLodStepMaxInc.Text = Convert.ToString(serviceModel.LodStepMaxInc, CultureInfo.CurrentUICulture);
-            txtLodStepMaxDec.Text = Convert.ToString(serviceModel.LodStepMaxDec, CultureInfo.CurrentUICulture);
-        }
-
-        protected static void FillIndices(DataGrid dataGrid)
-        {
-            DataGridTextColumn column0 = new()
-            {
-                Header = "#",
-                Width = 16
-            };
-
-            Binding bindingColumn0 = new()
-            {
-                RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGridRow), 1),
-                Converter = new RowToIndexConvertor()
-            };
-
-            column0.Binding = bindingColumn0;
-
-            dataGrid.Columns.Add(column0);
         }
 
         protected void UpdateStatus()
@@ -208,7 +177,7 @@ namespace MSFS2020_AutoFPS
 
         protected float GetAverageFPS()
         {
-            if (serviceModel.MemoryAccess != null && serviceModel.MemoryAccess.IsFgModeActive())
+            if (serviceModel.MemoryAccess != null && serviceModel.MemoryAccess.IsFgModeActive() && serviceModel.MemoryAccess.IsActiveWindowMSFS())
                 return IPCManager.SimConnect.GetAverageFPS() * 2.0f;
             else
                 return IPCManager.SimConnect.GetAverageFPS();
@@ -223,30 +192,69 @@ namespace MSFS2020_AutoFPS
             if (serviceModel.MemoryAccess != null)
             {
                 lblappUrl.Visibility = Visibility.Hidden;
+                lblStatusMessage.Foreground = new SolidColorBrush(Colors.Black);
                 lblSimTLOD.Content = serviceModel.MemoryAccess.GetTLOD_PC().ToString("F0");
-                lblSimOLOD.Content = serviceModel.MemoryAccess.GetOLOD_PC().ToString("F0");
-                if (serviceModel.MemoryAccess.IsVrModeActive())
-                {
-                    lblSimCloudQs.Content = CloudQualityLabel(serviceModel.MemoryAccess.GetCloudQ_VR());
-                    lblIsVR.Content = "VR Mode active";
-                }
-                else
-                {
-                    lblSimCloudQs.Content = CloudQualityLabel(serviceModel.MemoryAccess.GetCloudQ_PC());
-                    lblIsVR.Content = "PC Mode" + (serviceModel.MemoryAccess.IsFgModeActive() ? " & FG" : "") + " active";
-                }
-     
                 if (serviceModel.MemoryAccess.MemoryWritesAllowed())
                 {
-                    lblsimCompatible.Visibility = Visibility.Hidden;
-
+                    lblStatusMessage.Content = serviceModel.MemoryAccess.IsDX12() ? "DX 12 | " : " DX11 | ";
+                    if (serviceModel.MemoryAccess.IsVrModeActive())
+                    {
+                        lblSimOLOD.Content = serviceModel.MemoryAccess.GetOLOD_VR().ToString("F0");
+                        lblSimCloudQs.Content = CloudQualityLabel(serviceModel.MemoryAccess.GetCloudQ_VR());
+                        lblStatusMessage.Content += " VR Mode";
+                    }
+                    else
+                    {
+                        lblSimOLOD.Content = serviceModel.MemoryAccess.GetOLOD_PC().ToString("F0");
+                        lblSimCloudQs.Content = CloudQualityLabel(serviceModel.MemoryAccess.GetCloudQ_PC());
+                        lblStatusMessage.Content += " PC Mode";
+                        lblStatusMessage.Content += (serviceModel.MemoryAccess.IsFgModeActive() ? (serviceModel.MemoryAccess.IsActiveWindowMSFS() ? " | FG Active" : " | FG Inactive") : "");
+                    }
                 }
                 else
                 {
-                    lblsimCompatible.Content = "Incompatible MSFS version - Sim Values read only";
-                    lblsimCompatible.Foreground = new SolidColorBrush(Colors.Red);
+                    lblStatusMessage.Content = "Incompatible MSFS version - Sim Values read only";
+                    lblStatusMessage.Foreground = new SolidColorBrush(Colors.Red);
                 }
+                if (serviceModel.IsSessionRunning)
+                {
+                    float MinTLOD = serviceModel.MinTLOD;
+                    float MaxTLOD = serviceModel.MaxTLOD;
+                    if (serviceModel.UseExpertOptions)
+                    {
+                        MinTLOD = serviceModel.MinTLOD;
+                        MaxTLOD = serviceModel.MaxTLOD;
+                    }
+                    else
+                    {
+                        if (serviceModel.MemoryAccess.IsVrModeActive())
+                        {
+                            MinTLOD = Math.Max(serviceModel.DefaultTLOD_VR * 0.5f, 10);
+                            MaxTLOD = serviceModel.DefaultTLOD_VR * 2.0f;
+                        }
+                        else
+                        {
+                            MinTLOD = Math.Max(serviceModel.DefaultTLOD * 0.5f, 10);
+                            MaxTLOD = serviceModel.DefaultTLOD * 2.0f;
+                        }
+                    }
 
+                    if (serviceModel.MemoryAccess.IsFgModeActive()) lblTargetFPS.Content = "Target FG FPS";
+                    else lblTargetFPS.Content = "Target FPS";
+                    if (GetAverageFPS() < serviceModel.TargetFPS && serviceModel.MemoryAccess.GetTLOD_PC() == MinTLOD)
+                        lblSimFPS.Foreground = new SolidColorBrush(Colors.Red);
+                    else if (GetAverageFPS() > serviceModel.TargetFPS && serviceModel.MemoryAccess.GetTLOD_PC() == MaxTLOD)
+                        lblSimFPS.Foreground = new SolidColorBrush(Colors.DarkGreen);
+                    else lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
+
+                    if (serviceModel.MemoryAccess.GetTLOD_PC() == MinTLOD) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Red);
+                    else if (serviceModel.MemoryAccess.GetTLOD_PC() == MaxTLOD) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Green);
+                    else if (serviceModel.tlod_step) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Orange);
+                    else lblSimTLOD.Foreground = new SolidColorBrush(Colors.Black);
+                    if (serviceModel.DecCloudQ && serviceModel.DecCloudQActive) lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Red);
+                    else lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Black);
+                }
+                else lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
             }
             else
             {
@@ -254,29 +262,6 @@ namespace MSFS2020_AutoFPS
                 lblSimOLOD.Content = "n/a";
                 lblSimCloudQs.Content = "n/a";
             }
-
-            if (serviceModel.UseTargetFPS && serviceModel.IsSessionRunning)
-            {
-                if (GetAverageFPS() < serviceModel.TargetFPS)
-                    lblSimFPS.Foreground = new SolidColorBrush(Colors.Red);
-                else
-                    lblSimFPS.Foreground = new SolidColorBrush(Colors.DarkGreen);
-            }
-            else
-            {
-                lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
-            }
-
-            lblSimTLOD.Foreground = new SolidColorBrush(Colors.Black);
-            lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Black);
-
-            if (serviceModel.MemoryAccess != null)
-            {
-                if (serviceModel.MemoryAccess.GetTLOD_PC() == serviceModel.MinTLOD) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Red);
-                else if (serviceModel.MemoryAccess.GetTLOD_PC() == serviceModel.MaxTLOD) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Green);
-                else if (serviceModel.tlod_step) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Orange);
-            }
-            if (serviceModel.DecCloudQ && serviceModel.DecCloudQActive) lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Red);
         }
 
         protected void UpdateAircraftValues()
@@ -303,23 +288,11 @@ namespace MSFS2020_AutoFPS
             }
         }
 
-        protected static void UpdateIndex(DataGrid grid, List<(float, float)> pairs, int index)
-        {
-            if (index >= 0 && index < pairs.Count)
-                grid.SelectedIndex = index;
-        }
-
         protected void OnTick(object sender, EventArgs e)
         {
             UpdateStatus();
             UpdateLiveValues();
             UpdateAircraftValues();
-
-            //if (serviceModel.IsSessionRunning)
-            //{
-            //    UpdateIndex(dgTlodPairs, serviceModel.PairsTLOD[serviceModel.SelectedProfile], serviceModel.CurrentPairTLOD);
-            //    UpdateIndex(dgOlodPairs, serviceModel.PairsOLOD[serviceModel.SelectedProfile], serviceModel.CurrentPairOLOD);
-            //}
         }
 
         protected void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -344,11 +317,13 @@ namespace MSFS2020_AutoFPS
             Hide();
         }
 
-        //private void chkUseTargetFPS_Click(object sender, RoutedEventArgs e)
-        //{
-        //    serviceModel.SetSetting("useTargetFps", chkUseTargetFPS.IsChecked.ToString().ToLower());
-        //    LoadSettings();
-        //}
+        private void chkUseExpertOptions_Click(object sender, RoutedEventArgs e)
+        {
+            serviceModel.SetSetting("useExpertOptions", chkUseExpertOptions.IsChecked.ToString().ToLower());
+            LoadSettings();
+            if (serviceModel.UseExpertOptions) stkpnlMSFSSettings.Visibility = Visibility.Visible;
+            else stkpnlMSFSSettings.Visibility = Visibility.Collapsed;
+        }
 
         private void chkOpenWindow_Click(object sender, RoutedEventArgs e)
         {
@@ -356,6 +331,11 @@ namespace MSFS2020_AutoFPS
             LoadSettings();
         }
 
+        private void chkGroundTLODChanges_Click(object sender, RoutedEventArgs e)
+        {
+            serviceModel.SetSetting("GroundTLODChanges", chkGroundTLODChanges.IsChecked.ToString().ToLower());
+            LoadSettings();
+        }
         private void chkDecCloudQ_Click(object sender, RoutedEventArgs e)
         {
             serviceModel.SetSetting("DecCloudQ", chkDecCloudQ.IsChecked.ToString().ToLower());
@@ -395,21 +375,6 @@ namespace MSFS2020_AutoFPS
                     key = "FpsTolerance";
                     intValue = true;
                     break;
-                case "txtDecreaseTlod":
-                    key = "decreaseTlod";
-                    break;
-                case "txtDecreaseOlod":
-                    key = "decreaseOlod";
-                    break;
-                case "txtConstraintTicks":
-                    key = "constraintTicks";
-                    intValue = true;
-                    break;
-                case "txtConstraintDelayTicks":
-                    key = "constraintDelayTicks";
-                    intValue = true;
-                    zeroAllowed = true;
-                    break;
                 case "txtCloudRecoveryTLOD":
                     key = "CloudRecoveryTLOD";
                     intValue = true;
@@ -421,14 +386,14 @@ namespace MSFS2020_AutoFPS
                 case "txtMaxTLod":
                     key = "maxTLod";
                     break;
-                case "txtLodStepMaxInc":
-                    key = "LodStepMaxInc";
-                    intValue = true;
-                    break;
-                case "txtLodStepMaxDec":
-                    key = "LodStepMaxDec";
-                    intValue = true;
-                    break;
+                //case "txtLodStepMaxInc":
+                //    key = "LodStepMaxInc";
+                //    intValue = true;
+                //    break;
+                //case "txtLodStepMaxDec":
+                //    key = "LodStepMaxDec";
+                //    intValue = true;
+                //    break;
                 default:
                     key = "";
                     break;
@@ -454,112 +419,6 @@ namespace MSFS2020_AutoFPS
             LoadSettings();
         }
 
-        private static void SetPairTextBox(DataGrid sender, TextBox alt, TextBox value, ref int index)
-        {
-            if (sender.SelectedIndex == -1 || sender.SelectedItem == null)
-                return;
-
-            var item = (KeyValuePair<float, float>)sender.SelectedItem;
-            alt.Text = Convert.ToString((int)item.Key, CultureInfo.CurrentUICulture);
-            value.Text = Convert.ToString(item.Value, CultureInfo.CurrentUICulture);
-            index = sender.SelectedIndex;
-        }
-
-        //private void dgTlodPairs_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        //{
-        //    SetPairTextBox(dgTlodPairs, txtTlodAlt, txtTlodValue, ref editPairTLOD);
-        //}
-
-        //private void dgOlodPairs_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        //{
-        //    SetPairTextBox(dgOlodPairs, txtOlodAlt, txtOlodValue, ref editPairOLOD);
-        //}
-
-        private void ChangeLodPair(ref int pairIndex, TextBox alt, TextBox value, List<(float, float)> pairs)
-        {
-            if (pairIndex == -1)
-                return;
-
-            if (pairIndex == 0 && alt.Text != "0")
-                alt.Text = "0";
-
-            if (int.TryParse(alt.Text, CultureInfo.InvariantCulture, out int agl) && float.TryParse(value.Text, new RealInvariantFormat(value.Text), out float lod)
-                && pairIndex < pairs.Count && agl >= 0 && lod >= serviceModel.SimMinLOD)
-            {
-                var oldPair = pairs[pairIndex];
-                pairs[pairIndex] = (agl, lod);
-                if (pairs.Count(pair => pair.Item1 == agl) > 1)
-                    pairs[pairIndex] = oldPair;
-                serviceModel.SavePairs();
-            }
-
-            LoadSettings();
-            alt.Text = "";
-            value.Text = "";
-            pairIndex = -1;
-        }
-
-        //private void btnTlodChange_Click(object sender, RoutedEventArgs e)
-        //{
-        //    ChangeLodPair(ref editPairTLOD, txtTlodAlt, txtTlodValue, serviceModel.PairsTLOD[serviceModel.SelectedProfile]);
-        //}
-
-        //private void btnOlodChange_Click(object sender, RoutedEventArgs e)
-        //{
-        //    ChangeLodPair(ref editPairOLOD, txtOlodAlt, txtOlodValue, serviceModel.PairsOLOD[serviceModel.SelectedProfile]);
-        //}
-
-        private void AddLodPair(ref int pairIndex, TextBox alt, TextBox value, List<(float, float)> pairs)
-        {
-            if (int.TryParse(alt.Text, CultureInfo.InvariantCulture, out int agl) && float.TryParse(value.Text, new RealInvariantFormat(value.Text), out float lod)
-                && agl >= 0 && lod >= serviceModel.SimMinLOD
-                && !pairs.Any(pair => pair.Item1 == agl))
-            {
-                pairs.Add((agl, lod));
-                ServiceModel.SortTupleList(pairs);
-                serviceModel.SavePairs();
-            }
-
-            LoadSettings();
-            alt.Text = "";
-            value.Text = "";
-            pairIndex = -1;
-        }
-
-        //private void btnTlodAdd_Click(object sender, RoutedEventArgs e)
-        //{
-        //    AddLodPair(ref editPairTLOD, txtTlodAlt, txtTlodValue, serviceModel.PairsTLOD[serviceModel.SelectedProfile]);
-        //}
-
-        //private void btnOlodAdd_Click(object sender, RoutedEventArgs e)
-        //{
-        //    AddLodPair(ref editPairOLOD, txtOlodAlt, txtOlodValue, serviceModel.PairsOLOD[serviceModel.SelectedProfile]);
-        //}
-
-        private void RemoveLoadPair(ref int pairIndex, TextBox alt, TextBox value, List<(float, float)> pairs)
-        {
-            if (pairIndex < 1 || pairIndex >= pairs.Count)
-                return;
-
-            pairs.RemoveAt(pairIndex);
-            ServiceModel.SortTupleList(pairs);
-            serviceModel.SavePairs();
-            LoadSettings();
-            alt.Text = "";
-            value.Text = "";
-            pairIndex = -1;
-        }
-
-        //private void btnTlodRemove_Click(object sender, RoutedEventArgs e)
-        //{
-        //    RemoveLoadPair(ref editPairTLOD, txtTlodAlt, txtTlodValue, serviceModel.PairsTLOD[serviceModel.SelectedProfile]);
-        //}
-
-        //private void btnOlodRemove_Click(object sender, RoutedEventArgs e)
-        //{
-        //    RemoveLoadPair(ref editPairOLOD, txtOlodAlt, txtOlodValue, serviceModel.PairsOLOD[serviceModel.SelectedProfile]);
-        //}
-
         private void txtLodStepMaxInc_TextChanged(object sender, TextChangedEventArgs e)
         {
 
@@ -574,7 +433,11 @@ namespace MSFS2020_AutoFPS
         {
 
         }
-        
+        private void chkGroundTLODChanges_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             try
@@ -602,41 +465,6 @@ namespace MSFS2020_AutoFPS
                 lblCloudRecoveryTLOD.Visibility = Visibility.Hidden;
                 txtCloudRecoveryTLOD.Visibility = Visibility.Hidden;
             }
-        }
-    }
- 
-    public class RowToIndexConvertor : MarkupExtension, IValueConverter
-    {
-        static RowToIndexConvertor convertor;
-
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value != null && value is DataGridRow row)
-            {
-                return row.GetIndex();
-            }
-            else
-            {
-                return -1;
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            convertor ??= new RowToIndexConvertor();
-
-            return convertor;
-        }
-
-
-        public RowToIndexConvertor()
-        {
-
         }
     }
 }

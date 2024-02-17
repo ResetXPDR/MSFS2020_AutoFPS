@@ -32,14 +32,14 @@ namespace MSFS2020_AutoFPS
                 return;
             }
 
-            if (Process.GetProcessesByName("DynamicLOD_ResetEdition").Length > 0)
+            if (Process.GetProcessesByName("DynamicLOD_ResetEdition").Length > 1)
             {
                 MessageBox.Show("DynamicLOD_ResetEdition is already running!", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();
                 return;
             }
 
-            if (Process.GetProcessesByName("DynamicLOD").Length > 0)
+            if (Process.GetProcessesByName("DynamicLOD").Length > 1)
             {
                 MessageBox.Show("A pre-ResetEdition version of AutoLOD is already running!", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();

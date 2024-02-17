@@ -28,11 +28,12 @@ namespace MSFS2020_AutoFPS
         public List<List<(float, float)>> PairsOLOD { get; set; }
         public int CurrentPairOLOD;
         public bool fpsMode { get; set; }
-        public bool UseTargetFPS { get; set; }
+        public bool UseExpertOptions { get; set; }
         public int TargetFPS { get; set; }
         public int FPSTolerance { get; set; }
         public int CloudRecoveryTLOD { get; set; }
         public bool DecCloudQActive { get; set; }
+        public bool GroundTLODChanges { get; set; }
         public int ConstraintTicks { get; set; }
         public int ConstraintDelayTicks { get; set; }
         public float DecreaseTLOD { get; set; }
@@ -91,10 +92,11 @@ namespace MSFS2020_AutoFPS
             ConfigVersion = Convert.ToInt32(ConfigurationFile.GetSetting("ConfigVersion", "1"));
             WaitForConnect = Convert.ToBoolean(ConfigurationFile.GetSetting("waitForConnect", "true"));
             OpenWindow = Convert.ToBoolean(ConfigurationFile.GetSetting("openWindow", "true"));
-            DecCloudQ = Convert.ToBoolean(ConfigurationFile.GetSetting("DecCloudQ", "false"));
+            DecCloudQ = Convert.ToBoolean(ConfigurationFile.GetSetting("DecCloudQ", "true"));
+            GroundTLODChanges = Convert.ToBoolean(ConfigurationFile.GetSetting("GroundTLODChanges", "true"));
             SimBinary = Convert.ToString(ConfigurationFile.GetSetting("simBinary", "FlightSimulator"));
             SimModule = Convert.ToString(ConfigurationFile.GetSetting("simModule", "WwiseLibPCx64P.dll"));
-            UseTargetFPS = Convert.ToBoolean(ConfigurationFile.GetSetting("useTargetFps", "true"));
+            UseExpertOptions = Convert.ToBoolean(ConfigurationFile.GetSetting("useExpertOptions", "false"));
             TargetFPS = Convert.ToInt32(ConfigurationFile.GetSetting("targetFps", "40"));
             FPSTolerance = Convert.ToInt32(ConfigurationFile.GetSetting("FpsTolerance", "5"));
             CloudRecoveryTLOD = Convert.ToInt32(ConfigurationFile.GetSetting("CloudRecoveryTLOD", "100"));
