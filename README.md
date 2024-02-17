@@ -2,7 +2,7 @@
 
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
 
-This utility is new development that is a simplification DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing the TLOD and OLOD based on the current AGL and an easy to use GUI. It provides features such as:<br/>
+This utility is a new development that is a simplification DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing the TLOD and OLOD based on the current AGL and an easy to use GUI. It provides features such as:<br/>
 - Adjusting TLOD automatically to achieve a user-defined target FPS band based on user-defined maximum and minimum LODs,<br/>
 - Simultaneous PC and VR mode compatibilty,<br>
 - Cloud quality decrease option for when FPS can't be achieved at the lowest desired TLOD,<br/>
@@ -29,9 +29,9 @@ The Installer will install the following Software:
 
 <br/>
 
-Currently in development, but when available [Download here](https://github.com/ResetXPDR/AutoLOD_ResetEdition/releases/latest)
+Currently in development, but when available [Download here](https://github.com/ResetXPDR/MSFS2020_AutoFPS/releases/latest)
 
-(Under Assests, the AutoLOD_ResetEdition-Installer-vXYZ.exe File)
+(Under Assests, the MSFS2020_AutoFPS-Installer-vXYZ.exe File)
 
 <br/><br/>
 
@@ -39,17 +39,17 @@ Currently in development, but when available [Download here](https://github.com/
 Basically: Just run the Installer.<br/>
 
 Some Notes:
-- AutoLOD_ResetEdition has to be stopped before installing.
+- MSFS2020_AutoFPS has to be stopped before installing.
 - If the MobiFlight Module is not installed or outdated, MSFS also has to be stopped.
 - If you have duplicate MobiFlight Modules installed, in either your official or community folders, the utility may display 0 value Sim Values and otherwise not function. Remove the duplicate versions, rerun the utility installer and it should now work.
 - Do not run the Installer as Admin!
 - If you wish to retain your settings for an update version, do NOT uninstall first, as that deletes all app files, including the config file. Just run the installer, select update and your settings will be retained.
 - For Auto-Start either your FSUIPC7.ini or EXE.xml (MSFS) is modified. The Installer does not create a Backup.
 - The utility may be blocked by Windows Security or your AV-Scanner, try if unblocking and/or setting an Exception helps (for the whole Folder)
-- The Installation-Location is fixed to %appdata%\AutoLOD_ResetEdition (your Users AppData\Roaming Folder) and can't be changed.
-  - Binary in %appdata%\AutoLOD_ResetEdition\bin
-  - Logs in %appdata%\AutoLOD_ResetEdition\log
-  - Config: %appdata%\AutoLOD_ResetEdition\AutoLOD_ResetEdition.config
+- The Installation-Location is fixed to %appdata%\MSFS2020_AutoFPS (your Users AppData\Roaming Folder) and can't be changed.
+  - Binary in %appdata%\MSFS2020_AutoFPS\bin
+  - Logs in %appdata%\MSFS2020_AutoFPS\log
+  - Config: %appdata%\MSFS2020_AutoFPS\MSFS2020_AutoFPS.config
 
 <br/><br/>
 
