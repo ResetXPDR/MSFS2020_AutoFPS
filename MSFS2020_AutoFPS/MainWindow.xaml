@@ -131,7 +131,7 @@
                               <Label Content="FPS Tolerance" MinWidth="95"/>
                                 <TextBox x:Name="txtFPSTolerance" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42"   LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="5,0,0,0"/>
                                 <Label Content="%"/>
-                                <CheckBox x:Name="chkGroundTLODChanges" Margin="15,0,0,0" VerticalContentAlignment="Center" Click="chkGroundTLODChanges_Click" Width="159" Content="TLOD changes on ground" Checked="chkGroundTLODChanges_Checked" Padding="4,0,0,0"/>
+                                <CheckBox x:Name="chkTLODMinGndLanding" Margin="15,0,0,0" VerticalContentAlignment="Center" Click="chkTLODMinGndLanding_Click" Width="192" Content="TLOD Min on Ground/Landing" Checked="chkTLODMinGndLanding_Checked" Padding="4,0,0,0"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                                 <Label Content="TLOD Minimum" MinWidth="100"/>

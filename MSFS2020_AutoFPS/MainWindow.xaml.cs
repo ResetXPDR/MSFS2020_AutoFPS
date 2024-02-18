@@ -144,7 +144,7 @@ namespace MSFS2020_AutoFPS
             txtMinTLod.Text = Convert.ToString(serviceModel.MinTLOD, CultureInfo.CurrentUICulture);
             txtMaxTLod.Text = Convert.ToString(serviceModel.MaxTLOD, CultureInfo.CurrentUICulture);
             chkDecCloudQ.IsChecked = serviceModel.DecCloudQ;
-            chkGroundTLODChanges.IsChecked = serviceModel.GroundTLODChanges;
+            chkTLODMinGndLanding.IsChecked = serviceModel.TLODMinGndLanding;
             txtCloudRecoveryTLOD.Text = Convert.ToString(serviceModel.CloudRecoveryTLOD, CultureInfo.CurrentUICulture);
         }
 
@@ -331,9 +331,9 @@ namespace MSFS2020_AutoFPS
             LoadSettings();
         }
 
-        private void chkGroundTLODChanges_Click(object sender, RoutedEventArgs e)
+        private void chkTLODMinGndLanding_Click(object sender, RoutedEventArgs e)
         {
-            serviceModel.SetSetting("GroundTLODChanges", chkGroundTLODChanges.IsChecked.ToString().ToLower());
+            serviceModel.SetSetting("TLODMinGndLanding", chkTLODMinGndLanding.IsChecked.ToString().ToLower());
             LoadSettings();
         }
         private void chkDecCloudQ_Click(object sender, RoutedEventArgs e)
@@ -433,7 +433,7 @@ namespace MSFS2020_AutoFPS
         {
 
         }
-        private void chkGroundTLODChanges_Checked(object sender, RoutedEventArgs e)
+        private void chkTLODMinGndLanding_Checked(object sender, RoutedEventArgs e)
         {
 
         }

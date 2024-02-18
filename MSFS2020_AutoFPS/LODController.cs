@@ -24,6 +24,7 @@ namespace MSFS2020_AutoFPS
         private int cloudQ_VR = 0;
         private int fpsModeTicks = 0;
         private int fpsModeDelayTicks = 0;
+        private float vs;
 
         public LODController(ServiceModel model)
         {
@@ -49,7 +50,7 @@ namespace MSFS2020_AutoFPS
 
     private void UpdateVariables()
         {
-            float vs = SimConnect.ReadSimVar("VERTICAL SPEED", "feet per second");
+            vs = SimConnect.ReadSimVar("VERTICAL SPEED", "feet per second");
             Model.OnGround = SimConnect.ReadSimVar("SIM ON GROUND", "Bool") == 1.0f;
             verticalStatsVS[verticalIndex] = vs;
             if (vs >= 8.0f)
@@ -81,7 +82,7 @@ namespace MSFS2020_AutoFPS
             UpdateVariables();
 
             int FPSTolerance;
-            bool GroundTLODChanges;
+            bool TLODMinGndLanding;
             bool DecCloudQ;
             float MinTLOD;
             float MaxTLOD;
@@ -90,7 +91,7 @@ namespace MSFS2020_AutoFPS
             if (Model.UseExpertOptions)
             {
                 FPSTolerance = Model.FPSTolerance;
-                GroundTLODChanges = Model.GroundTLODChanges;
+                TLODMinGndLanding = Model.TLODMinGndLanding;
                 MinTLOD = Model.MinTLOD;
                 MaxTLOD = Model.MaxTLOD;
                 DecCloudQ = Model.DecCloudQ;
@@ -99,7 +100,7 @@ namespace MSFS2020_AutoFPS
             else
             {
                 FPSTolerance = 5;
-                GroundTLODChanges = true;
+                TLODMinGndLanding = true;
                 if (Model.MemoryAccess.IsVrModeActive())
                 {
                     MinTLOD = Math.Max(Model.DefaultTLOD_VR * 0.5f, 10);
@@ -114,35 +115,41 @@ namespace MSFS2020_AutoFPS
                 CloudRecoveryTLOD = Model.DefaultTLOD - 1;
             }
             float deltaFPS = GetAverageFPS() - Model.TargetFPS;
-            if (Math.Abs(deltaFPS) >= Model.TargetFPS * FPSTolerance / 100)
+            if (Math.Abs(deltaFPS) >= Model.TargetFPS * FPSTolerance / 100 || (TLODMinGndLanding && altAboveGnd < 2000))
             {
-                newTLOD = tlod + (GroundTLODChanges && Model.OnGround ? Math.Sign(deltaFPS) * FPSTolerance * (Math.Abs(deltaFPS) >= Model.TargetFPS * 2 * FPSTolerance / 100 && (groundSpeed < 1 || !Model.OnGround) ? 2 : 1) * (altAboveGnd < 1000 && !Model.OnGround ? (float)altAboveGnd / 1000 : 1) : 0);
+                if (TLODMinGndLanding)
+                {
+                    if (VSAverage() <= 0 && altAboveGnd < 2000) newTLOD = tlod + (altAboveGnd - 1000 > 0 ? (tlod - MinTLOD) / (altAboveGnd - 1000) * VSAverage(): MinTLOD - tlod);
+                    else newTLOD = tlod + (!Model.OnGround ? Math.Sign(deltaFPS) * FPSTolerance * (Math.Abs(deltaFPS) >= Model.TargetFPS * 2 * FPSTolerance / 100 ? 2 : 1) * (altAboveGnd < 1000 && !Model.OnGround ? (float)altAboveGnd / 1000 : 1) : 0);
+                }
+                else
+                    newTLOD = tlod + Math.Sign(deltaFPS) * (Model.OnGround && groundSpeed > 1 ? 1 : FPSTolerance * (Math.Abs(deltaFPS) >= Model.TargetFPS * 2 * FPSTolerance / 100 && (groundSpeed < 1 || !Model.OnGround) ? 2 : 1) * (altAboveGnd < 1000 && !Model.OnGround ? (float)altAboveGnd / 1000 : 1));
                 newTLOD = (float)Math.Round(Math.Min(MaxTLOD, Math.Max(MinTLOD, newTLOD)));
-                if (Math.Abs(tlod - newTLOD) >= 1 && (!Model.OnGround || groundSpeed < 1))
+                if (Math.Abs(tlod - newTLOD) >= 1)
                 {
                     Model.MemoryAccess.SetTLOD(newTLOD);
                     Model.tlod_step = true;
-                    if (DecCloudQ && newTLOD == MinTLOD)
-                    {
-                        if (Model.MemoryAccess.IsVrModeActive() && Model.DefaultCloudQ_VR >= 1)
-                        {
-                            Model.MemoryAccess.SetCloudQ_VR(Model.DefaultCloudQ_VR - 1);
-                            Model.DecCloudQActive = true;
-                        }
-                        if (!Model.MemoryAccess.IsVrModeActive() && Model.DefaultCloudQ >= 1)
-                        {
-                            Model.MemoryAccess.SetCloudQ(Model.DefaultCloudQ - 1);
-                            Model.DecCloudQActive = true;
-                        }
-                    }
-                    if (DecCloudQ && Model.DecCloudQActive && newTLOD >= CloudRecoveryTLOD)
-                    {
-                        if (Model.MemoryAccess.IsVrModeActive()) Model.MemoryAccess.SetCloudQ_VR(Model.DefaultCloudQ_VR);
-                        else Model.MemoryAccess.SetCloudQ(Model.DefaultCloudQ);
-                        Model.DecCloudQActive = false;
-                    }
                 }
                 else Model.tlod_step = false;
+                if (DecCloudQ && newTLOD == MinTLOD && ((!TLODMinGndLanding && Model.tlod_step) || (TLODMinGndLanding && deltaFPS <= -Model.TargetFPS * FPSTolerance / 100)))
+                {
+                    if (Model.MemoryAccess.IsVrModeActive() && Model.DefaultCloudQ_VR >= 1)
+                    {
+                        Model.MemoryAccess.SetCloudQ_VR(Model.DefaultCloudQ_VR - 1);
+                        Model.DecCloudQActive = true;
+                    }
+                    if (!Model.MemoryAccess.IsVrModeActive() && Model.DefaultCloudQ >= 1)
+                    {
+                        Model.MemoryAccess.SetCloudQ(Model.DefaultCloudQ - 1);
+                        Model.DecCloudQActive = true;
+                    }
+                }
+                if (DecCloudQ && Model.DecCloudQActive && ((!TLODMinGndLanding && newTLOD >= CloudRecoveryTLOD && Model.tlod_step) || (TLODMinGndLanding && deltaFPS >= Model.TargetFPS * FPSTolerance / 100)))
+                {
+                    if (Model.MemoryAccess.IsVrModeActive()) Model.MemoryAccess.SetCloudQ_VR(Model.DefaultCloudQ_VR);
+                    else Model.MemoryAccess.SetCloudQ(Model.DefaultCloudQ);
+                    Model.DecCloudQActive = false;
+                }
             }
             else
             {

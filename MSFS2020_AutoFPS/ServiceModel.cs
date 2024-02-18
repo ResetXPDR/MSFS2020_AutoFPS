@@ -33,7 +33,7 @@ namespace MSFS2020_AutoFPS
         public int FPSTolerance { get; set; }
         public int CloudRecoveryTLOD { get; set; }
         public bool DecCloudQActive { get; set; }
-        public bool GroundTLODChanges { get; set; }
+        public bool TLODMinGndLanding { get; set; }
         public int ConstraintTicks { get; set; }
         public int ConstraintDelayTicks { get; set; }
         public float DecreaseTLOD { get; set; }
@@ -93,7 +93,7 @@ namespace MSFS2020_AutoFPS
             WaitForConnect = Convert.ToBoolean(ConfigurationFile.GetSetting("waitForConnect", "true"));
             OpenWindow = Convert.ToBoolean(ConfigurationFile.GetSetting("openWindow", "true"));
             DecCloudQ = Convert.ToBoolean(ConfigurationFile.GetSetting("DecCloudQ", "true"));
-            GroundTLODChanges = Convert.ToBoolean(ConfigurationFile.GetSetting("GroundTLODChanges", "true"));
+            TLODMinGndLanding = Convert.ToBoolean(ConfigurationFile.GetSetting("TLODMinGndLanding", "true"));
             SimBinary = Convert.ToString(ConfigurationFile.GetSetting("simBinary", "FlightSimulator"));
             SimModule = Convert.ToString(ConfigurationFile.GetSetting("simModule", "WwiseLibPCx64P.dll"));
             UseExpertOptions = Convert.ToBoolean(ConfigurationFile.GetSetting("useExpertOptions", "false"));
