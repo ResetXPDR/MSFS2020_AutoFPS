@@ -88,12 +88,9 @@ namespace MSFS2020_AutoFPS
                 Model.CancellationRequested = true;
                 if (Model.DefaultSettingsRead && Model.IsSessionRunning)
                 {
-                    //Logger.Log(LogLevel.Information, "App:OnExit", $"Resetting LODs to {Model.DefaultTLOD} / {Model.DefaultOLOD} and VR {Model.DefaultTLOD_VR} / {Model.DefaultOLOD_VR}");
                     Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Sim still running, resetting TLODs to PC / VR {Model.DefaultTLOD} / {Model.DefaultTLOD_VR}");
                     Model.MemoryAccess.SetTLOD_PC(Model.DefaultTLOD);
                     Model.MemoryAccess.SetTLOD_VR(Model.DefaultTLOD_VR);
-                    //Model.MemoryAccess.SetOLOD_PC(Model.DefaultOLOD);
-                    //Model.MemoryAccess.SetOLOD_VR(Model.DefaultOLOD_VR);
                     Logger.Log(LogLevel.Information, "App:OnExit", $"Resetting cloud quality to {Model.DefaultCloudQ} / VR {Model.DefaultCloudQ_VR}");
                     Model.MemoryAccess.SetCloudQ(Model.DefaultCloudQ);
                     Model.MemoryAccess.SetCloudQ_VR(Model.DefaultCloudQ_VR);

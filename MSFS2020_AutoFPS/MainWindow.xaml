@@ -61,8 +61,8 @@
                             <Label Name="lblSimTLOD" MinWidth="64" VerticalContentAlignment="Center">n/a</Label>
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Label MinWidth="60" VerticalContentAlignment="Center">OLOD:</Label>
-                            <Label Name="lblSimOLOD" MinWidth="64" VerticalContentAlignment="Center">n/a</Label>
+                            <Label MinWidth="60" VerticalContentAlignment="Center">Priority:</Label>
+                            <Label Name="lblAppPriority" MinWidth="64" VerticalContentAlignment="Center">n/a</Label>
                         </StackPanel>
 
                         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">

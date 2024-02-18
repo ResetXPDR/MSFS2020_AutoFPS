@@ -100,7 +100,7 @@ namespace MSFS2020_AutoFPS
             else
             {
                 FPSTolerance = 5;
-                TLODMinGndLanding = true;
+                TLODMinGndLanding = false;
                 if (Model.MemoryAccess.IsVrModeActive())
                 {
                     MinTLOD = Math.Max(Model.DefaultTLOD_VR * 0.5f, 10);
@@ -114,12 +114,14 @@ namespace MSFS2020_AutoFPS
                 DecCloudQ = true;
                 CloudRecoveryTLOD = Model.DefaultTLOD - 1;
             }
+            if ((!Model.UseExpertOptions || Model.TLODMinGndLanding) && altAboveGnd < 2000 && (VSAverage() <= 0 || Model.OnGround)) Model.IsAppPriorityFPS = false;
+            else Model.IsAppPriorityFPS = true;
             float deltaFPS = GetAverageFPS() - Model.TargetFPS;
             if (Math.Abs(deltaFPS) >= Model.TargetFPS * FPSTolerance / 100 || (TLODMinGndLanding && altAboveGnd < 2000))
             {
                 if (TLODMinGndLanding)
                 {
-                    if (VSAverage() <= 0 && altAboveGnd < 2000) newTLOD = tlod + (altAboveGnd - 1000 > 0 ? (tlod - MinTLOD) / (altAboveGnd - 1000) * VSAverage(): MinTLOD - tlod);
+                    if ((VSAverage() <= 0 || Model.OnGround) && altAboveGnd < 2000) newTLOD = tlod + (altAboveGnd - 1000 > 0 ? (tlod - MinTLOD) / (altAboveGnd - 1000) * VSAverage(): MinTLOD - tlod);
                     else newTLOD = tlod + (!Model.OnGround ? Math.Sign(deltaFPS) * FPSTolerance * (Math.Abs(deltaFPS) >= Model.TargetFPS * 2 * FPSTolerance / 100 ? 2 : 1) * (altAboveGnd < 1000 && !Model.OnGround ? (float)altAboveGnd / 1000 : 1) : 0);
                 }
                 else

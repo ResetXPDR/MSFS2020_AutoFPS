@@ -197,15 +197,17 @@ namespace MSFS2020_AutoFPS
                 if (serviceModel.MemoryAccess.MemoryWritesAllowed())
                 {
                     lblStatusMessage.Content = serviceModel.MemoryAccess.IsDX12() ? "DX 12 | " : " DX11 | ";
+                    if (serviceModel.IsAppPriorityFPS) lblAppPriority.Content = "FPS";
+                    else lblAppPriority.Content = "TLOD Min";
                     if (serviceModel.MemoryAccess.IsVrModeActive())
                     {
-                        lblSimOLOD.Content = serviceModel.MemoryAccess.GetOLOD_VR().ToString("F0");
+                        //lblAppPriority.Content = serviceModel.MemoryAccess.GetOLOD_VR().ToString("F0");
                         lblSimCloudQs.Content = CloudQualityLabel(serviceModel.MemoryAccess.GetCloudQ_VR());
                         lblStatusMessage.Content += " VR Mode";
                     }
                     else
                     {
-                        lblSimOLOD.Content = serviceModel.MemoryAccess.GetOLOD_PC().ToString("F0");
+                        //lblAppPriority.Content = serviceModel.MemoryAccess.GetOLOD_PC().ToString("F0");
                         lblSimCloudQs.Content = CloudQualityLabel(serviceModel.MemoryAccess.GetCloudQ_PC());
                         lblStatusMessage.Content += " PC Mode";
                         lblStatusMessage.Content += (serviceModel.MemoryAccess.IsFgModeActive() ? (serviceModel.MemoryAccess.IsActiveWindowMSFS() ? " | FG Active" : " | FG Inactive") : "");
@@ -259,7 +261,7 @@ namespace MSFS2020_AutoFPS
             else
             {
                 lblSimTLOD.Content = "n/a";
-                lblSimOLOD.Content = "n/a";
+                lblAppPriority.Content = "n/a";
                 lblSimCloudQs.Content = "n/a";
             }
         }
@@ -377,8 +379,6 @@ namespace MSFS2020_AutoFPS
                     break;
                 case "txtCloudRecoveryTLOD":
                     key = "CloudRecoveryTLOD";
-                    intValue = true;
-                    zeroAllowed = true;
                     break;
                 case "txtMinTLod":
                     key = "minTLod";
@@ -406,6 +406,17 @@ namespace MSFS2020_AutoFPS
             {
                 if (notNegative)
                     iValue = Math.Abs(iValue);
+                switch (key)
+                {
+                    case "targetFps":
+                        if (iValue < 10 || iValue > 200) iValue = serviceModel.TargetFPS;
+                        break;
+                    case "FpsTolerance":
+                        if (iValue > 20) iValue = serviceModel.FPSTolerance;
+                        break;
+                    default:
+                        break;
+                }
                 serviceModel.SetSetting(key, Convert.ToString(iValue, CultureInfo.InvariantCulture));
             }
 
@@ -413,6 +424,22 @@ namespace MSFS2020_AutoFPS
             {
                 if (notNegative)
                     fValue = Math.Abs(fValue);
+                switch (key)
+                {
+                    case "minTLod":
+                        if (fValue < 10 || fValue > serviceModel.MaxTLOD - 10) fValue = serviceModel.MinTLOD;
+                        if (serviceModel.CloudRecoveryTLOD < fValue + 10) serviceModel.SetSetting("CloudRecoveryTLOD", Convert.ToString(Math.Round((fValue + serviceModel.MaxTLOD) / 2), CultureInfo.InvariantCulture));
+                        break;
+                    case "maxTLod":
+                        if (fValue < serviceModel.MinTLOD + 10) fValue = serviceModel.MaxTLOD;
+                        if (serviceModel.CloudRecoveryTLOD > fValue - 10) serviceModel.SetSetting("CloudRecoveryTLOD", Convert.ToString(Math.Round((fValue + serviceModel.MinTLOD)/2), CultureInfo.InvariantCulture));
+                        break;
+                    case "CloudRecoveryTLOD":
+                        if (fValue < serviceModel.MinTLOD + 5 || fValue > serviceModel.MaxTLOD - 5) fValue = serviceModel.CloudRecoveryTLOD;
+                        break;
+                    default:
+                        break;
+                }
                 serviceModel.SetSetting(key, Convert.ToString(fValue, CultureInfo.InvariantCulture));
             }
 

@@ -29,6 +29,7 @@ namespace MSFS2020_AutoFPS
         public int CurrentPairOLOD;
         public bool fpsMode { get; set; }
         public bool UseExpertOptions { get; set; }
+        public bool IsAppPriorityFPS { get; set; } = true;
         public int TargetFPS { get; set; }
         public int FPSTolerance { get; set; }
         public int CloudRecoveryTLOD { get; set; }
@@ -93,7 +94,7 @@ namespace MSFS2020_AutoFPS
             WaitForConnect = Convert.ToBoolean(ConfigurationFile.GetSetting("waitForConnect", "true"));
             OpenWindow = Convert.ToBoolean(ConfigurationFile.GetSetting("openWindow", "true"));
             DecCloudQ = Convert.ToBoolean(ConfigurationFile.GetSetting("DecCloudQ", "true"));
-            TLODMinGndLanding = Convert.ToBoolean(ConfigurationFile.GetSetting("TLODMinGndLanding", "true"));
+            TLODMinGndLanding = Convert.ToBoolean(ConfigurationFile.GetSetting("TLODMinGndLanding", "false"));
             SimBinary = Convert.ToString(ConfigurationFile.GetSetting("simBinary", "FlightSimulator"));
             SimModule = Convert.ToString(ConfigurationFile.GetSetting("simModule", "WwiseLibPCx64P.dll"));
             UseExpertOptions = Convert.ToBoolean(ConfigurationFile.GetSetting("useExpertOptions", "false"));
