@@ -139,11 +139,15 @@ namespace MSFS2020_AutoFPS
         {
             chkOpenWindow.IsChecked = serviceModel.OpenWindow;
             chkUseExpertOptions.IsChecked = serviceModel.UseExpertOptions;
-            txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS, CultureInfo.CurrentUICulture);
+            if (serviceModel.ActiveGraphicsMode == "VR") txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS_VR, CultureInfo.CurrentUICulture);
+            else if (serviceModel.ActiveGraphicsMode == "FG") txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS_FG, CultureInfo.CurrentUICulture);
+            else txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS_PC, CultureInfo.CurrentUICulture);
+            serviceModel.ActiveGraphicsModeChanged = false;
             txtFPSTolerance.Text = Convert.ToString(serviceModel.FPSTolerance, CultureInfo.CurrentUICulture);
             txtMinTLod.Text = Convert.ToString(serviceModel.MinTLOD, CultureInfo.CurrentUICulture);
             txtMaxTLod.Text = Convert.ToString(serviceModel.MaxTLOD, CultureInfo.CurrentUICulture);
             chkDecCloudQ.IsChecked = serviceModel.DecCloudQ;
+            chkPauseMSFSFocusLost.IsChecked = serviceModel.PauseMSFSFocusLost;
             chkTLODMinGndLanding.IsChecked = serviceModel.TLODMinGndLanding;
             txtCloudRecoveryTLOD.Text = Convert.ToString(serviceModel.CloudRecoveryTLOD, CultureInfo.CurrentUICulture);
         }
@@ -177,7 +181,7 @@ namespace MSFS2020_AutoFPS
 
         protected float GetAverageFPS()
         {
-            if (serviceModel.MemoryAccess != null && serviceModel.MemoryAccess.IsFgModeActive() && serviceModel.MemoryAccess.IsActiveWindowMSFS())
+            if (serviceModel.MemoryAccess != null && serviceModel.FgModeActive && serviceModel.ActiveWindowMSFS)
                 return IPCManager.SimConnect.GetAverageFPS() * 2.0f;
             else
                 return IPCManager.SimConnect.GetAverageFPS();
@@ -187,35 +191,38 @@ namespace MSFS2020_AutoFPS
             if (IPCManager.SimConnect != null && IPCManager.SimConnect.IsConnected)
                 lblSimFPS.Content = GetAverageFPS().ToString("F0");
             else
+            {
                 lblSimFPS.Content = "n/a";
-
+                lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
+            }
+ 
             if (serviceModel.MemoryAccess != null)
             {
                 lblappUrl.Visibility = Visibility.Hidden;
                 lblStatusMessage.Foreground = new SolidColorBrush(Colors.Black);
-                lblSimTLOD.Content = serviceModel.MemoryAccess.GetTLOD_PC().ToString("F0");
+                lblSimTLOD.Content = serviceModel.tlod.ToString("F0");
                 if (serviceModel.MemoryAccess.MemoryWritesAllowed())
                 {
-                    lblStatusMessage.Content = serviceModel.MemoryAccess.IsDX12() ? "DX 12 | " : " DX11 | ";
+                    lblStatusMessage.Content = serviceModel.MemoryAccess.IsDX12() ? "DX12" : " DX11";
                     if (serviceModel.IsAppPriorityFPS) lblAppPriority.Content = "FPS";
                     else lblAppPriority.Content = "TLOD Min";
-                    if (serviceModel.MemoryAccess.IsVrModeActive())
+                    if (serviceModel.VrModeActive)
                     {
-                        //lblAppPriority.Content = serviceModel.MemoryAccess.GetOLOD_VR().ToString("F0");
-                        lblSimCloudQs.Content = CloudQualityLabel(serviceModel.MemoryAccess.GetCloudQ_VR());
-                        lblStatusMessage.Content += " VR Mode";
+                        lblSimCloudQs.Content = CloudQualityLabel(serviceModel.cloudQ_VR);
+                        lblStatusMessage.Content += " | VR Mode";
                     }
                     else
                     {
-                        //lblAppPriority.Content = serviceModel.MemoryAccess.GetOLOD_PC().ToString("F0");
-                        lblSimCloudQs.Content = CloudQualityLabel(serviceModel.MemoryAccess.GetCloudQ_PC());
-                        lblStatusMessage.Content += " PC Mode";
-                        lblStatusMessage.Content += (serviceModel.MemoryAccess.IsFgModeActive() ? (serviceModel.MemoryAccess.IsActiveWindowMSFS() ? " | FG Active" : " | FG Inactive") : "");
+                        lblSimCloudQs.Content = CloudQualityLabel(serviceModel.cloudQ);
+                        lblStatusMessage.Content += "  | PC Mode";
+                        lblStatusMessage.Content += (serviceModel.FgModeActive ? (serviceModel.ActiveWindowMSFS ? " | FG Active" : " | FG Inactive") : "");
                     }
+                    if (!serviceModel.ActiveWindowMSFS && (!serviceModel.UseExpertOptions || serviceModel.PauseMSFSFocusLost)) lblStatusMessage.Content += " | Auto PAUSED";
+                    else if (serviceModel.FPSSettleCounter > 0) lblStatusMessage.Content += " | FPS Settling for " + serviceModel.FPSSettleCounter.ToString("F0") + " second" + (serviceModel.FPSSettleCounter != 1 ? "s" : "");
                 }
                 else
                 {
-                    lblStatusMessage.Content = "Incompatible MSFS version - Sim Values read only";
+                    lblStatusMessage.Content = "Integrity test fail - Read only mode";
                     lblStatusMessage.Foreground = new SolidColorBrush(Colors.Red);
                 }
                 if (serviceModel.IsSessionRunning)
@@ -229,7 +236,7 @@ namespace MSFS2020_AutoFPS
                     }
                     else
                     {
-                        if (serviceModel.MemoryAccess.IsVrModeActive())
+                        if (serviceModel.VrModeActive)
                         {
                             MinTLOD = Math.Max(serviceModel.DefaultTLOD_VR * 0.5f, 10);
                             MaxTLOD = serviceModel.DefaultTLOD_VR * 2.0f;
@@ -241,16 +248,23 @@ namespace MSFS2020_AutoFPS
                         }
                     }
 
-                    if (serviceModel.MemoryAccess.IsFgModeActive()) lblTargetFPS.Content = "Target FG FPS";
-                    else lblTargetFPS.Content = "Target FPS";
-                    if (GetAverageFPS() < serviceModel.TargetFPS && serviceModel.MemoryAccess.GetTLOD_PC() == MinTLOD)
-                        lblSimFPS.Foreground = new SolidColorBrush(Colors.Red);
-                    else if (GetAverageFPS() > serviceModel.TargetFPS && serviceModel.MemoryAccess.GetTLOD_PC() == MaxTLOD)
-                        lblSimFPS.Foreground = new SolidColorBrush(Colors.DarkGreen);
-                    else lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
-
-                    if (serviceModel.MemoryAccess.GetTLOD_PC() == MinTLOD) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Red);
-                    else if (serviceModel.MemoryAccess.GetTLOD_PC() == MaxTLOD) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Green);
+                    lblTargetFPS.Content = "Target " + serviceModel.ActiveGraphicsMode + " FPS";
+                    if (serviceModel.ActiveGraphicsModeChanged) LoadSettings();
+                    float ToleranceFPS = serviceModel.TargetFPS * (serviceModel.UseExpertOptions ? serviceModel.FPSTolerance : 5.0f) / 100.0f;
+                    if (serviceModel.TLODMinGndLanding)
+                    {
+                        if (GetAverageFPS() < serviceModel.TargetFPS - ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Red);
+                        else if (GetAverageFPS() > serviceModel.TargetFPS + ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Green);
+                        else lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
+                    }
+                    else
+                    {
+                        if (GetAverageFPS() < serviceModel.TargetFPS - ToleranceFPS && serviceModel.tlod == MinTLOD) lblSimFPS.Foreground = new SolidColorBrush(Colors.Red);
+                        else if (Math.Abs(GetAverageFPS() - serviceModel.TargetFPS) <= ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Green);
+                        else lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
+                    }
+                    if (serviceModel.tlod == MinTLOD && (!serviceModel.TLODMinGndLanding || GetAverageFPS() < serviceModel.TargetFPS)) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Red);
+                    else if ((!serviceModel.TLODMinGndLanding && serviceModel.tlod == MaxTLOD) || (serviceModel.TLODMinGndLanding && serviceModel.tlod == MinTLOD && GetAverageFPS() > serviceModel.TargetFPS)) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Green);
                     else if (serviceModel.tlod_step) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Orange);
                     else lblSimTLOD.Foreground = new SolidColorBrush(Colors.Black);
                     if (serviceModel.DecCloudQ && serviceModel.DecCloudQActive) lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Red);
@@ -261,8 +275,11 @@ namespace MSFS2020_AutoFPS
             else
             {
                 lblSimTLOD.Content = "n/a";
+                lblSimTLOD.Foreground = new SolidColorBrush(Colors.Black);
                 lblAppPriority.Content = "n/a";
                 lblSimCloudQs.Content = "n/a";
+                lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Black);
+                lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
             }
         }
 
@@ -273,20 +290,11 @@ namespace MSFS2020_AutoFPS
                 var simConnect = IPCManager.SimConnect;
                 lblPlaneAGL.Content = simConnect.ReadSimVar("PLANE ALT ABOVE GROUND", "feet").ToString("F0");
                 lblPlaneVS.Content = (simConnect.ReadSimVar("VERTICAL SPEED", "feet per second") * 60.0f).ToString("F0");
-                //if (serviceModel.OnGround)
-                //    lblVSTrend.Content = "Ground";
-                //else if (serviceModel.VerticalTrend > 0)
-                //    lblVSTrend.Content = "Climb";
-                //else if (serviceModel.VerticalTrend < 0)
-                //    lblVSTrend.Content = "Descent";
-                //else
-                //    lblVSTrend.Content = "Cruise";
             }
             else
             {
                 lblPlaneAGL.Content = "n/a";
                 lblPlaneVS.Content = "n/a";
-                //lblVSTrend.Content = "n/a";
             }
         }
 
@@ -341,7 +349,14 @@ namespace MSFS2020_AutoFPS
         private void chkDecCloudQ_Click(object sender, RoutedEventArgs e)
         {
             serviceModel.SetSetting("DecCloudQ", chkDecCloudQ.IsChecked.ToString().ToLower());
-           LoadSettings();
+            LoadSettings();
+            chkCloudRecoveryTLOD_WindowVisibility();
+
+        }
+        private void chkPauseMSFSFocusLost_Click(object sender, RoutedEventArgs e)
+        {
+            serviceModel.SetSetting("PauseMSFSFocusLost", chkPauseMSFSFocusLost.IsChecked.ToString().ToLower());
+            LoadSettings();
             chkCloudRecoveryTLOD_WindowVisibility();
 
         }
@@ -386,14 +401,6 @@ namespace MSFS2020_AutoFPS
                 case "txtMaxTLod":
                     key = "maxTLod";
                     break;
-                //case "txtLodStepMaxInc":
-                //    key = "LodStepMaxInc";
-                //    intValue = true;
-                //    break;
-                //case "txtLodStepMaxDec":
-                //    key = "LodStepMaxDec";
-                //    intValue = true;
-                //    break;
                 default:
                     key = "";
                     break;
@@ -410,6 +417,9 @@ namespace MSFS2020_AutoFPS
                 {
                     case "targetFps":
                         if (iValue < 10 || iValue > 200) iValue = serviceModel.TargetFPS;
+                        if (serviceModel.ActiveGraphicsMode == "VR") key = "targetFpsVR";
+                        else if (serviceModel.ActiveGraphicsMode == "FG") key = "targetFpsFG";
+                        else key = "targetFpsPC";
                         break;
                     case "FpsTolerance":
                         if (iValue > 20) iValue = serviceModel.FPSTolerance;
@@ -457,6 +467,11 @@ namespace MSFS2020_AutoFPS
         }
 
         private void chkDecCloudQ_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+        
+        private void chkPauseMSFSFocusLost_Checked(object sender, RoutedEventArgs e)
         {
 
         }

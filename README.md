@@ -50,6 +50,7 @@ Some Notes:
   - Binary in %appdata%\MSFS2020_AutoFPS\bin
   - Logs in %appdata%\MSFS2020_AutoFPS\log
   - Config: %appdata%\MSFS2020_AutoFPS\MSFS2020_AutoFPS.config
+- If after installing and running the app your simconnect always stays red, try downloading and installing a Microsoft official version of “Microsoft Visual C++ 2015 - 2022 Redistributable”, which may be missing from your Windows installation.
 
 <br/><br/>
 
@@ -65,8 +66,14 @@ This section is currently TBD
   - Red values indicate not connected, green is connected.
 - Sim Values
   - Will not show valid values unless all three connections are green.
-  - Red values mean FPS Adaption is active, orange means LOD stepping is active, black means steady state, n/a means not available right now.
+  - Red values mean your FPS, TLOD or cloud quality is at its lower limit, green means they are at their upper limit, orange means TLOD stepping is active, black means steady state, n/a means not available right now.
+  - Priority will show whether FPS or TLOD Min are the current automation priority, with the latter only being shown if the TLOD min for ground/landing is enabled and conditions are such that working towards TLOD Min because of your flight phase (on or near the ground) now has priority over maintaining FPS. 
 - General
+  - Target FPS - The most important setting in this app. Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
+  - Use Expert Options - when disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking provided you have set a realisting FPS target in the first place. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option.
+- MSFS Settings
+  -    
+
   - You can have (exactly) six different Sets/Profiles for the AGL/LOD Pairs to switch between (manually but dynamically).
   - Cruise LOD Updates, when checked, will continue to update LOD values based on AGL in the cruise phase, which is useful for VFR flights over undulating terrain and has an otherwise negligble impact on high level or IFR flights so it is recommended to enable this.
   - LOD Step Max, when checked, allows the utility to slow the rate of change in LOD per second, with increase and decrease being individually settable, to smooth out LOD table changes. This allows you to have large steps in your LOD tables without experiencing abrupt changes like having it disabled would do, hence it is recommended to turn it on and start out with the default steps of 5.

@@ -87,10 +87,10 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="369*"/>
-                            <ColumnDefinition Width="369*"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="6*"/>
+                            <RowDefinition Height="29*"/>
                             <RowDefinition Height="29*"/>
                             <RowDefinition Height="33.96"/>
                         </Grid.RowDefinitions>
@@ -99,17 +99,15 @@
                             <Label Name="lblTargetFPS" Content="Target FPS" MinWidth="100"/>
                             <TextBox x:Name="txtTargetFPS" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42"   LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="0,0,30,0"/>
                         </StackPanel>
-                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,8,0,0" Grid.ColumnSpan="2">
-                            <CheckBox Name="chkUseExpertOptions" VerticalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Click="chkUseExpertOptions_Click">Use Expert Options</CheckBox>
-                        </StackPanel>
                         <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0">
+                            <CheckBox Name="chkUseExpertOptions" VerticalContentAlignment="Center" Width="170"  Height="24" MaxHeight="24" MinHeight="24" Click="chkUseExpertOptions_Click" Margin="5,0,0,0">Use Expert Options</CheckBox>
+                            <CheckBox x:Name="chkOpenWindow" VerticalContentAlignment="Center" Click="chkOpenWindow_Click" Content="Open Window on App Start" Height="15" Width="220"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0">
                             <Label Name="lblStatusMessage" MinWidth="50" VerticalContentAlignment="Center" Content=""/>
                             <TextBlock x:Name="lblappUrl" VerticalAlignment="Center"> <Hyperlink NavigateUri="https://github.com/ResetXPDR/MSFS_AutoLOD/releases/latest" RequestNavigate="Hyperlink_RequestNavigate">
                                 here</Hyperlink>
                             </TextBlock>
-                        </StackPanel>
-                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,8,0,0">
-                            <CheckBox x:Name="chkOpenWindow" VerticalContentAlignment="Center" Click="chkOpenWindow_Click" Content="Open Window on App Start" Height="15" Width="220"/>
                         </StackPanel>
                     </Grid>
                 </GroupBox>
@@ -139,17 +137,13 @@
                                 <Label Content="TLOD Maximum" MinWidth="100"/>
                                 <TextBox x:Name="txtMaxTLod" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="5,0,0,0"/>
                             </StackPanel>
-                            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,2,0,0" Visibility="Collapsed">
-                                <Label Name="lblLodStepMax" VerticalContentAlignment="Center"  Width ="96" Padding="5,5,0,5">TLOD Steps</Label>
-                                <TextBox Name="txtLodStepMaxInc" Margin="4,0,0,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" TextChanged="txtLodStepMaxInc_TextChanged"></TextBox>
-                                <Label VerticalContentAlignment="Center"  Width ="133" Padding="5,5,0,5">Up</Label>
-                                <TextBox x:Name="txtLodStepMaxDec" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" TextChanged="txtLodStepMaxDec_TextChanged" Margin="2,0,5,0"/>
-                                <Label VerticalContentAlignment="Center" Padding="5,5,0,5">Down</Label>
-                            </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
                                 <CheckBox x:Name="chkDecCloudQ" VerticalContentAlignment="Center" Click="chkDecCloudQ_Click" Width="152" Content="Decrease Cloud Quality" Checked="chkDecCloudQ_Checked" Padding="4,0,0,0"/>
                                 <Label Name= "lblCloudRecoveryTLOD" >Cloud Recovery TLOD</Label>
                                 <TextBox Name="txtCloudRecoveryTLOD" Margin="1,0,0,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp"></TextBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                <CheckBox x:Name="chkPauseMSFSFocusLost" VerticalContentAlignment="Center" Click="chkPauseMSFSFocusLost_Click" Width="270" Content="Pause when MSFS loses focus" Checked="chkPauseMSFSFocusLost_Checked" Padding="4,0,0,0"/>
                             </StackPanel>
 
                         </StackPanel>
