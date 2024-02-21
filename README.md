@@ -9,7 +9,7 @@ This utility is a new development that is a simplification DynamicLOD_ResetEditi
 - Automatic pause when MSFS loses focus option, particularly useful if using FG due to varying FPS when MSFS gains or loses focus,</br>
 - Automatic FPS settling timer on MSFS graphics mode and focus changes to allow FPS to stabilise before acting upon,</br>
 - Simultaneous PC, FG and VR mode compatibilty including correct FG FPS display and separate FPS targets for each mode,<br>
-- A greatly simplified GUI, when expert options are not enabled, that uses pre-defined settings for an automated experience suited to most novice users, and</br>
+- A greatly simplified GUI, when expert options are not enabled, that uses pre-defined settings for an automated experience suited to most user scenarios, and</br>
 - Auto restoration of original settings changed by the utility.<br/><br/>
 
 Important:<br/> 
