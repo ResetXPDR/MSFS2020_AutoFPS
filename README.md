@@ -51,6 +51,7 @@ Some Notes:
   - Logs in %appdata%\MSFS2020_AutoFPS\log
   - Config: %appdata%\MSFS2020_AutoFPS\MSFS2020_AutoFPS.config
 - If after installing and running the app your simconnect always stays red, try downloading and installing a Microsoft official version of “Microsoft Visual C++ 2015 - 2022 Redistributable”, which may be missing from your Windows installation.
+- If you experience an "MSFS compatibility test failed - Read Only mode" it is either because you have changed MSFS settings in your usercfg.opt file beyond what is possible to set in the MSFS settings menu or a new version of MSFS has come out that has a different memory map to what the app expects. If the former, go into MSFS settings at the main menu and reset to default for both PC and VR mode, then make all changes to MSFS within the MSFS settings menu. If the latter, I will likely be already aware of it and working on a solution, but if you are likely one of the first (eg. on an MSFS beta) then do let me know.
 
 <br/><br/>
 
@@ -69,9 +70,10 @@ This section is currently TBD
   - Green means the sim value is at or better than target value being sought, red means at lowest level or worse than target value being sought, orange means TLOD is auto adjusting, black is shown otherwise.
   - Priority will show whether FPS or TLOD Min are the current automation priority, with the latter only being shown if the TLOD min for ground/landing is enabled and conditions are such that working towards TLOD Min because of your flight phase (on or near the ground) now has priority over maintaining FPS. 
 - General
-  - Target FPS - The most important setting in this app. Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
-  - Use Expert Options - when disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking provided you have set a realisting FPS target in the first place. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option.
+  - Target FPS - The most important setting in this app. Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it. There is a setting for each graphics mode (VR, PC and FG) which you can only change while in that mode and on the ground or in a flight.
+  - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realisting FPS target in the first place. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option.
 - MSFS Settings
+  -  FPS Tolerance - Determines how much variance from your target FPS must occur before the app will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be. The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller. Vice versa for higher settings. The default value of 5% should provide the most balanced experience.                                      
 - **Less is more**:
   - Fewer Increments/Decrements are better of reasonable Step-Size (roughly in the Range of 25-75) or use Step LOD Max to spread LOD changes out over time.
   - Don't overdo it with extreme low or high xLOD Values. A xLOD of 100 is reasonable fine on Ground, 200-ish is reasonable fine in the air. 400 if you have a super computer.
