@@ -7,7 +7,7 @@ This utility is a new development that is a simplification of, and a slightly di
 - TLOD minimum on ground/landing option, which prioritises TLOD over FPS during these flight phases and also averts exacerbating existing texture tearing issues with DX12,</br>
 - Cloud quality decrease option for when FPS can't be achieved at the lowest desired TLOD,<br/>
 - Automatic pause when MSFS loses focus option, particularly useful if using FG due to varying FPS when MSFS gains or loses focus,</br>
-- Automatic FPS settling timer on MSFS graphics mode and focus changes to allow FPS to stabilise before acting upon,</br>
+- Automatic FPS settling timer on MSFS graphics mode and focus changes to allow FPS to stabilise before being acted upon,</br>
 - Simultaneous PC, FG and VR mode compatibilty including correct FG FPS display and separate FPS targets for each mode,<br>
 - A greatly simplified GUI, when expert options are not enabled, that uses pre-defined settings for an automated experience suited to most user scenarios, and</br>
 - Auto restoration of original settings changed by the utility.<br/><br/>
