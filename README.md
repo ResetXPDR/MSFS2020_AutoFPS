@@ -70,8 +70,13 @@ This section is currently TBD
   - Green means the sim value is at or better than target value being sought, red means at lowest level or worse than target value being sought, orange means TLOD is auto adjusting, black is shown otherwise.
   - Priority will show whether FPS or TLOD Min are the current automation priority, with the latter only being shown if the TLOD min for ground/landing is enabled and conditions are such that working towards TLOD Min because of your flight phase (on or near the ground) now has priority over maintaining FPS. 
 - General
-  - Target FPS - The most important setting in this app. Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it. There is a setting for each graphics mode (VR, PC and FG) which you can only change while in that mode and on the ground or in a flight.
+  - Target FPS - The most important setting in this app. Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it. There is a setting for each graphics mode (PC, FG and VR) which you can only change while in that mode and on the ground or in a flight.
   - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realisting FPS target in the first place. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option.
+  - Open window on app start - determines the app window's startup state.
+  - Status Message - On app startup indicates key system messages, such as:
+    - Before loading a flight - whether a newer version of the app is available to download and install
+    - Loading in to a flight  - whether MSFS memory integrity test have failed, and
+    - Flight is loaded - showing detected DX version, Graphics Mode (PC, FG, or VR), and app pause or FPS settling time status as applicable.
 - MSFS Settings
   -  FPS Tolerance - Determines how much variance from your target FPS must occur before the app will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be. The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller. Vice versa for higher settings. The default value of 5% should provide the most balanced experience.                                      
 - **Less is more**:
