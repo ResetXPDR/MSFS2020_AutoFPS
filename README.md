@@ -67,6 +67,7 @@ Some Notes:
 - Closing the Window does not close the utiltiy, use the Context Menu of the SysTray Icon.
 - Clicking on the SysTray Icon opens the Window (again).
 - Runnning as Admin NOT required (BUT: It is required to be run under the same User/Elevation as MSFS).
+- If you wish to change the default MSFS settings that MSFS will use without this app, you must do so either without this app running or, if it is, only while you are in the MSFS main menu (ie not in a flight). 
 - Connection Status
   - Red values indicate not connected, green is connected.
 - Sim Values
