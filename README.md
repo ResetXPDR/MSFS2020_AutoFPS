@@ -51,7 +51,10 @@ Some Notes:
   - Logs in %appdata%\MSFS2020_AutoFPS\log
   - Config: %appdata%\MSFS2020_AutoFPS\MSFS2020_AutoFPS.config
 - If after installing and running the app your simconnect always stays red, try downloading and installing a Microsoft official version of “Microsoft Visual C++ 2015 - 2022 Redistributable”, which may be missing from your Windows installation.
-- If you get an "MSFS compatibility test failed - Read Only mode" message it is either because you have changed MSFS settings in your usercfg.opt file beyond what is possible to set in the MSFS settings menu or a new version of MSFS has come out that has a different memory map to what the app expects. If the former, go into MSFS settings at the main menu and reset to default (F12) the graphics settings for both PC and VR mode, then make all changes to MSFS within the MSFS settings menu. If the latter, I will likely be already aware of it and working on a solution, but if you may be one of the first to encounter it (eg. on an MSFS beta) then please do let me know.
+- If you get an "MSFS compatibility test failed - Read Only mode" message there are three possible causes:
+  - You may have changed MSFS settings in your usercfg.opt file beyond what is possible to set in the MSFS settings menu. To rectify, go into MSFS settings at the main menu and reset to default (F12) the graphics settings for both PC and VR mode, then make all changes to MSFS within the MSFS settings menu.
+  - There is an issue with permissions and you may need to run the app as Administrator.
+  - A new version of MSFS has come out that has a different memory map to what the app expects, which has happened only once since MSFS 2020 was released, and the app can't auto adjust to the new memory location for MSFS settings. If so, I will likely be already aware of it and working on a solution, but if you may be one of the first to encounter it (eg. on an MSFS beta) then please do let me know.
 
 <br/><br/>
 
