@@ -71,7 +71,7 @@ namespace MSFS2020_AutoFPS
             }
             if (serviceModel.TestVersion)
             {
-                lblStatusMessage.Content = "Concept demo version";
+                lblStatusMessage.Content = "Test version installed";
                 lblStatusMessage.Foreground = new SolidColorBrush(Colors.Green);
             }
 
@@ -442,11 +442,11 @@ namespace MSFS2020_AutoFPS
                 {
                     case "minTLod":
                         if (fValue < 10 || fValue > serviceModel.MaxTLOD - 10) fValue = serviceModel.MinTLOD;
-                        if (serviceModel.CloudRecoveryTLOD < fValue + 10) serviceModel.SetSetting("CloudRecoveryTLOD", Convert.ToString(Math.Round((fValue + serviceModel.MaxTLOD) / 2), CultureInfo.InvariantCulture));
+                        if (serviceModel.CloudRecoveryTLOD < fValue + 10) serviceModel.SetSetting("CloudRecoveryTLOD", Convert.ToString(Math.Round(2 * (fValue + serviceModel.MaxTLOD) / 5), CultureInfo.InvariantCulture));
                         break;
                     case "maxTLod":
                         if (fValue < serviceModel.MinTLOD + 10) fValue = serviceModel.MaxTLOD;
-                        if (serviceModel.CloudRecoveryTLOD > fValue - 10) serviceModel.SetSetting("CloudRecoveryTLOD", Convert.ToString(Math.Round((fValue + serviceModel.MinTLOD)/2), CultureInfo.InvariantCulture));
+                        if (serviceModel.CloudRecoveryTLOD > fValue - 10) serviceModel.SetSetting("CloudRecoveryTLOD", Convert.ToString(Math.Round(2 * (fValue + serviceModel.MinTLOD) / 5), CultureInfo.InvariantCulture));
                         break;
                     case "CloudRecoveryTLOD":
                         if (fValue < serviceModel.MinTLOD + 5 || fValue > serviceModel.MaxTLOD - 5) fValue = serviceModel.CloudRecoveryTLOD;

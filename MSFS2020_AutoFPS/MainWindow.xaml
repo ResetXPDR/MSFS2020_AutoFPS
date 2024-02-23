@@ -114,7 +114,7 @@
             </StackPanel>
             <StackPanel Name="stkpnlMSFSSettings" Orientation="Vertical" Grid.Column="0" Grid.Row="3">
                 <GroupBox BorderBrush="DarkGray" BorderThickness="1" Margin="10,8,10,8">
-                    <GroupBox.Header>MSFS Settings</GroupBox.Header>
+                    <GroupBox.Header>Expert Options</GroupBox.Header>
                     <Grid Margin="0,2,0,2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
