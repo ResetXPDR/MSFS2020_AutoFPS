@@ -19,7 +19,7 @@ Important:<br/>
 If you are not familiar with what MSFS graphics settings do, specifically TLOD and cloud quality, and don't understand the consequences of changing them, it is highly recommended you do not use this utility.
 <br/><br/>
 
-This utility is unsigned because I am a hobbyist and the cost of obtaining certification is prohibitive to me. As a result, you may get a warning message of a potentially dangerous app when you download it in a web browser like Chrome. You can either trust this download, based on feedback you can easily find on Avsim and Youtube, and run a virus scan and malware scan before you install just be sure, otherwise choose not to and not have this utility version.<br/><br/>
+This utility is unsigned because I am a hobbyist and the cost of obtaining certification is prohibitive to me. As a result, you may get a warning message of a potentially dangerous app when you download it in a web browser like Chrome or from your antivirus program, including Windows Defender. You can either trust this download, based on feedback you can easily find on Avsim and Youtube, make an exception in your browser and/or antivirus program for the download then run a virus scan and malware scan before you install just be sure, otherwise choose not to and not have this utility version.<br/><br/>
 
 ## Requirements
 
