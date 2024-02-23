@@ -62,7 +62,7 @@ Some Notes:
 <br/><br/>
 
 ## Usage / Configuration
--General
+- General
   - Starting manually: anytime, but preferably before MSFS or in the Main Menu. The utility will stop itself when MSFS closes. 
   - Closing the Window does not close the utiltiy, use the Context Menu of the SysTray Icon.
   - Clicking on the SysTray Icon opens the Window (again).
