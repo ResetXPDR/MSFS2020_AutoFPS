@@ -36,7 +36,7 @@ Currently in development, but when available [Download here](https://github.com/
 <br/><br/>
 
 ## Installation / Update / Uninstall
-Basically: Just run the Installer.<br/>
+Basically: Just run the Installer to do all three of these.<br/>
 
 Some Notes:
 - MSFS2020_AutoFPS has to be stopped before installing.
@@ -55,6 +55,7 @@ Some Notes:
   - You may have changed MSFS settings in your usercfg.opt file beyond what is possible to set in the MSFS settings menu. To rectify, go into MSFS settings at the main menu and reset to default (F12) the graphics settings for both PC and VR mode, then make all changes to MSFS within the MSFS settings menu.
   - There is an issue with permissions and you may need to run the app as Administrator.
   - A new version of MSFS has come out that has a different memory map to what the app expects, which has happened only once since MSFS 2020 was released, and the app can't auto adjust to the new memory location for MSFS settings. If so, I will likely be already aware of it and working on a solution, but if you may be one of the first to encounter it (eg. on an MSFS beta) then please do let me know.
+- To uninstall, run the installer and select remove on the first window.
 
 <br/><br/>
 
