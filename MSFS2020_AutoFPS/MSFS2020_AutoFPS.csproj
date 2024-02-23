@@ -9,7 +9,7 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
     <Authors>Fragtality</Authors>
-    <Description>Another Adapative LOD Implementation based on muumimorko
+    <Description>Another Adapative LOD Implementation based on muumimorko and Fratality
 Work</Description>
     <Copyright>Copyright © 2024</Copyright>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>

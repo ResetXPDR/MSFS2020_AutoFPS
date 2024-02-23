@@ -98,7 +98,7 @@ namespace MSFS2020_AutoFPS
             Model.DefaultCloudQ = Model.MemoryAccess.GetCloudQ_PC();
             Model.DefaultCloudQ_VR = Model.MemoryAccess.GetCloudQ_VR();
             Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Initial cloud quality PC {Model.DefaultCloudQ} / VR {Model.DefaultCloudQ_VR}");
-            if (Model.UseExpertOptions && Model.TLODMinGndLanding)
+            if (Model.UseExpertOptions || Model.TLODMinGndLanding)
             {
                 Model.MemoryAccess.SetTLOD(Model.MinTLOD);
                 Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Setting Min TLOD on ground " + $"{Model.MinTLOD}");

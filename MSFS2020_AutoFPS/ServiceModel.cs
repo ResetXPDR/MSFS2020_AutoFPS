@@ -73,7 +73,7 @@ namespace MSFS2020_AutoFPS
         public long OffsetPointerVrMode { get; set; }
         public long OffsetPointerFgMode { get; set; }
         public bool TestVersion { get; set; } = false;
-  
+
         protected ConfigurationFile ConfigurationFile = new();
 
         public ServiceModel()
@@ -85,22 +85,24 @@ namespace MSFS2020_AutoFPS
         {
             ConfigurationFile.LoadConfiguration();
 
-            TestVersion = true;
             LogLevel = Convert.ToString(ConfigurationFile.GetSetting("logLevel", "Debug"));
             MfLvarsPerFrame = Convert.ToInt32(ConfigurationFile.GetSetting("mfLvarPerFrame", "15"));
             ConfigVersion = Convert.ToInt32(ConfigurationFile.GetSetting("ConfigVersion", "1"));
             WaitForConnect = Convert.ToBoolean(ConfigurationFile.GetSetting("waitForConnect", "true"));
             OpenWindow = Convert.ToBoolean(ConfigurationFile.GetSetting("openWindow", "true"));
             DecCloudQ = Convert.ToBoolean(ConfigurationFile.GetSetting("DecCloudQ", "true"));
-            TLODMinGndLanding = Convert.ToBoolean(ConfigurationFile.GetSetting("TLODMinGndLanding", "false"));
+            TLODMinGndLanding = Convert.ToBoolean(ConfigurationFile.GetSetting("TLODMinGndLanding", "true"));
             SimBinary = Convert.ToString(ConfigurationFile.GetSetting("simBinary", "FlightSimulator"));
             SimModule = Convert.ToString(ConfigurationFile.GetSetting("simModule", "WwiseLibPCx64P.dll"));
             UseExpertOptions = Convert.ToBoolean(ConfigurationFile.GetSetting("useExpertOptions", "false"));
             PauseMSFSFocusLost = Convert.ToBoolean(ConfigurationFile.GetSetting("PauseMSFSFocusLost", "true"));
-            TargetFPS = Convert.ToInt32(ConfigurationFile.GetSetting("targetFps", "40"));
             TargetFPS_PC = Convert.ToInt32(ConfigurationFile.GetSetting("targetFpsPC", "40"));
             TargetFPS_VR = Convert.ToInt32(ConfigurationFile.GetSetting("targetFpsVR", "40"));
             TargetFPS_FG = Convert.ToInt32(ConfigurationFile.GetSetting("targetFpsFG", "40"));
+            if (ActiveGraphicsMode == "VR") TargetFPS = TargetFPS_VR;
+            else if (ActiveGraphicsMode == "FG") TargetFPS = TargetFPS_FG;
+            else TargetFPS = TargetFPS_PC;
+            TargetFPS = Convert.ToInt32(ConfigurationFile.GetSetting("targetFps", "40"));
             FPSTolerance = Convert.ToInt32(ConfigurationFile.GetSetting("FpsTolerance", "5"));
             CloudRecoveryTLOD = Convert.ToInt32(ConfigurationFile.GetSetting("CloudRecoveryTLOD", "100"));
             MinTLOD = Convert.ToSingle(ConfigurationFile.GetSetting("minTLod", "50"), new RealInvariantFormat(ConfigurationFile.GetSetting("minTLod", "50")));

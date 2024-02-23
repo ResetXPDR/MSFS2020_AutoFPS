@@ -96,7 +96,7 @@
                         </Grid.RowDefinitions>
                         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,34" Grid.RowSpan="2"/>
                         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0" Grid.ColumnSpan="2">
-                            <Label Name="lblTargetFPS" Content="Target FPS" MinWidth="100"/>
+                            <Label Name="lblTargetFPS" Content="Target PC FPS" MinWidth="100"/>
                             <TextBox x:Name="txtTargetFPS" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42"   LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="0,0,30,0"/>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0">

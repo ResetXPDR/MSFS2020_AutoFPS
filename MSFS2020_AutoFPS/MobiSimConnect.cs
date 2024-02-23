@@ -32,7 +32,7 @@ namespace MSFS2020_AutoFPS
 
         public bool SimIsPaused { get; private set; }
         public bool SimIsRunning { get; private set; }
-        private const int fpsLen = 60 * 5; // 5 second average for Autolod
+        private const int fpsLen = 60 * 5; // 5 second average for AutoFPS
         private float[] fpsStatistic;
         private int fpsIndex;
 

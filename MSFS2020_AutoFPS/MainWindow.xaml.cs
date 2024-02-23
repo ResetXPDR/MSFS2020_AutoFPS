@@ -51,7 +51,7 @@ namespace MSFS2020_AutoFPS
 
             string latestAppVersionStr = GetFinalRedirect("https://github.com/ResetXPDR/MSFS2020_AutoFPS/releases/latest");
             lblappUrl.Visibility = Visibility.Hidden;
-            if (int.TryParse(assemblyVersion.Replace(".", ""), CultureInfo.InvariantCulture, out int currentAppVersion) &&  latestAppVersionStr != null && latestAppVersionStr.Length > 70)
+            if (int.TryParse(assemblyVersion.Replace(".", ""), CultureInfo.InvariantCulture, out int currentAppVersion) &&  latestAppVersionStr != null && latestAppVersionStr.Length > 50)
             { 
                 latestAppVersionStr = latestAppVersionStr.Substring(latestAppVersionStr.Length - 5, 5);
                 if (int.TryParse(latestAppVersionStr.Replace(".", ""), CultureInfo.InvariantCulture, out int LatestAppVersion))
@@ -60,6 +60,7 @@ namespace MSFS2020_AutoFPS
                     {
                         lblStatusMessage.Content = "Newer app version " + (latestAppVersionStr) + " now available";
                         lblStatusMessage.Foreground = new SolidColorBrush(Colors.Green);
+                        lblappUrl.Visibility = Visibility.Visible;
                     }
                     else
                     {
@@ -222,20 +223,23 @@ namespace MSFS2020_AutoFPS
                 }
                 else
                 {
-                    lblStatusMessage.Content = "Integrity test fail - Read only mode";
+                    lblStatusMessage.Content = "MSFS compatibility test failed - Read Only mode";
                     lblStatusMessage.Foreground = new SolidColorBrush(Colors.Red);
                 }
                 if (serviceModel.IsSessionRunning)
                 {
+                    bool TLODMinGndLanding;
                     float MinTLOD = serviceModel.MinTLOD;
                     float MaxTLOD = serviceModel.MaxTLOD;
                     if (serviceModel.UseExpertOptions)
                     {
+                        TLODMinGndLanding = serviceModel.TLODMinGndLanding;
                         MinTLOD = serviceModel.MinTLOD;
                         MaxTLOD = serviceModel.MaxTLOD;
                     }
                     else
                     {
+                        TLODMinGndLanding = true;
                         if (serviceModel.VrModeActive)
                         {
                             MinTLOD = Math.Max(serviceModel.DefaultTLOD_VR * 0.5f, 10);
@@ -251,7 +255,7 @@ namespace MSFS2020_AutoFPS
                     lblTargetFPS.Content = "Target " + serviceModel.ActiveGraphicsMode + " FPS";
                     if (serviceModel.ActiveGraphicsModeChanged) LoadSettings();
                     float ToleranceFPS = serviceModel.TargetFPS * (serviceModel.UseExpertOptions ? serviceModel.FPSTolerance : 5.0f) / 100.0f;
-                    if (serviceModel.TLODMinGndLanding)
+                    if (TLODMinGndLanding)
                     {
                         if (GetAverageFPS() < serviceModel.TargetFPS - ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Red);
                         else if (GetAverageFPS() > serviceModel.TargetFPS + ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Green);
@@ -263,8 +267,8 @@ namespace MSFS2020_AutoFPS
                         else if (Math.Abs(GetAverageFPS() - serviceModel.TargetFPS) <= ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Green);
                         else lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
                     }
-                    if (serviceModel.tlod == MinTLOD && (!serviceModel.TLODMinGndLanding || GetAverageFPS() < serviceModel.TargetFPS)) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Red);
-                    else if ((!serviceModel.TLODMinGndLanding && serviceModel.tlod == MaxTLOD) || (serviceModel.TLODMinGndLanding && serviceModel.tlod == MinTLOD && GetAverageFPS() > serviceModel.TargetFPS)) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Green);
+                    if (serviceModel.tlod == MinTLOD && (!TLODMinGndLanding || GetAverageFPS() < serviceModel.TargetFPS)) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Red);
+                    else if ((!TLODMinGndLanding && serviceModel.tlod == MaxTLOD) || (TLODMinGndLanding && serviceModel.tlod == MinTLOD && GetAverageFPS() > serviceModel.TargetFPS)) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Green);
                     else if (serviceModel.tlod_step) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Orange);
                     else lblSimTLOD.Foreground = new SolidColorBrush(Colors.Black);
                     if (serviceModel.DecCloudQ && serviceModel.DecCloudQActive) lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Red);

@@ -35,7 +35,8 @@ namespace MSFS2020_AutoFPS
                 GetActiveDXVersion();
                 Logger.Log(LogLevel.Debug, "MemoryManager:MemoryManager", $"Trying offsetModuleBase: 0x{model.OffsetModuleBase.ToString("X8")}");
                 GetMSFSMemoryAddresses();
-                if (addrTLOD > 0) MemoryBoundaryTest();
+                if (addrTLOD > 0) MemoryBoundaryTest(true);
+                else Logger.Log(LogLevel.Debug, "MemoryManager:MemoryManager", "Failed first TLOD address setting attempt");
                 if (!allowMemoryWrites)
                 {
                     Logger.Log(LogLevel.Debug, "MemoryManager:MemoryManager", $"Boundary tests failed - possible MSFS memory map change");
@@ -90,18 +91,31 @@ namespace MSFS2020_AutoFPS
             else Logger.Log(LogLevel.Debug, "MemoryManager:ModuleOffsetSearch", $"OffsetModuleBase not found after {offset} iterations");
 
         }
-        private void MemoryBoundaryTest()
+        private void MemoryBoundaryTest(bool logResult = false)
         {
             // Boundary check a few known setting memory addresses to see if any fail which likely indicates MSFS memory map has changed
-            if (GetTLOD_PC() < 10 || GetTLOD_PC() > 400 || GetTLOD_VR() < 10 || GetTLOD_VR() > 400
-                || GetOLOD_PC() < 10 || GetOLOD_PC() > 400 || GetOLOD_VR() < 10 || GetOLOD_VR() > 400
+            if (GetTLOD_PC() < 10 || GetTLOD_PC() > 1000 || GetTLOD_VR() < 10 || GetTLOD_VR() > 1000
+                || GetOLOD_PC() < 10 || GetOLOD_PC() > 1000 || GetOLOD_VR() < 10 || GetOLOD_VR() > 1000
                 || GetCloudQ_PC() < 0 || GetCloudQ_PC() > 3 || GetCloudQ_VR() < 0 || GetCloudQ_VR() > 3
                 || MemoryInterface.ReadMemory<int>(addrVrMode) < 0 || MemoryInterface.ReadMemory<int>(addrVrMode) > 1
                 || MemoryInterface.ReadMemory<int>(addrTLOD + offsetPointerAnsioFilter) < 1 || MemoryInterface.ReadMemory<int>(addrTLOD + offsetPointerAnsioFilter) > 16
                 || !(MemoryInterface.ReadMemory<int>(addrTLOD + offsetWaterWaves) == 128 || MemoryInterface.ReadMemory<int>(addrTLOD + offsetWaterWaves) == 256 || MemoryInterface.ReadMemory<int>(addrTLOD + offsetWaterWaves) == 512))
+            {
                 allowMemoryWrites = false;
+            }
             else allowMemoryWrites = true;
- 
+            if (logResult && (Model.TestVersion || !allowMemoryWrites))
+            {
+                Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"TLOD PC: {GetTLOD_PC()}");
+                Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"TLOD VR: {GetTLOD_VR()}");
+                Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"OLOD PC: {GetOLOD_PC()}");
+                Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"OLOD VR: {GetOLOD_VR()}");
+                Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"Cloud Quality PC: {GetCloudQ_PC()}");
+                Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"Cloud Quality VR: {GetCloudQ_VR()}");
+                Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"VR Mode: {MemoryInterface.ReadMemory<int>(addrVrMode)}");
+                Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"Ansio Filter: {MemoryInterface.ReadMemory<int>(addrTLOD + offsetPointerAnsioFilter)}");
+                Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"Water Waves: {MemoryInterface.ReadMemory<int>(addrTLOD + offsetWaterWaves)}");
+            }
         }
         private void GetMSFSMemoryAddresses()
         {
