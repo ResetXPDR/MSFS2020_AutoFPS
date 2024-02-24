@@ -31,7 +31,7 @@ The Installer will install the following Software:
 
 <br/>
 
-Currently in development, but when available [Download here](https://github.com/ResetXPDR/MSFS2020_AutoFPS/releases/latest)
+[Download here](https://github.com/ResetXPDR/MSFS2020_AutoFPS/releases/latest)
 
 (Under Assests, the MSFS2020_AutoFPS-Installer-vXYZ.exe File)
 
