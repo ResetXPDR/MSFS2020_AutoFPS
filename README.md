@@ -12,6 +12,8 @@ This utility is a new development that is a simplification of, and a slightly di
 - A greatly simplified GUI option that uses pre-defined settings for an automated experience suited to most user scenarios, and</br>
 - Auto restoration of original settings changed by the utility.<br/><br/>
 
+This utility can be installed concurrent with any DynamicLOD variant. You just shouldn't run them at the same time, as they would both be fighting each other with MSFS settings. AutoFPS can detect whether itself or a previous DynamicLOD variant is running and will quit if it finds one. DynamicLOD_ResetEdition 0.3.7 does the same except it doesn't know about AutoFPS because I started that after 0.3.7 was released, so you need to be aware of that potential conflict if you start DynamicLOD_ResetEdition 0.3.7 after MSFS_AdaptiveLOD. The next DynamicLOD_Reset version will be fully AutoFPS aware. 
+
 Important:<br/> 
 - This utility directly accesses active MSFS memory locations while MSFS is running to read and set TLOD and cloud quality settings on the fly at a maximum rate of one read and, if required, change per setting per second. The utility will first verify that the MSFS memory locations being used are still valid and if not, likely because of an MSFS version change, will attempt to find where they have been relocated. If it does find the new memory locations and they pass validation tests, the utility will update itself automatically and will function as normal. If it can't find or validate MSFS memory locations at any time when starting up, the utility will self-restrict to read only mode to prevent the utility making changes to unknown MSFS memory locations.<br/>
 - As such, I believe the app to be robust in its interaction with validated MSFS memory locations and to be responsible in disabling itself if it can't guarantee that. Nonetheless, this utility is offered as is and no responsibility will be taken for unintended negative side effects. Use at your own risk!<br/><br/>
@@ -29,14 +31,14 @@ The Installer will install the following Software:
 
 <br/>
 
-Currently in development, but when available [Download here](https://github.com/ResetXPDR/MSFS2020_AutoFPS/releases/latest)
+[Download here](https://github.com/ResetXPDR/MSFS2020_AutoFPS/releases/latest)
 
 (Under Assests, the MSFS2020_AutoFPS-Installer-vXYZ.exe File)
 
 <br/><br/>
 
 ## Installation / Update / Uninstall
-Basically: Just run the Installer.<br/>
+Basically: Just run the Installer to do all three of these.<br/>
 
 Some Notes:
 - MSFS2020_AutoFPS has to be stopped before installing.
@@ -55,15 +57,17 @@ Some Notes:
   - You may have changed MSFS settings in your usercfg.opt file beyond what is possible to set in the MSFS settings menu. To rectify, go into MSFS settings at the main menu and reset to default (F12) the graphics settings for both PC and VR mode, then make all changes to MSFS within the MSFS settings menu.
   - There is an issue with permissions and you may need to run the app as Administrator.
   - A new version of MSFS has come out that has a different memory map to what the app expects, which has happened only once since MSFS 2020 was released, and the app can't auto adjust to the new memory location for MSFS settings. If so, I will likely be already aware of it and working on a solution, but if you may be one of the first to encounter it (eg. on an MSFS beta) then please do let me know.
+- To uninstall, run the installer and select remove on the first window. This will remove all traces of the app, including the desktop icon, MSFS or FSUIPC autostart entries if you used them, and the entire app folder, including your configuration file.
 
 <br/><br/>
 
 ## Usage / Configuration
-
-- Starting manually: anytime, but preferably before MSFS or in the Main Menu. The utility will stop itself when MSFS closes. 
-- Closing the Window does not close the utiltiy, use the Context Menu of the SysTray Icon.
-- Clicking on the SysTray Icon opens the Window (again).
-- Runnning as Admin NOT required (BUT: It is required to be run under the same User/Elevation as MSFS).
+- General
+  - Starting manually: anytime, but preferably before MSFS or in the Main Menu. The utility will stop itself when MSFS closes. 
+  - Closing the Window does not close the utiltiy, use the Context Menu of the SysTray Icon.
+  - Clicking on the SysTray Icon opens the Window (again).
+  - Runnning as Admin NOT required (BUT: It is required to be run under the same User/Elevation as MSFS).
+  - Do not change TLOD, OLOD and Cloud Quality MSFS settings manually while in a flight with this app running as it will conflict with what the app is managing and they will not restore to what you set when you exit your flight. If you wish to change the defaults for these MSFS settings, you must do so either without this app running or, if it is, only while you are in the MSFS main menu (ie not in a flight). 
 - Connection Status
   - Red values indicate not connected, green is connected.
 - Sim Values
@@ -72,7 +76,10 @@ Some Notes:
   - FPS shows the FPS averaged over 5 seconds which will smooth out any transient FPS spikes experienced when panning or loading new scenery or objects so that automated MSFS setting changes are minimised.
   - Priority will show whether FPS or TLOD Min are the current automation priority, with the latter only being shown if the TLOD min for ground/landing is enabled and conditions are such that, because of your flight phase (on or near the ground), working towards TLOD Min now has priority over maintaining FPS. 
 - General
-  - Target FPS - The most important setting in this app. Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it. There is a setting for each graphics mode (PC, FG and VR) which you can only change while in that mode and on the ground or in a flight. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR.
+  - Target FPS - The most important setting in this app.
+    - Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
+    - There is a setting for each graphics mode (PC, FG and VR) which you can only change while in that mode and on the ground or in a flight. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR.
+    - If you use an FPS cap, or Vsync for the same purpose, you will need to set your target FPS to be around 10% lower than that cap. This allows the automated TLOD increase logic to function properly because it needs FPS to get above the target FPS plus the FPS tolerance to activate an increase in TLOD. If doing so causes unacceptable tearing of the image on your monitor, or breaks motion reprojection if you use it with VR, then this app isn't suitable for you.
   - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option.
   - Open window on app start - determines the app window's startup state.
   - Status Message - On app startup indicates key system messages, such as:
