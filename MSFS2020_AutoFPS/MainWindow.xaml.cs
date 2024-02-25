@@ -27,8 +27,8 @@ namespace MSFS2020_AutoFPS
         protected ServiceModel serviceModel;
         protected DispatcherTimer timer;
 
-        protected int editPairTLOD = -1;
-        protected int editPairOLOD = -1;
+        private int logTimer = 0;
+        private int logTimerInterval = 8;
 
         public MainWindow(NotifyIconViewModel notifyModel, ServiceModel serviceModel)
         {
@@ -38,10 +38,12 @@ namespace MSFS2020_AutoFPS
 
              string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')];
-            Title += " (" + assemblyVersion + (serviceModel.TestVersion ? "-concept_demo" : "")+ ")";
+            Title += " (" + assemblyVersion + (serviceModel.TestVersion ? "-test" : "")+ ")";
 
             if (serviceModel.UseExpertOptions) stkpnlMSFSSettings.Visibility = Visibility.Visible;
             else stkpnlMSFSSettings.Visibility = Visibility.Collapsed;
+            if (serviceModel.TestVersion) chkTestLogSimValues.Visibility = Visibility.Visible;
+            else chkTestLogSimValues.Visibility = Visibility.Hidden;
 
             timer = new DispatcherTimer
             {
@@ -140,6 +142,7 @@ namespace MSFS2020_AutoFPS
         {
             chkOpenWindow.IsChecked = serviceModel.OpenWindow;
             chkUseExpertOptions.IsChecked = serviceModel.UseExpertOptions;
+            chkTestLogSimValues.IsChecked = serviceModel.TestLogSimValues;
             if (serviceModel.ActiveGraphicsMode == "VR") txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS_VR, CultureInfo.CurrentUICulture);
             else if (serviceModel.ActiveGraphicsMode == "FG") txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS_FG, CultureInfo.CurrentUICulture);
             else txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS_PC, CultureInfo.CurrentUICulture);
@@ -151,6 +154,7 @@ namespace MSFS2020_AutoFPS
             chkPauseMSFSFocusLost.IsChecked = serviceModel.PauseMSFSFocusLost;
             chkTLODMinGndLanding.IsChecked = serviceModel.TLODMinGndLanding;
             txtCloudRecoveryTLOD.Text = Convert.ToString(serviceModel.CloudRecoveryTLOD, CultureInfo.CurrentUICulture);
+            if (serviceModel.TestVersion && serviceModel.TestLogSimValues) Logger.Log(LogLevel.Information, "MainWindow:LoadSettings", $"Expert: {serviceModel.UseExpertOptions} Mode: {serviceModel.ActiveGraphicsMode} Target: {txtTargetFPS.Text} Tol: {txtFPSTolerance.Text} TMin: {txtMinTLod.Text} TMax: {txtMaxTLod.Text} CloudQ: {serviceModel.DecCloudQ} CRecovT: {txtCloudRecoveryTLOD.Text} Pause: {serviceModel.PauseMSFSFocusLost} TMaxGL: {serviceModel.TLODMinGndLanding}");
         }
 
         protected void UpdateStatus()
@@ -215,11 +219,11 @@ namespace MSFS2020_AutoFPS
                     else
                     {
                         lblSimCloudQs.Content = CloudQualityLabel(serviceModel.cloudQ);
-                        lblStatusMessage.Content += "  | PC Mode";
-                        lblStatusMessage.Content += (serviceModel.FgModeActive ? (serviceModel.ActiveWindowMSFS ? " | FG Active" : " | FG Inactive") : "");
+                        lblStatusMessage.Content += (serviceModel.FgModeActive ? (serviceModel.ActiveWindowMSFS ? " | FG Mode Active" : " | FG Mode Inactive") : " | PC Mode");
                     }
                     if (!serviceModel.ActiveWindowMSFS && (!serviceModel.UseExpertOptions || serviceModel.PauseMSFSFocusLost)) lblStatusMessage.Content += " | Auto PAUSED";
                     else if (serviceModel.FPSSettleCounter > 0) lblStatusMessage.Content += " | FPS Settling for " + serviceModel.FPSSettleCounter.ToString("F0") + " second" + (serviceModel.FPSSettleCounter != 1 ? "s" : "");
+                    else if (serviceModel.TestVersion) lblStatusMessage.Content += " | Trigger Alt: " + serviceModel.TLODMinTriggerAlt.ToString("F0") + " Primed: " + serviceModel.TLODMinDescentPhasePrimed + " Active: " + serviceModel.TLODMinDescentPhaseActive;
                 }
                 else
                 {
@@ -273,6 +277,13 @@ namespace MSFS2020_AutoFPS
                     else lblSimTLOD.Foreground = new SolidColorBrush(Colors.Black);
                     if (serviceModel.DecCloudQ && serviceModel.DecCloudQActive) lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Red);
                     else lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Black);
+
+                    if (serviceModel.TestVersion && serviceModel.TestLogSimValues && logTimer == 0 && serviceModel.FPSSettleCounter == 0 && !(!serviceModel.ActiveWindowMSFS && (!serviceModel.UseExpertOptions || serviceModel.PauseMSFSFocusLost)))
+                    {
+                        Logger.Log(LogLevel.Information, "MainWindow:UpdateLiveValues", $"FPS: {lblSimFPS.Content} TLOD: {lblSimTLOD.Content} AGL: {lblPlaneAGL.Content} FPM: {lblPlaneVS.Content} Clouds: {lblSimCloudQs.Content} Priority: {lblAppPriority.Content}");
+                        logTimer = logTimerInterval;
+                    }
+                    else if (--logTimer < 0) logTimer = 0;
                 }
                 else lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
             }
@@ -331,6 +342,11 @@ namespace MSFS2020_AutoFPS
             Hide();
         }
 
+        private void chkTestLogSimValues_Click(object sender, RoutedEventArgs e)
+        {
+            serviceModel.SetSetting("testLogSimValues", chkTestLogSimValues.IsChecked.ToString().ToLower());
+            LoadSettings();
+        }
         private void chkUseExpertOptions_Click(object sender, RoutedEventArgs e)
         {
             serviceModel.SetSetting("useExpertOptions", chkUseExpertOptions.IsChecked.ToString().ToLower());
@@ -349,6 +365,12 @@ namespace MSFS2020_AutoFPS
         {
             serviceModel.SetSetting("TLODMinGndLanding", chkTLODMinGndLanding.IsChecked.ToString().ToLower());
             LoadSettings();
+            if (serviceModel.MemoryAccess != null)
+            {
+                if (serviceModel.VrModeActive) serviceModel.MemoryAccess.SetCloudQ_VR(serviceModel.DefaultCloudQ_VR);
+                else serviceModel.MemoryAccess.SetCloudQ(serviceModel.DefaultCloudQ);
+                serviceModel.DecCloudQActive = false;
+            }
         }
         private void chkDecCloudQ_Click(object sender, RoutedEventArgs e)
         {

@@ -126,7 +126,9 @@ namespace MSFS2020_AutoFPS
                 loggerConfiguration.MinimumLevel.Information();
             Log.Logger = loggerConfiguration.CreateLogger();
             Log.Information($"-----------------------------------------------------------------------");
-            Logger.Log(LogLevel.Information, "App:InitLog", $"MSFS2020_AutoFPS started! Log Level: {logLevel} Log File: {logFilePath}");
+            string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')];
+            Logger.Log(LogLevel.Information, "App:InitLog", $"MSFS2020_AutoFPS v{assemblyVersion} started! Log Level: {logLevel} Log File: {logFilePath}");
         }
 
         protected void InitSystray()

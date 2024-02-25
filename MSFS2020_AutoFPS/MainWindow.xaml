@@ -98,6 +98,7 @@
                         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0" Grid.ColumnSpan="2">
                             <Label Name="lblTargetFPS" Content="Target PC FPS" MinWidth="100"/>
                             <TextBox x:Name="txtTargetFPS" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42"   LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="0,0,30,0"/>
+                            <CheckBox x:Name="chkTestLogSimValues" VerticalContentAlignment="Center" Width="170"  Height="24" MaxHeight="24" MinHeight="24" Click="chkTestLogSimValues_Click" Content="Log Sim Values" Margin="3,0,0,0"/>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0">
                             <CheckBox Name="chkUseExpertOptions" VerticalContentAlignment="Center" Width="170"  Height="24" MaxHeight="24" MinHeight="24" Click="chkUseExpertOptions_Click" Margin="5,0,0,0">Use Expert Options</CheckBox>
