@@ -47,6 +47,11 @@ Some Notes:
 - If the MobiFlight Module is not installed or outdated, MSFS also has to be stopped.
 - If you have duplicate MobiFlight Modules installed, in either your official or community folders, the utility may display 0 value Sim Values and otherwise not function. Remove the duplicate versions, rerun the utility installer and it should now work.
 - Do not run the Installer as Admin!
+- If the installer will not run at all, Windows SmartScreen is potentially blocking it because the app is so new. The solution to try is:
+  - Right-click on the Installer and select properties
+  - Check the option "Unblock"
+  - Click on Apply and Ok to save the change
+  - Then try to install it again
 - If you wish to retain your settings for an update version, do NOT uninstall first, as that deletes all app files, including the config file. Just run the installer, select update and your settings will be retained.
 - For Auto-Start either your FSUIPC7.ini or EXE.xml (MSFS) is modified. The Installer does not create a Backup.
 - The utility may be blocked by Windows Security or your AV-Scanner, try if unblocking and/or setting an Exception helps (for the whole Folder)
