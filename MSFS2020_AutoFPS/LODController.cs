@@ -18,7 +18,6 @@ namespace MSFS2020_AutoFPS
         private int[] verticalStats = new int[5];
         private float[] verticalStatsVS = new float[5];
         private int verticalIndex = 0;
-        private int altAboveGnd = 0;
         private int groundSpeed = 0;
         private float vs;
  
@@ -53,9 +52,9 @@ namespace MSFS2020_AutoFPS
 
             Model.VerticalTrend = VerticalAverage();
 
-            altAboveGnd = (int)SimConnect.ReadSimVar("PLANE ALT ABOVE GROUND", "feet");
-            if (altAboveGnd == 0 && !Model.OnGround)
-                altAboveGnd = (int)SimConnect.ReadSimVar("PLANE ALT ABOVE GROUND MINUS CG", "feet");
+            Model.altAboveGnd = (int)SimConnect.ReadSimVar("PLANE ALT ABOVE GROUND", "feet");
+            if (Model.altAboveGnd == 0 && !Model.OnGround)
+                Model.altAboveGnd = (int)SimConnect.ReadSimVar("PLANE ALT ABOVE GROUND MINUS CG", "feet");
 
             groundSpeed = (int)SimConnect.ReadSimVar("GROUND VELOCITY", "knots");
             GetMSFSState();
@@ -66,13 +65,21 @@ namespace MSFS2020_AutoFPS
             UpdateVariables();
 
             float TLODStep;
-            bool TLODMinGndLanding;
-            bool DecCloudQ;
-            float FPSTolerance;
+            bool TLODMinGndLanding = true;
+            bool DecCloudQ = true;
+            float FPSTolerance = 5.0f;
             float MinTLOD;
             float MaxTLOD;
             float newTLOD;
-            float CloudRecoveryTLOD;
+            float CloudRecoveryTLOD = Model.DefaultTLOD - 1;
+            float OLODAtBase = Model.DefaultOLOD; 
+            float AltOLODBase = 2000;
+            float OLODAtTop = Math.Max(Model.DefaultOLOD * 0.2f, 10.0f);
+            float AltOLODTop = 10000;
+            float TLODMinAltBand;
+            float AltTLODBase = 1000;
+            float AvgDescentRate = 2000;
+            const float FPSPriorityBaseAlt = 1000;
             if (Model.UseExpertOptions)
             {
                 FPSTolerance = (float)Model.FPSTolerance;
@@ -81,11 +88,14 @@ namespace MSFS2020_AutoFPS
                 MaxTLOD = Model.MaxTLOD;
                 DecCloudQ = Model.DecCloudQ;
                 CloudRecoveryTLOD = Model.CloudRecoveryTLOD;
+                if (Model.TLODMinGndLanding)
+                {
+                    AltTLODBase = Model.AltTLODBase;
+                    AvgDescentRate = Model.AvgDescentRate;
+                }
             }
             else
             {
-                FPSTolerance = 5.0f;
-                TLODMinGndLanding = true;
                 if (Model.VrModeActive)
                 {
                     MinTLOD = Math.Max(Model.DefaultTLOD_VR * 0.5f, 10.0f);
@@ -96,38 +106,30 @@ namespace MSFS2020_AutoFPS
                     MinTLOD = Math.Max(Model.DefaultTLOD * 0.5f, 10.0f);
                     MaxTLOD = Model.DefaultTLOD * 2.0f;
                 }
-                DecCloudQ = true;
-                CloudRecoveryTLOD = Model.DefaultTLOD - 1;
+            }
+            if (Model.CustomAutoOLOD && Model.UseExpertOptions)
+            {
+                OLODAtBase = Model.OLODAtBase;
+                AltOLODBase = Model.AltOLODBase;
+                OLODAtTop = Model.OLODAtTop;
+                AltOLODTop = Model.AltOLODTop;
             }
             TLODStep = Math.Max(2.0f, Model.FPSTolerance);
-
-            if (Model.UseExpertOptions && Model.TLODMinGndLanding)
-            {
-                Model.TLODMinTriggerAlt = 1000 + Math.Abs(VSAverage()) * (Model.tlod - MinTLOD) / TLODStep;
-                if (altAboveGnd > Model.TLODMinTriggerAlt + 1000) Model.TLODMinDescentPhasePrimed = true;
-                if (altAboveGnd <= Model.TLODMinTriggerAlt && Model.TLODMinDescentPhasePrimed) Model.TLODMinDescentPhaseActive = true;
-                if (altAboveGnd <= 500)
-                {
-                    Model.TLODMinDescentPhasePrimed = false;
-                    Model.TLODMinDescentPhaseActive = false;
-                }
-            }
+            TLODMinAltBand = AvgDescentRate / 60 * ((MaxTLOD - MinTLOD) / TLODStep);
  
-            if ((Model.UseExpertOptions && !Model.TLODMinGndLanding) || altAboveGnd >= Model.TLODMinTriggerAlt || (VerticalAverage() >= 3 && !Model.OnGround)) Model.IsAppPriorityFPS = true;
+            if (!TLODMinGndLanding ||  Model.altAboveGnd >= AltTLODBase + TLODMinAltBand) Model.IsAppPriorityFPS = true;
             else Model.IsAppPriorityFPS = false;
-            if (!(!Model.ActiveWindowMSFS && (!Model.UseExpertOptions || Model.PauseMSFSFocusLost)) && Model.FPSSettleCounter == 0)
+            if (!(!Model.ActiveWindowMSFS && (Model.UseExpertOptions && Model.PauseMSFSFocusLost)) && Model.FPSSettleCounter == 0)
             {
                 float deltaFPS = GetAverageFPS() - Model.TargetFPS;
-                if (Math.Abs(deltaFPS) >= Model.TargetFPS * FPSTolerance / 100 || (TLODMinGndLanding && altAboveGnd < Model.TLODMinTriggerAlt))
+                if (Math.Abs(deltaFPS) >= Model.TargetFPS * FPSTolerance / 100 || !Model.IsAppPriorityFPS)
                 {
-                    if (TLODMinGndLanding)
+                    newTLOD = Model.tlod + Math.Sign(deltaFPS) * (Model.OnGround && groundSpeed > 1 ? 2 : TLODStep * (Math.Abs(deltaFPS) >= Model.TargetFPS * 2 * FPSTolerance / 100 && (groundSpeed < 1 || !Model.OnGround) ? 2 : 1) * (Model.altAboveGnd < FPSPriorityBaseAlt && !Model.OnGround ? (float)Model.altAboveGnd / FPSPriorityBaseAlt : 1));
+                    if (!Model.IsAppPriorityFPS)
                     {
-                        if ((VerticalAverage() <= -3 || Model.OnGround) && altAboveGnd <= Model.TLODMinTriggerAlt) newTLOD = Model.tlod + (altAboveGnd - 1000 > 0 ? Math.Max((Model.tlod - MinTLOD) / (altAboveGnd - 1000) * VSAverage(), -20) : (Model.OnGround ? MinTLOD - Model.tlod : -20));
-                        else if (Model.TLODMinDescentPhaseActive && altAboveGnd <= Model.TLODMinTriggerAlt) newTLOD = Model.tlod;
-                        else newTLOD = Model.tlod + (!Model.OnGround ? Math.Sign(deltaFPS) * TLODStep * (Math.Abs(deltaFPS) >= Model.TargetFPS * 2 * FPSTolerance / 100 ? 2 : 1) * (altAboveGnd < 1000 && !Model.OnGround && VerticalAverage() >= 3 ? (float)altAboveGnd / 1000 : (altAboveGnd > 1000 ? 1 : -1)) * (altAboveGnd < 100 ? 0 : 1) : 0);
+                        if (Model.altAboveGnd < AltTLODBase) newTLOD = MinTLOD;
+                        else newTLOD = Math.Min(MinTLOD + (MaxTLOD - MinTLOD) * (Model.altAboveGnd - AltTLODBase) / TLODMinAltBand, newTLOD);
                     }
-                    else
-                        newTLOD = Model.tlod + Math.Sign(deltaFPS) * (Model.OnGround && groundSpeed > 1 ? 2 : TLODStep * (Math.Abs(deltaFPS) >= Model.TargetFPS * 2 * FPSTolerance / 100 && (groundSpeed < 1 || !Model.OnGround) ? 2 : 1) * (altAboveGnd < 1000 && !Model.OnGround ? (float)altAboveGnd / 1000 : 1));
                     newTLOD = (float)Math.Round(Math.Min(MaxTLOD, Math.Max(MinTLOD, newTLOD)));
                     if (Math.Abs(Model.tlod - newTLOD) >= 1)
                     {
@@ -155,10 +157,33 @@ namespace MSFS2020_AutoFPS
                         Model.DecCloudQActive = false;
                     }
                 }
+                else Model.tlod_step = false;
+
+                if (Model.CustomAutoOLOD && Model.UseExpertOptions)
+                {
+                    float newOLOD;
+                    if (Model.altAboveGnd < AltOLODBase) newOLOD = OLODAtBase;
+                    else if (Model.altAboveGnd > AltOLODTop) newOLOD = OLODAtTop;
+                    else
+                    {
+                        newOLOD = OLODAtBase + (OLODAtTop - OLODAtBase) * (Model.altAboveGnd - AltOLODBase) / (AltOLODTop - AltOLODBase);
+                        if (Math.Abs(newOLOD - Model.olod) > FPSTolerance) newOLOD = newOLOD + Math.Sign(newOLOD - Model.olod) * FPSTolerance;
+                    }
+                    if (newOLOD != Model.olod && Math.Abs(newOLOD - Model.olod) >= 1)
+                    {
+                        Model.MemoryAccess.SetOLOD(newOLOD);
+                        Model.olod_step = true;
+                    }
+                    else Model.olod_step = false;
+                }
                 else
                 {
-                    Model.tlod_step = false;
-                    Model.olod_step = false;
+                    Model.olod_step = true;
+                    if (Model.VrModeActive && Model.olod != Model.DefaultOLOD_VR)
+                        Model.MemoryAccess.SetOLOD_VR(Model.DefaultOLOD_VR);
+                    else if (!Model.VrModeActive && Model.olod != Model.DefaultOLOD)
+                        Model.MemoryAccess.SetOLOD_PC(Model.DefaultOLOD);
+                    else Model.olod_step = false;
                 }
             }
             else if (--Model.FPSSettleCounter < 0) Model.FPSSettleCounter = 0;
@@ -174,7 +199,7 @@ namespace MSFS2020_AutoFPS
 
         public float GetAverageFPS()
         {
-            if (Model.FgModeActive)
+            if (Model.FgModeEnabled)
                 return (float)Math.Round(IPCManager.SimConnect.GetAverageFPS() * 2.0f);
             else
                 return (float)Math.Round(IPCManager.SimConnect.GetAverageFPS());
@@ -182,11 +207,12 @@ namespace MSFS2020_AutoFPS
         private void GetMSFSState()
         {
             Model.tlod = Model.MemoryAccess.GetTLOD_PC();
+            Model.olod = Model.MemoryAccess.GetOLOD_PC();
             Model.cloudQ = Model.MemoryAccess.GetCloudQ_PC();
             Model.cloudQ_VR = Model.MemoryAccess.GetCloudQ_VR();
             Model.VrModeActive = Model.MemoryAccess.IsVrModeActive();
-            Model.FgModeActive = Model.MemoryAccess.IsFgModeActive();
-            if (Model.ActiveWindowMSFS != Model.MemoryAccess.IsActiveWindowMSFS() && (!Model.UseExpertOptions || Model.PauseMSFSFocusLost)) Model.FPSSettleCounter = ServiceModel.FPSSettleSeconds;
+            Model.FgModeEnabled = Model.MemoryAccess.IsFgModeEnabled();
+            if (Model.ActiveWindowMSFS != Model.MemoryAccess.IsActiveWindowMSFS() && Model.UseExpertOptions && Model.PauseMSFSFocusLost) Model.FPSSettleCounter = ServiceModel.FPSSettleSeconds;
             Model.ActiveWindowMSFS = Model.MemoryAccess.IsActiveWindowMSFS();
             string ActiveGraphicsMode = Model.ActiveGraphicsMode;
             if (Model.VrModeActive)
@@ -194,7 +220,7 @@ namespace MSFS2020_AutoFPS
                 Model.ActiveGraphicsMode = "VR";
                 Model.TargetFPS = Model.TargetFPS_VR;
             }
-            else if (Model.FgModeActive)
+            else if (Model.FgModeEnabled)
             {
                 Model.ActiveGraphicsMode = "FG";
                 Model.TargetFPS = Model.TargetFPS_FG;

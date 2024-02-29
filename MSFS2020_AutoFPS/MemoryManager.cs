@@ -104,7 +104,7 @@ namespace MSFS2020_AutoFPS
                 allowMemoryWrites = false;
             }
             else allowMemoryWrites = true;
-            if (logResult && (Model.TestVersion || !allowMemoryWrites))
+            if (logResult && (ServiceModel.TestVersion || !allowMemoryWrites))
             {
                 Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"TLOD PC: {GetTLOD_PC()}");
                 Logger.Log(LogLevel.Debug, "MemoryManager:BoundaryTest", $"TLOD VR: {GetTLOD_VR()}");
@@ -215,7 +215,7 @@ namespace MSFS2020_AutoFPS
         {
             return isDX12;
         }
-        public bool IsFgModeActive()
+        public bool IsFgModeEnabled()
         {
             try
             {
@@ -225,7 +225,7 @@ namespace MSFS2020_AutoFPS
             }
             catch (Exception ex)
             {
-                Logger.Log(LogLevel.Error, "MemoryManager:IsFgModeActive", $"Exception {ex}: {ex.Message}");
+                Logger.Log(LogLevel.Error, "MemoryManager:IsFgModeEnabled", $"Exception {ex}: {ex.Message}");
             }
 
             return false;

@@ -94,14 +94,21 @@ namespace MSFS2020_AutoFPS
             Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", "Starting Service Loop");
             Model.DefaultTLOD = Model.MemoryAccess.GetTLOD_PC();
             Model.DefaultTLOD_VR = Model.MemoryAccess.GetTLOD_VR();
-            Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Initial TLODs " + $"PC / VR {Model.DefaultTLOD} / {Model.DefaultTLOD_VR}");
+            Model.DefaultOLOD = Model.MemoryAccess.GetOLOD_PC();
+            Model.DefaultOLOD_VR = Model.MemoryAccess.GetOLOD_VR();
+            Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Initial LODs PC {Model.DefaultTLOD} / {Model.DefaultOLOD} and VR {Model.DefaultTLOD_VR} / {Model.DefaultOLOD_VR}");
             Model.DefaultCloudQ = Model.MemoryAccess.GetCloudQ_PC();
             Model.DefaultCloudQ_VR = Model.MemoryAccess.GetCloudQ_VR();
             Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Initial cloud quality PC {Model.DefaultCloudQ} / VR {Model.DefaultCloudQ_VR}");
-            if (Model.UseExpertOptions || Model.TLODMinGndLanding)
+            if (!Model.UseExpertOptions || Model.TLODMinGndLanding)
             {
                 Model.MemoryAccess.SetTLOD(Model.MinTLOD);
-                Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Setting Min TLOD on ground " + $"{Model.MinTLOD}");
+                Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Setting TLOD Min on ground " + $"{Model.MinTLOD}");
+            }
+            if (Model.CustomAutoOLOD && Model.UseExpertOptions)
+            {
+                Model.MemoryAccess.SetOLOD(Model.OLODAtBase);
+                Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Setting OLOD @ Base on ground " + $"{Model.OLODAtBase}");
             }
             Model.DefaultSettingsRead = true;
             while (!Model.CancellationRequested && IPCManager.IsSimRunning() && IPCManager.IsCamReady())
@@ -120,9 +127,11 @@ namespace MSFS2020_AutoFPS
 
             if (true && IPCManager.IsSimRunning())
             {
-                Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Sim still running, resetting TLODs to PC / VR {Model.DefaultTLOD} / {Model.DefaultTLOD_VR}");
+                Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Sim still running, resetting LODs to {Model.DefaultTLOD} / {Model.DefaultOLOD} and VR {Model.DefaultTLOD_VR} / {Model.DefaultOLOD_VR}");
                 Model.MemoryAccess.SetTLOD_PC(Model.DefaultTLOD);
                 Model.MemoryAccess.SetTLOD_VR(Model.DefaultTLOD_VR);
+                Model.MemoryAccess.SetOLOD_PC(Model.DefaultOLOD);
+                Model.MemoryAccess.SetOLOD_VR(Model.DefaultOLOD_VR);
                 Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Sim still running, resetting cloud quality to {Model.DefaultCloudQ} / VR {Model.DefaultCloudQ_VR}");
                 Model.MemoryAccess.SetCloudQ(Model.DefaultCloudQ);
                 Model.MemoryAccess.SetCloudQ_VR(Model.DefaultCloudQ_VR);

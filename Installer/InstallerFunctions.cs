@@ -133,9 +133,9 @@ namespace Installer
 
             try
             {
-                string path = Parameters.msExeStore;
+                string path = Parameters.msExeSteam;
                 if (!File.Exists(path))
-                    path = Parameters.msExeSteam;
+                    path = Parameters.msExeStore;
 
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(File.ReadAllText(path));

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MSFS2020_AutoFPS"
         mc:Ignorable="d"
-        Title="MSFS2020_AutoFPS" Height="480" Width="402" SizeToContent="WidthAndHeight" ResizeMode="NoResize" IsVisibleChanged="Window_IsVisibleChanged" Closing="Window_Closing">
+        Name ="AutoFPS" Title="MSFS2020_AutoFPS" Height="580" Width="402" SizeToContent="WidthAndHeight" ResizeMode="NoResize" IsVisibleChanged="Window_IsVisibleChanged" Closing="Window_Closing" Topmost="True">
     <Window.Resources>
         <Style TargetType="GroupBox">
             <Setter Property="HeaderTemplate">
@@ -21,7 +21,10 @@
     <Viewbox Name="viewBox" Stretch="None" StretchDirection="DownOnly" HorizontalAlignment="Left" Width="399">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="240*" MinWidth="240"/>
+                <ColumnDefinition Width="33*" MinWidth="240"/>
+                <ColumnDefinition Width="261*"/>
+                <ColumnDefinition Width="55*"/>
+                <ColumnDefinition Width="55*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="64*"/>
@@ -30,7 +33,7 @@
                 <RowDefinition Height="256*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Vertical" Grid.ColumnSpan="4" Margin="0,0,0,17" Grid.RowSpan="2">
                 <GroupBox Grid.Row="0" Grid.Column="0" BorderBrush="DarkGray" BorderThickness="1" Margin="10,8,10,8">
                     <GroupBox.Header>Connection Status</GroupBox.Header>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -61,8 +64,8 @@
                             <Label Name="lblSimTLOD" MinWidth="64" VerticalContentAlignment="Center">n/a</Label>
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Label MinWidth="60" VerticalContentAlignment="Center">Priority:</Label>
-                            <Label Name="lblAppPriority" MinWidth="64" VerticalContentAlignment="Center">n/a</Label>
+                            <Label MinWidth="60" VerticalContentAlignment="Center">OLOD:</Label>
+                            <Label Name="lblSimOLOD" MinWidth="64" VerticalContentAlignment="Center">n/a</Label>
                         </StackPanel>
 
                         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
@@ -81,7 +84,7 @@
                 </GroupBox>
             </StackPanel>
 
-            <StackPanel Orientation="Vertical" Grid.Row="2" HorizontalAlignment="Center" Width="402">
+            <StackPanel Orientation="Vertical" Grid.Row="2" HorizontalAlignment="Left" Width="402" Grid.ColumnSpan="4" Margin="1,0,0,22">
                 <GroupBox BorderBrush="DarkGray" BorderThickness="1" Margin="10,8,10,8">
                     <GroupBox.Header>General</GroupBox.Header>
                     <Grid>
@@ -96,13 +99,14 @@
                         </Grid.RowDefinitions>
                         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,34" Grid.RowSpan="2"/>
                         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0" Grid.ColumnSpan="2">
-                            <Label Name="lblTargetFPS" Content="Target PC FPS" MinWidth="100"/>
-                            <TextBox x:Name="txtTargetFPS" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42"   LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="0,0,30,0"/>
-                            <CheckBox x:Name="chkTestLogSimValues" VerticalContentAlignment="Center" Width="170"  Height="24" MaxHeight="24" MinHeight="24" Click="chkTestLogSimValues_Click" Content="Log Sim Values" Margin="3,0,0,0"/>
+                            <Label Name="lblTargetFPS" Content="Target PC FPS" MinWidth="120"/>
+                            <TextBox x:Name="txtTargetFPS" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42"   LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp"/>
+                            <CheckBox x:Name="chkOnTop" VerticalContentAlignment="Center" Width="76"  Height="24" MaxHeight="24" MinHeight="24" Click="chkOnTop_Click" Content="On top" Margin="13,0,0,0"/>
+                            <CheckBox x:Name="chkTestLogSimValues" VerticalContentAlignment="Center" Width="102"  Height="24" MaxHeight="24" MinHeight="24" Click="chkTestLogSimValues_Click" Content="Log Sim Values"/>
                         </StackPanel>
                         <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0">
                             <CheckBox Name="chkUseExpertOptions" VerticalContentAlignment="Center" Width="170"  Height="24" MaxHeight="24" MinHeight="24" Click="chkUseExpertOptions_Click" Margin="5,0,0,0">Use Expert Options</CheckBox>
-                            <CheckBox x:Name="chkOpenWindow" VerticalContentAlignment="Center" Click="chkOpenWindow_Click" Content="Open Window on App Start" Height="15" Width="220"/>
+                                <CheckBox x:Name="chkOpenWindow" VerticalContentAlignment="Center" Click="chkOpenWindow_Click" Content="Open Window on App Start" Height="15" Width="220"/>
                         </StackPanel>
                         <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0">
                             <Label Name="lblStatusMessage" MinWidth="50" VerticalContentAlignment="Center" Content=""/>
@@ -111,9 +115,10 @@
                             </TextBlock>
                         </StackPanel>
                     </Grid>
+                    
                 </GroupBox>
             </StackPanel>
-            <StackPanel Name="stkpnlMSFSSettings" Orientation="Vertical" Grid.Column="0" Grid.Row="3">
+            <StackPanel Name="stkpnlMSFSSettings" Orientation="Vertical" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4" Margin="0,122,0,0" Grid.RowSpan="2">
                 <GroupBox BorderBrush="DarkGray" BorderThickness="1" Margin="10,8,10,8">
                     <GroupBox.Header>Expert Options</GroupBox.Header>
                     <Grid Margin="0,2,0,2">
@@ -126,11 +131,21 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <StackPanel Orientation="Vertical">
-                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                              <Label Content="FPS Tolerance" MinWidth="95"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <Label Content="FPS Tolerance" MinWidth="95"/>
                                 <TextBox x:Name="txtFPSTolerance" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42"   LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="5,0,0,0"/>
                                 <Label Content="%"/>
                                 <CheckBox x:Name="chkTLODMinGndLanding" Margin="15,0,0,0" VerticalContentAlignment="Center" Click="chkTLODMinGndLanding_Click" Width="192" Content="TLOD Min on Ground/Landing" Checked="chkTLODMinGndLanding_Checked" Padding="4,0,0,0"/>
+                            </StackPanel>
+                            <StackPanel Name="stkpnlTLODMinOptions" Orientation="Vertical" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" Margin="0,0,0,0" Grid.RowSpan="2">
+                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <Label Content="Alt TLOD Base" MinWidth="100"/>
+                                <TextBox Name="txtAltTLODBase" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="0,0,0,0"/>
+                                <Label Content="ft" Margin="0,0,12,0"/>
+                                <Label Content="Avg Descent Rate" MinWidth="100"/>
+                                <TextBox x:Name="txtAvgDescentRate" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="0,0,0,0"/>
+                                <Label Content="fpm"/>
+                                </StackPanel>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                                 <Label Content="TLOD Minimum" MinWidth="100"/>
@@ -144,8 +159,27 @@
                                 <TextBox Name="txtCloudRecoveryTLOD" Margin="1,0,0,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp"></TextBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                <CheckBox x:Name="chkPauseMSFSFocusLost" VerticalContentAlignment="Center" Click="chkPauseMSFSFocusLost_Click" Width="270" Content="Pause when MSFS loses focus" Checked="chkPauseMSFSFocusLost_Checked" Padding="4,0,0,0"/>
+                                <CheckBox x:Name="chkCustomAutoOLOD" VerticalContentAlignment="Center" Click="chkCustomAutoOLOD_Click" Width="177" Content="Auto OLOD" Padding="4,0,0,0" Checked="chkCustomAutoOLOD_Checked"/>
+                                <CheckBox x:Name="chkPauseMSFSFocusLost" VerticalContentAlignment="Center" Click="chkPauseMSFSFocusLost_Click" Width="185" Content="Pause when MSFS loses focus" Checked="chkPauseMSFSFocusLost_Checked" Padding="4,0,0,0"/>
                             </StackPanel>
+                            <StackPanel Name="stkpnlCustomAutoOLOD" Orientation="Vertical" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" Margin="0,0,0,0" Grid.RowSpan="2">
+                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                    <Label Content="OLOD @ Base" MinWidth="100"/>
+                                <TextBox Name="txtOLODAtBase" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="0,0,30,0"/>
+                                
+                                <Label Content="OLOD @ Top" MinWidth="100"/>
+                                <TextBox x:Name="txtOLODAtTop" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="5,0,0,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <Label Content="Alt OLOD Base" MinWidth="100"/>
+                                <TextBox Name="txtAltOLODBase" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="0,0,0,0"/>
+                                <Label Content="ft" Margin="0,0,12,0"/>
+                                <Label Content="Alt OLOD Top" MinWidth="100"/>
+                                <TextBox x:Name="txtAltOLODTop" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="5,0,0,0"/>
+                                <Label Content="ft"/>
+                            </StackPanel>
+                            </StackPanel>
+
 
                         </StackPanel>
                     </Grid>
