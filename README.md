@@ -74,6 +74,7 @@ Some Notes:
 <br/><br/>
 
 ## Usage / Configuration
+
 - General
   - Starting manually: anytime, but preferably before MSFS or in the Main Menu. The utility will stop itself when MSFS closes. 
   - Closing the Window does not close the utiltiy, use the Context Menu of the SysTray Icon.
@@ -92,7 +93,17 @@ Some Notes:
     - Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
     - There is a setting for each graphics mode (PC, FG and VR) which you can only change while in that mode and on the ground or in a flight. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR. If using FG, the target FPS you set is your desired FG FPS, not the FG inactive FPS you see when this app has the focus instead of MSFS. 
     - If you use an FPS cap, or Vsync for the same purpose, you will need to set your target FPS to be around 10% lower than that cap. This allows the automated TLOD increase logic to function properly because it needs FPS to get above the target FPS plus the FPS tolerance to activate an increase in TLOD. If doing so causes unacceptable tearing of the image on your monitor, or breaks motion reprojection if you use it with VR, then this app isn't suitable for you.
-  - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option.
+  - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
+    - FPS Tolerance - 5%
+    - TLOD Minimum on Ground/Landing - enabled
+    - Alt TLOD Base (coming up in the next version) - 1000 ft
+    - Avg Descent Rate (coming up in the next version)  - 2000 fpm
+    - TLOD Minimum - 50% of your current MSFS TLOD setting
+    - TLOD Maximum - 200% of your current MSFS TLOD setting
+    - Decrease Cloud Quality - enabled
+    - Cloud Recovery TLOD - 2/5 between TLOD Minimum and TLOD Maximum
+    - Auto OLOD (coming up in the next version) - disabled
+    - Pause when MSFS loses focus - enabled in current version but will be disabled in the next version
   - Open window on app start - determines the app window's startup state.
   - Status Message - On app startup indicates key system messages, such as:
     - Before loading a flight - whether a newer version of the app is available to download and install
