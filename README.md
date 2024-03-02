@@ -2,7 +2,7 @@
 
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
 
-This utility is a new development that is a simplification of, and a slightly different concept to, DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing the two settings that impact MSFS performance the most, namely TLOD and cloud quality settings, based on the current AGL and with an easy to use GUI. It provides features such as:<br/>
+This utility is a new development that is a simplification of, and a slightly different concept to, DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use GUI and provides features such as:<br/>
 - Automatically adjusts TLOD to achieve a user-defined target FPS band based on pre or user-defined maximum and minimum TLODs,<br/>
 - TLOD minimum on ground/landing option, which prioritises TLOD over FPS during these flight phases and also averts exacerbating existing texture tearing issues with DX12,</br>
 - Cloud quality decrease option for when FPS can't be achieved at the lowest desired TLOD,<br/>
