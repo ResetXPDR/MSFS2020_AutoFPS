@@ -28,7 +28,7 @@ Which app should I use? DynamicLOD_ResetEdition or MSFS2020_AutoFPS?:
 Frame Generation (FG) users: 
 - The app does detect correct FG FPS when FG is enabled in MSFS, however FG is only active when MSFS is the focused window and becomes inactive when not, through your graphics driver not this app.
 - To see correct FG FPS, use the app's "On Top" option to overlay this app over MSFS and give MSFS the focus.
-- If FG is being incorrectly reported as enabled by the app, the likely reason is that the FG mod had been installed and removed and the now the now greyed out MSFS FG setting is still set to on. To fix, change the DLSSG line in your UserCfg.opt file to be DLSSG 0.
+- If FG is being incorrectly reported as enabled by the app, the likely reason is that either the FG mod had been installed and removed or you have disabled Hardware Accelerated Graphics Scheduling under Windows settings and the now the now greyed out MSFS FG setting may show that it is off but it is still set to on internally to MSFS. To fix, change the DLSSG line in your UserCfg.opt file to be DLSSG 0.
 
 Dangerous/Unsafe program warnings:
 - This utility is unsigned because I am a hobbyist and the cost of obtaining certification is prohibitive to me, so you may get a warning message of a potentially dangerous app when you download it in a web browser like Chrome or from your antivirus program, including Windows Defender.
