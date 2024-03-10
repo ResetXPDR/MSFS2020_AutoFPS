@@ -3,9 +3,10 @@
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
 
 This utility is a new development that is a simplification of, and a slightly different concept to, DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use GUI and provides features such as:<br/>
-- Automatically adjusts TLOD to achieve a user-defined target FPS band based on pre or user-defined maximum and minimum TLODs,<br/>
+- Automatic TLOD adjustment to achieve a user-defined target FPS band based on pre or user-defined maximum and minimum TLODs,<br/>
 - TLOD minimum on ground/landing option, which prioritises TLOD over FPS during these flight phases and also averts exacerbating existing texture tearing issues with DX12,</br>
 - Cloud quality decrease option for when FPS can't be achieved at the lowest desired TLOD,<br/>
+- Automatic OLOD adjustment option based on an automatic or user-definable OLOD range and altitude band,<br/>
 - Automatic pause when MSFS loses focus option, particularly useful if using FG due to varying FPS when MSFS gains or loses focus,</br>
 - Automatic FPS settling timer on MSFS graphics mode and focus changes to allow FPS to stabilise before being acted upon,</br>
 - Simultaneous PC, FG and VR mode compatibilty including correct FG FPS display and separate FPS targets for each mode,<br>
@@ -124,7 +125,7 @@ Some Notes:
     - Cloud Recovery TLOD - 2/5 between TLOD Minimum and TLOD Maximum
     - Auto OLOD (coming up in the next version) - disabled
     - Pause when MSFS loses focus - enabled in current version but will be disabled in the next version
-  - On Top (v0.4.1) - allows the app to overlay your MSFS session if desired, with MSFS having the focus. This is mainly useful for adjusting settings and seeing the outcome over the top of your flight as it progresses. It should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
+  - On Top - allows the app to overlay your MSFS session if desired, with MSFS having the focus. This is mainly useful for adjusting settings and seeing the outcome over the top of your flight as it progresses. It should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
   - Open window on app start - determines the app window's startup state.
   - Status Message - On app startup indicates key system messages, such as:
     - Before loading a flight - whether a newer version of the app is available to download and install
@@ -142,7 +143,7 @@ Some Notes:
   -  TLOD Max - Sets the maximum TLOD the automation algorithm will use. When expert settings are disabled, the app will use 200% of your existing MSFS TLOD setting for this parameter.
   -  Decrease Cloud Quality - When enabled, will reduce cloud quality by one level if TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance. When expert settings are disabled, the app will enable this setting.
   -  Cloud Recovery TLOD - The TLOD level required to cancel an active cloud quality reduction state and restore cloud quality back to its initial higher quality level. This provides a TLOD buffer to account for the increased TLOD achieved by reducing cloud quality to stop FPS adaption constantly toggling on and off. This parameter is ideally set to 50 TLOD above TLOD Min provided that the aforementioned conditions can be met. When expert settings are disabled, the app will use your existing MSFS TLOD setting for this parameter.
-  -  Auto OLOD (v0.4.1)
+  -  Auto OLOD
      -  This option is disabled by default. When enabled, four user definable parameters relating to this feature will be revealed on the UI.
      -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base and top level and with OLOD values defined for each of these altitudes.
      -  The app will set OLOD @ Base at or below the Alt OLOD Base, set the OLOD @ Top at or above Alt OLOD Top and interpolate in between. Note that OLOD @ Base can be higher, lower or the same value as the OLOD @ Top, depending on whether you want OLOD to decrease, increase or stay the same respectively as you ascend. 
