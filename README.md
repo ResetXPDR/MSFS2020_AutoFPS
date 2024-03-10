@@ -117,14 +117,14 @@ Some Notes:
   - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
     - FPS Tolerance - 5%
     - TLOD Minimum on Ground/Landing - enabled
-    - Alt TLOD Base (coming up in the next version) - 1000 ft
-    - Avg Descent Rate (coming up in the next version)  - 2000 fpm
+    - Alt TLOD Base - 1000 ft
+    - Avg Descent Rate - 2000 fpm
     - TLOD Minimum - 50% of your current MSFS TLOD setting
     - TLOD Maximum - 200% of your current MSFS TLOD setting
     - Decrease Cloud Quality - enabled
     - Cloud Recovery TLOD - 2/5 between TLOD Minimum and TLOD Maximum
-    - Auto OLOD (coming up in the next version) - disabled
-    - Pause when MSFS loses focus - enabled in current version but will be disabled in the next version
+    - Auto OLOD - disabled
+    - Pause when MSFS loses focus - disabled
   - On Top - allows the app to overlay your MSFS session if desired, with MSFS having the focus. This is mainly useful for adjusting settings and seeing the outcome over the top of your flight as it progresses. It should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
   - Open window on app start - determines the app window's startup state.
   - Status Message - On app startup indicates key system messages, such as:
