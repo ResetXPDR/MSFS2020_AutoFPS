@@ -1,5 +1,7 @@
 # MSFS2020_AutoFPS
 
+(Currently being updated in preparation for the imminent release of v0.4.2)
+
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
 
 This utility is a new development that is a simplification of, and a slightly different concept to, DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use GUI and provides features such as:<br/>
@@ -135,14 +137,13 @@ Some Notes:
     - Should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
   - Flight type
        - VFR
-         - TLOD will be locked any time you are below 100 ft or are on the ground, except if TLOD Min + gets activated if enabled and performance conditions are good enough to boost your starting TLOD.
+         - TLOD will be locked any time you are below 100 ft or are on the ground, except if TLOD Min + is enabled and gets activated where it will be higher.
          - Once in the air above 100 ft, your TLOD will dynamically change to achieve your target FPS.
          - Once below 100 ft, your TLOD will lock to whatever it last was and will stay that way until you take off and climb above 100 ft.
        - IFR
          - Exactly like the old TLOD Min on ground/landing option whereby your TLOD will be locked to either a pre-determined (non-expert) or user-selectable (expert) TLOD Min.
-         - Again, TLOD Min + may increase this should performance conditions be good enough to boost your starting TLOD.
          - Once in the air and above either a pre-determined (non-expert) or user-selectable (expert) TLOD base altitude, TLOD will be allowed to change to the lower of either the schedule based on your TLODs, FPS sensitivity and average descent rate settings or what your current performance dictates.
-         - On descent your TLOD will progressively work its way down to TLOD Min by the TLOD base altitude. As with VFR mode, TLOD will not change on the ground unless TLOD Min + is activated and performance conditions are met.
+         - On descent your TLOD will progressively work its way down to TLOD Min by the TLOD base altitude. As with VFR mode, TLOD will not change on the ground unless TLOD Min + enabled and activated.
   - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
     - Auto Target FPS - user selectable 
     - FPS Sensitivity - 5%
@@ -164,19 +165,27 @@ Some Notes:
       - The FPS settling timer runs for up to 20 seconds to allow FPS to settle between pausing/unpausing, auto target FPS calibration, TLOD Min + transitions and VR/PC/FG mode transitions. This allows the FPS to stabilise before engaging automatic functions and should lead to much smaller TLOD changes when seeking the target FPS on such transitions.
       - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected.
 - MSFS Settings
-  -  FPS Sensitivity - Determines how sensitive the app will be to variance from your target FPS before it will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be. The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller. Vice versa for higher settings. When expert settings are disabled, the default value of 5 should provide the most balanced experience.
-  -  TLOD Min - Sets the minimum TLOD the automation algorithm will use. When expert settings are disabled, the app will use 50% of your existing MSFS TLOD setting for this parameter.
+  - FPS Sensitivity - Determines how sensitive the app will be to variance from your target FPS before it will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be. The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller. Vice versa for higher settings. When expert settings are disabled, the default value of 5 should provide the most balanced experience.
+  -  Pause when MSFS loses focus - This will stop TLOD and, if applicable, cloud quality from changing while you are focused on another app and not MSFS. It is particularly useful for when using FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. When expert settings are disabled, the app will disable this setting.
+  - TLOD Min with optional +
+    - Sets the minimum TLOD the automation algorithm will use. When expert settings are disabled, the app will use 50% of your existing MSFS TLOD setting for this parameter.
+    - When + is checked or is enabled by default in non-expert mode, your TLOD Min will increase by 50 if system is achieving 15% or greater FPS than your target FPS to provide addition graphics quality with this additional performance.
+    - TLOD Min + will only activate on the ground or when descending and transitioning from FPS to TLOD priority mode. Once activated on the ground, it will remain set so as not to tempt ground texture corruption occurring. On descent, if minimum performance can not be maintained for TLOD Min +, it will self-cancel before landing without any sudden TLOD changes.
   -  TLOD Max - Sets the maximum TLOD the automation algorithm will use. When expert settings are disabled, the app will use 200% of your existing MSFS TLOD setting for this parameter.
-  -  Alt TLOD Base - only visible when flight type selected is IFR. This is the altitude at or below which TLOD will be at TLOD Min.
-  -  Avg Descent Rate
-    -  Only visible when flight type selected is IFR.
-    -  Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
-    -  This band ensures that, if you descend at your set Avg Descent Rate or less, that the app can decrement TLOD from TLOD Max to TLOD Min by the Alt TLOD Base without exceeding the LOD Step rate associated with the FPS sensitivity level you have set.
-  -  Decrease Cloud Quality - When enabled, will reduce cloud quality by one level if TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance. When expert settings are disabled, the app will enable this setting.
-  -  Cloud Recovery TLOD - The TLOD level required to cancel an active cloud quality reduction state and restore cloud quality back to its initial higher quality level. This provides a TLOD buffer to account for the increased TLOD achieved by reducing cloud quality to stop FPS adaption constantly toggling on and off. This parameter is ideally set to 50 TLOD above TLOD Min provided that the aforementioned conditions can be met. When expert settings are disabled, the app will use your existing MSFS TLOD setting for this parameter.
+  - Alt TLOD Base - only visible when flight type selected is IFR. This is the altitude at or below which TLOD will be at TLOD Min.
+  - Avg Descent Rate
+    - Only visible when flight type selected is IFR.
+    - Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
+    - This band ensures that, if you descend at your set Avg Descent Rate or less, that the app can decrement TLOD from TLOD Max to TLOD Min by the Alt TLOD Base without exceeding the LOD Step rate associated with the FPS sensitivity level you have set.
+  - Decrease Cloud Quality - When enabled, will reduce cloud quality by one level if TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance. This is enabled automatically in non-expert mode.
+  - Cloud Recovery TLOD with optional +
+    - The TLOD level required to cancel an active cloud quality reduction state and restore cloud quality back to its initial higher quality level.
+    - Provides a TLOD buffer to account for the increased TLOD achieved by reducing cloud quality and will minimise the chance that cloud quality will constantly change down and up.
+    - In expert mode it is ideally set to 50 TLOD or more above TLOD Min provided that the aforementioned conditions can be met.
+    - In non-expert mode the app will use your existing MSFS TLOD setting as the basis for calculating for this parameter and if it detects excessive changing it will automatically increase its calculated cloud recovery TLOD.
+    - When + is checked, Cloud Recovery TLOD becomes relative to TLOD Min instead of absolute.
   -  Auto OLOD
      -  This option is disabled by default. When enabled, four user definable parameters relating to this feature will be revealed on the UI.
      -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base and top level and with OLOD values defined for each of these altitudes.
      -  The app will set OLOD @ Base at or below the Alt OLOD Base, set the OLOD @ Top at or above Alt OLOD Top and interpolate in between. Note that OLOD @ Base can be higher, lower or the same value as the OLOD @ Top, depending on whether you want OLOD to decrease, increase or stay the same respectively as you ascend. 
-  -  Pause when MSFS loses focus - This will stop TLOD and, if applicable, cloud quality from changing while you are focused on another app and not MSFS. It is particularly useful for when using FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. When expert settings are disabled, the app will disable this setting.
 <br/><br/>
