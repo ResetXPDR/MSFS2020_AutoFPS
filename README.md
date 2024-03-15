@@ -5,7 +5,7 @@
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
 
 This app is a new development that is a simplification of, and a slightly different concept to, DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use GUI and provides features such as:<br/>
-- Automatic TLOD adjustment when in the air to achieve a user-defined target FPS band based on pre or user-defined maximum and minimum TLODs,
+- Automatic TLOD adjustment when in the air to achieve a user-defined or auto target FPS based on pre or user-defined maximum and minimum TLODs,
 - Improved target FPS tracking for all modes by having much smaller TLOD changes the closer you are to your target FPS, giving more consistent FPS for a better flight experience.    
 - A choice between VFR and IFR flight types, which changes the flight phases where the app prioritises FPS or TLOD,
 - Auto raising and lowering of the minimum TLOD option, depending on low altitude performance being either very favourable or poor respectively,
