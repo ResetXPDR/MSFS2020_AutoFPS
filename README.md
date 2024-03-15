@@ -4,7 +4,7 @@
 
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
 
-This utility is a new development that is a simplification of, and a slightly different concept to, DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use GUI and provides features such as:<br/>
+This app is a new development that is a simplification of, and a slightly different concept to, DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use GUI and provides features such as:<br/>
 - Automatic TLOD adjustment when in the air to achieve a user-defined target FPS band based on pre or user-defined maximum and minimum TLODs,
 - Improved target FPS tracking for all modes by having much smaller TLOD changes the closer you are to your target FPS, giving more consistent FPS for a better flight experience.    
 - A choice between VFR and IFR flight types, which changes the flight phases where the app prioritises FPS or TLOD,
@@ -15,15 +15,15 @@ This utility is a new development that is a simplification of, and a slightly di
 - Simultaneous PC, FG and VR mode compatibilty including correct FG FPS display and separate FPS targets for each mode,
 - A greatly simplified non-expert default UI option that uses pre-defined settings for an automated experience suited to most user scenarios,
 - Auto detection and protection from known similar apps already running or incompatibilities with newer MSFS versions, and
-- Auto restoration of original MSFS settings changed by the utility, recently enhanced to withstand MSFS CTDs.<br><br>
+- Auto restoration of original MSFS settings changed by the app, recently enhanced to withstand MSFS CTDs.<br><br>
 
 **Really, really important:**
 - Do not even mention, let alone try to discuss, this app on the MSFS official forums, even in personal messages, as they have taken the view that this app modifies licenced data, regardless of how harmless the way in which the app does it, and is therefore a violation of their Terms of Service and Code of Conduct for that website. If you do so, your post/personal message will be flagged by moderators and you may get banned from the MSFS official forums. You have been warned!
 - Notwithstanding, there is a new MSFS wishlist item requesting simconnect variables access to MSFS settings, which would allow me to make this app legitimate in MS/Abobo's eyes and expand the range of possibilities of what this app could do in future. Please vote for it [here](https://forums.flightsimulator.com/t/expose-tlod-olod-clouds-etc-via-simconnect-l-vars/634075). 
 
 Important:<br/> 
-- This utility directly accesses active MSFS memory locations while MSFS is running to read and set TLOD and cloud quality settings on the fly at a maximum rate of one read and, if required, change per setting per second. The utility will first verify that the MSFS memory locations being used are still valid and if not, likely because of an MSFS version change, will attempt to find where they have been relocated. If it does find the new memory locations and they pass validation tests, the utility will update itself automatically and will function as normal. If it can't find or validate MSFS memory locations at any time when starting up, the utility will self-restrict to read only mode to prevent the utility making changes to unknown MSFS memory locations.
-- As such, I believe the app to be robust in its interaction with validated MSFS memory locations and to be responsible in disabling itself if it can't guarantee that. Nonetheless, this utility is offered as is and no responsibility will be taken for unintended negative side effects. Use at your own risk!<br/><br/>
+- This app directly accesses active MSFS memory locations while MSFS is running to read and set TLOD and cloud quality settings on the fly at a maximum rate of one read and, if required, change per setting per second. The app will first verify that the MSFS memory locations being used are still valid and if not, likely because of an MSFS version change, will attempt to find where they have been relocated. If it does find the new memory locations and they pass validation tests, the app will update itself automatically and will function as normal. If it can't find or validate MSFS memory locations at any time when starting up, the app will self-restrict to read only mode to prevent the app making changes to unknown MSFS memory locations.
+- As such, I believe the app to be robust in its interaction with validated MSFS memory locations and to be responsible in disabling itself if it can't guarantee that. Nonetheless, this app is offered as is and no responsibility will be taken for unintended negative side effects. Use at your own risk!<br/><br/>
 
 I am new to this app/MSFS, or I don't care for all this technical jargon. What is the simplest way to use this app to make my MSFS experience better?
 - Start the app before you load your flight,
@@ -45,7 +45,7 @@ Frame Generation (FG) users:
 - If FG is being incorrectly reported as enabled by the app, the likely reason is that either the FG mod had been installed and removed or you have disabled Hardware Accelerated Graphics Scheduling under Windows settings and the now the now greyed out MSFS FG setting may show that it is off but it is still set to on internally to MSFS. To fix, change the DLSSG line in your UserCfg.opt file to be DLSSG 0.
 
 Dangerous/Unsafe program warnings:
-- This utility is unsigned because I am a hobbyist and the cost of obtaining certification is prohibitive to me, so you may get a warning message of a potentially dangerous app when you download it in a web browser like Chrome or from your antivirus program, including Windows Defender.
+- This app is unsigned because I am a hobbyist and the cost of obtaining certification is prohibitive to me, so you may get a warning message of a potentially dangerous app when you download it in a web browser like Chrome or from your antivirus program, including Windows Defender.
 - You can either trust this download, based on feedback you can easily find on Avsim and Youtube, make an exception in your browser and/or antivirus program for the download then run a virus scan and malware scan before you install just be sure, or just not install and use this app.<br/><br/>
 
 ## Requirements
@@ -63,12 +63,12 @@ The Installer will install the following Software:
 <br/><br/>
 
 ## Installation / Update / Uninstall
-Basically: Just run the Installer to do all three of these.<br/>
+Basically: Just run the Installer to either install, update or uninstall.<br/>
 
 Some Notes:
 - MSFS2020_AutoFPS has to be stopped before installing.
 - If the MobiFlight Module is not installed or outdated, MSFS also has to be stopped.
-- If you have duplicate MobiFlight Modules installed, in either your official or community folders, the utility may display 0 value Sim Values and otherwise not function. Remove the duplicate versions, rerun the utility installer and it should now work.
+- If you have duplicate MobiFlight Modules installed, in either your official or community folders, the app may display 0 value Sim Values and otherwise not function. Remove the duplicate versions, rerun the app installer and it should now work.
 - Do not run the Installer as Admin!
 - If the installer will not run at all, Windows SmartScreen is potentially blocking it because the app is so new. The solution to try is:
   - Right-click on the Installer and select properties
@@ -77,7 +77,7 @@ Some Notes:
   - Then try to install it again
 - If you wish to retain your settings for an update version, do NOT uninstall first, as that deletes all app files, including the config file. Just run the installer, select update and your settings will be retained.
 - For Auto-Start either your FSUIPC7.ini or EXE.xml (MSFS) is modified. The Installer does not create a Backup.
-- The utility may be blocked by Windows Security or your AV-Scanner, try if unblocking and/or setting an Exception helps (for the whole Folder)
+- The app may be blocked by Windows Security or your AV-Scanner, if so try to unblock or set an exception (for the whole Folder)
 - The Installation-Location is fixed to %appdata%\MSFS2020_AutoFPS (your Users AppData\Roaming Folder) and can't be changed.
   - Binary in %appdata%\MSFS2020_AutoFPS\bin
   - Logs in %appdata%\MSFS2020_AutoFPS\log
@@ -110,8 +110,8 @@ Some Notes:
 ## Usage / Configuration
 
 - General
-  - Starting manually: anytime, but preferably before MSFS or in the Main Menu. The utility will stop itself when MSFS closes. 
-  - Closing the Window does not close the utility, use the Context Menu of the SysTray Icon.
+  - Starting manually: anytime, but preferably before MSFS or in the Main Menu. The app will stop itself when MSFS closes. 
+  - Closing the Window does not close the app, use the Context Menu of the SysTray Icon.
   - Clicking on the SysTray Icon opens the Window (again).
   - If you wish to have the app window always open to the SysTray, close the app and manually change the openWindow key state in the config file to false.
   - Runnning as Admin NOT usually required (BUT: It is required to be run under the same User/Elevation as MSFS).
@@ -163,31 +163,32 @@ Some Notes:
     - TLOD Maximum - 300% of your current MSFS TLOD setting
     - TLOD Min + - enabled
     - Decrease Cloud Quality - enabled
-    - Cloud Recovery TLOD - 2/5 between TLOD Minimum and TLOD Maximum or + 50 over TLOD Min, whichever is lower
+    - Cloud Recovery TLOD
+      - 2/5 between TLOD Minimum and TLOD Maximum or + 50 over TLOD Min, whichever is lower.
+      - If excessive changing of cloud quality levels are detected, the app will automatically increase its calculated cloud recovery TLOD.
     - Auto OLOD - enabled
     - Pause when MSFS loses focus - disabled
-- MSFS Settings
-  - FPS Sensitivity - Determines how sensitive the app will be to variance from your target FPS before it will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be. The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller. Vice versa for higher settings. When expert settings are disabled, the default value of 5 should provide the most balanced experience.
-  -  Pause when MSFS loses focus - This will stop LODs and, if applicable, cloud quality from changing while you are focused on another app and not MSFS. It is particularly useful for when using FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. When expert settings are disabled, the app will disable this setting.
+- Expert Settings
+  - FPS Sensitivity - Determines how sensitive the app will be to variance from your target FPS before it will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be. The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller. Vice versa for higher settings. 
+  - Pause when MSFS loses focus - This will stop LODs and, if applicable, cloud quality from changing while you are focused on another app and not MSFS. It is particularly useful for when using FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. 
   - TLOD Min with optional +
-    - Sets the minimum TLOD the automation algorithm will use. When expert settings are disabled, the app will use 50% of your existing MSFS TLOD setting for this parameter.
-    - When + is checked or is enabled by default in non-expert mode, your TLOD Min will increase by 50 if system is achieving 15% or greater FPS than your target FPS to provide addition graphics quality with this additional performance.
+    - Sets the minimum TLOD the automation algorithm will use. 
+    - When + is checked and your system is achieving 15% or greater FPS than your target FPS, then your TLOD Min will increase by 50 - giving you additional graphics quality. 
     - TLOD Min + will only activate on the ground or when descending and transitioning from FPS to TLOD priority mode. Once activated on the ground, it will remain set so as not to tempt ground texture corruption occurring. On descent, if minimum performance can not be maintained for TLOD Min +, it will self-cancel before landing without any sudden TLOD changes.
-  -  TLOD Max - Sets the maximum TLOD the automation algorithm will use. When expert settings are disabled, the app will use 200% of your existing MSFS TLOD setting for this parameter.
+  -  TLOD Max - Sets the maximum TLOD the automation algorithm will use. 
   - Alt TLOD Base - only visible when flight type selected is IFR. This is the altitude at or below which TLOD will be at TLOD Min.
   - Avg Descent Rate
     - Only visible when flight type selected is IFR.
     - Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
     - This band ensures that, if you descend at your set Avg Descent Rate or less, that the app can decrement TLOD from TLOD Max to TLOD Min by the Alt TLOD Base without exceeding the LOD Step rate associated with the FPS sensitivity level you have set.
-  - Decrease Cloud Quality - When enabled, will reduce cloud quality by one level if TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance. This is enabled automatically in non-expert mode.
+  - Decrease Cloud Quality - When enabled, will reduce cloud quality by one level if TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance. 
   - Cloud Recovery TLOD with optional +
     - The TLOD level required to cancel an active cloud quality reduction state and restore cloud quality back to its initial higher quality level.
     - Provides a TLOD buffer to account for the increased TLOD achieved by reducing cloud quality and will minimise the chance that cloud quality will constantly change down and up.
-    - In expert mode it is ideally set to 50 TLOD or more above TLOD Min provided that the aforementioned conditions can be met.
-    - In non-expert mode the app will use your existing MSFS TLOD setting as the basis for calculating for this parameter and if it detects excessive changing it will automatically increase its calculated cloud recovery TLOD.
+    - Ideally set to 50 TLOD or more above TLOD Min provided that the aforementioned conditions can be met.
     - When + is checked, Cloud Recovery TLOD becomes relative to TLOD Min instead of absolute.
   -  Auto OLOD
-     -  This option is enabled by default in non-expert mode. When enabled, four user definable parameters relating to this feature will be revealed on the UI.
+     -  When enabled, four user definable parameters relating to this feature will be revealed on the UI.
      -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base and top level and with OLOD values defined for each of these altitudes.
      -  The app will set OLOD @ Base at or below the Alt OLOD Base, set the OLOD @ Top at or above Alt OLOD Top and interpolate in between. Note that OLOD @ Base can be higher, lower or the same value as the OLOD @ Top, depending on whether you want OLOD to decrease, increase or stay the same respectively as you ascend. 
 <br/><br/>
