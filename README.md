@@ -123,7 +123,7 @@ Some Notes:
   - Green means the sim value is at or better than target value being sought, red means at lowest level or worse than target value being sought, orange means TLOD or OLOD is auto adjusting, black is shown otherwise.
   - FPS shows the FPS for the current graphics mode averaged over 5 seconds which will smooth out any transient FPS spikes experienced when panning or loading new scenery or objects so that automated MSFS setting changes are minimised.
 - General
-  - Status Message - On app startup indicates key system messages, such as:
+  - Status Message - Displays key system messages, such as:
     - Before loading a flight - whether a newer version of the app is available to download and install
     - Loading in to a flight  - whether MSFS memory integrity test have failed, and
     - Flight is loaded
