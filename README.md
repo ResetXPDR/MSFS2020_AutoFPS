@@ -185,7 +185,7 @@ Some Notes:
     - In non-expert mode the app will use your existing MSFS TLOD setting as the basis for calculating for this parameter and if it detects excessive changing it will automatically increase its calculated cloud recovery TLOD.
     - When + is checked, Cloud Recovery TLOD becomes relative to TLOD Min instead of absolute.
   -  Auto OLOD
-     -  This option is disabled by default. When enabled, four user definable parameters relating to this feature will be revealed on the UI.
+     -  This option is enabled by default in non-expert mode. When enabled, four user definable parameters relating to this feature will be revealed on the UI.
      -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base and top level and with OLOD values defined for each of these altitudes.
      -  The app will set OLOD @ Base at or below the Alt OLOD Base, set the OLOD @ Top at or above Alt OLOD Top and interpolate in between. Note that OLOD @ Base can be higher, lower or the same value as the OLOD @ Top, depending on whether you want OLOD to decrease, increase or stay the same respectively as you ascend. 
 <br/><br/>
