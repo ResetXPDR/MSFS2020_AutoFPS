@@ -5,7 +5,7 @@ Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by
 This utility is a new development that is a simplification of, and a slightly different concept to, DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use GUI and provides features such as:<br/>
 - Automatic TLOD adjustment when in the air to achieve a user-defined target FPS band based on pre or user-defined maximum and minimum TLODs,
 - Improved target FPS tracking for all modes by having much smaller TLOD changes the closer you are to your target FPS, giving more consistent FPS for a better flight experience.    
-- Choose between VFR and IFR flight types, which changes the flight phases where the app prioritises FPS or TLOD,
+- A choice between VFR and IFR flight types, which changes the flight phases where the app prioritises FPS or TLOD, depending on flight phase,
 - Auto raising and lowering of the minimum TLOD option, depending on low altitude performance being either very favourable or poor respectively,
 - Auto target FPS option, which is useful if you don't know what target FPS to choose or if your flights are so varied that a single target FPS value is not always appropriate,
 - Cloud quality decrease option for when FPS can't be achieved at the lowest desired TLOD,
@@ -118,7 +118,7 @@ Some Notes:
   - Red values indicate not connected, green is connected.
 - Sim Values
   - Will not show valid values unless all three connections are green. n/a means not available right now.
-  - Green means the sim value is at or better than target value being sought, red means at lowest level or worse than target value being sought, orange means TLOD is auto adjusting, black is shown otherwise.
+  - Green means the sim value is at or better than target value being sought, red means at lowest level or worse than target value being sought, orange means TLOD or OLOD is auto adjusting, black is shown otherwise.
   - FPS shows the FPS for the current graphics mode averaged over 5 seconds which will smooth out any transient FPS spikes experienced when panning or loading new scenery or objects so that automated MSFS setting changes are minimised.
   - Priority will show whether FPS or TLOD Min are the current automation priority, depending on which flight type you have chosen and in what phase of flight you currently are. See the section on flight types for more information on this. 
 - General
