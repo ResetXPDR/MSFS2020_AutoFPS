@@ -1,7 +1,5 @@
 # MSFS2020_AutoFPS
 
-(Currently being updated in preparation for the imminent release of v0.4.2)
-
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
 
 This app aims to improve the MSFS user experience by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use UI and provides features such as:<br/>
