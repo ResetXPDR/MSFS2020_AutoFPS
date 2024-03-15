@@ -11,8 +11,9 @@ This utility is a new development that is a simplification of, and a slightly di
 - Cloud quality decrease option for when FPS can't be achieved at the lowest desired TLOD,
 - Automatic OLOD adjustment option based on an automatic or user-definable OLOD range and altitude band,
 - Simultaneous PC, FG and VR mode compatibilty including correct FG FPS display and separate FPS targets for each mode,
-- A greatly simplified non-expert UI option that uses pre-defined settings for an automated experience suited to most user scenarios, and
-- Auto restoration of original MSFS settings changed by the utility.<br/><br/>
+- A greatly simplified non-expert default UI option that uses pre-defined settings for an automated experience suited to most user scenarios,
+- Auto detection and protection from known similar apps already running or incompatibilities with newer MSFS versions, and
+- Auto restoration of original MSFS settings changed by the utility.<br/><br/
 
 **Really, really important:**<br>
 - Do not even mention, let alone try to discuss, this app on the MSFS official forums, even in personal messages, as they have taken the view that this app modifies licenced data, regardless of how harmless the way in which the app does it, and is therefore a violation of their Terms of Service and Code of Conduct for that website. If you do so, your post/personal message will be flagged by moderators and you may get banned from the MSFS official forums. You have been warned!
@@ -23,7 +24,7 @@ Important:<br/>
 - As such, I believe the app to be robust in its interaction with validated MSFS memory locations and to be responsible in disabling itself if it can't guarantee that. Nonetheless, this utility is offered as is and no responsibility will be taken for unintended negative side effects. Use at your own risk!<br/><br/>
 
 I am a noob, or I don't care for all this technical jargon. What is the simplest way to use this app to make my MSFS experience better?
-- (v0.4.2) Simply start the app, preferably before you load your flight, pick what type of flight you are doing ie. either VFR (GA aircraft) or IFR (airliners), pick a realistic target FPS (or click on auto target FPS for the app to pick it for you), wait until any FPS settle timer has finished (20 seconds max), then go fly!
+- (v0.4.2) Simply start the app, preferably before you load your flight, leave Use Expert Settings unchecked, pick what type of flight you are doing via the radio buttons ie. either VFR (GA aircraft) or IFR (airliners), enter a realistic target FPS (or click on auto target FPS for the app to pick it for you), click back on MSFS and wait until any FPS settle timer has finished (20 seconds max), then go fly!
 
 Which app should I use? DynamicLOD_ResetEdition or MSFS2020_AutoFPS?:
 - Essentially both apps are intended to give you better overall performance but with different priorities to achieve it that result in a slightly different experience.  They both allow a lower TLOD down low and on the ground, when your viewing distance reduced anyway so the visual impact is minimal, and a higher TLOD when at higher altitude and not in close proximity to complex scenery or traffic. They also adjust OLOD and Cloud Quality but TLOD is usually the most important determiner of performance at these two extremes.
@@ -120,18 +121,20 @@ Some Notes:
     - There is a setting for each graphics mode (PC, FG and VR) which you can only change while in that mode and on the ground or in a flight. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR. If using FG, the target FPS you set is your desired FG Active FPS, not the FG Inactive FPS you see when this app has the focus instead of MSFS. 
     - If you use an FPS cap, or Vsync for the same purpose, you will need to set your target FPS to be around 10% lower than that cap. This allows the automated TLOD increase logic to function properly because it needs FPS to get above the target FPS plus the FPS tolerance to activate an increase in TLOD. If doing so causes unacceptable tearing of the image on your monitor, or breaks motion reprojection if you use it with VR, then this app isn't suitable for you.
   - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
-    - FPS Tolerance - 5%
-    - TLOD Minimum on Ground/Landing - enabled
+    - (v0.4.2) Auto Target FPS - user selectable 
+    - FPS (v0.4.1) Tolerance (v0.4.2) Sensitivity - 5%
+    - (v0.4.1) TLOD Minimum on Ground/Landing - enabled
+    - (v0.4.2) VFR or IFR flight type - user selectable
     - Alt TLOD Base - 1000 ft
     - Avg Descent Rate - 2000 fpm
     - TLOD Minimum - 50% of your current MSFS TLOD setting
-    - TLOD Maximum - 200% of your current MSFS TLOD setting
+    - TLOD Maximum - (v0.4.1) 200% (v0.4.2) 300% of your current MSFS TLOD setting
+    - (v0.4.2) TLOD Min + - enabled
     - Decrease Cloud Quality - enabled
-    - Cloud Recovery TLOD - 2/5 between TLOD Minimum and TLOD Maximum
-    - Auto OLOD - disabled
+    - Cloud Recovery TLOD - 2/5 between TLOD Minimum and TLOD Maximum (v0.4.2) or + 50, whichever is lower
+    - Auto OLOD - (v0.4.1) disabled (v0.4.2) enabled
     - Pause when MSFS loses focus - disabled
   - On Top - allows the app to overlay your MSFS session if desired, with MSFS having the focus. This is mainly useful for adjusting settings and seeing the outcome over the top of your flight as it progresses. It should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
-  - Open window on app start - determines the app window's startup state.
   - Status Message - On app startup indicates key system messages, such as:
     - Before loading a flight - whether a newer version of the app is available to download and install
     - Loading in to a flight  - whether MSFS memory integrity test have failed, and
