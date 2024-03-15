@@ -140,7 +140,7 @@ Some Notes:
     - When checked, a target FPS will automatically be calculated, following any initial FPS settling, when stationary on the ground or any time you are in the air.
     - Automatically recalulated if performance conditions are too low for the calculated target FPS, on the ground after arriving at a new destination, if you change graphics mode or if you uncheck then check the option again for a quick recalibration.
     - With IFR it will range from 95% of your current average FPS on the ground to 85% at or above 3000 ft, the latter being lower to give head room for Max TLOD.
-    - With VFR it will be 5% less than each of the IFR percentages respectively to better suit the greater performance expectation with VFR flights..
+    - With VFR it will be 5% less than each of the IFR percentages respectively to better suit the greater performance expectation with VFR flights.
   - On Top
     - Allows the app to overlay your MSFS session if desired, with MSFS having the focus.
     - Mainly useful for adjusting settings and seeing the outcome over the top of your flight as it progresses.
