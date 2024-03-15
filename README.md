@@ -15,7 +15,7 @@ This utility is a new development that is a simplification of, and a slightly di
 - Simultaneous PC, FG and VR mode compatibilty including correct FG FPS display and separate FPS targets for each mode,
 - A greatly simplified non-expert default UI option that uses pre-defined settings for an automated experience suited to most user scenarios,
 - Auto detection and protection from known similar apps already running or incompatibilities with newer MSFS versions, and
-- Auto restoration of original MSFS settings changed by the utility.<br><br>
+- Auto restoration of original MSFS settings changed by the utility, recently enhanced to withstand MSFS CTDs.<br><br>
 
 **Really, really important:**
 - Do not even mention, let alone try to discuss, this app on the MSFS official forums, even in personal messages, as they have taken the view that this app modifies licenced data, regardless of how harmless the way in which the app does it, and is therefore a violation of their Terms of Service and Code of Conduct for that website. If you do so, your post/personal message will be flagged by moderators and you may get banned from the MSFS official forums. You have been warned!
