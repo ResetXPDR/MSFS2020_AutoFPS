@@ -120,7 +120,6 @@ Some Notes:
   - Will not show valid values unless all three connections are green. n/a means not available right now.
   - Green means the sim value is at or better than target value being sought, red means at lowest level or worse than target value being sought, orange means TLOD or OLOD is auto adjusting, black is shown otherwise.
   - FPS shows the FPS for the current graphics mode averaged over 5 seconds which will smooth out any transient FPS spikes experienced when panning or loading new scenery or objects so that automated MSFS setting changes are minimised.
-  - Priority will show whether FPS or TLOD Min are the current automation priority, depending on which flight type you have chosen and in what phase of flight you currently are. See the section on flight types for more information on this. 
 - General
   - Target FPS - The most important setting in this app.
     - Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
@@ -130,10 +129,20 @@ Some Notes:
     - When checked, a target FPS will automatically be calculated, following any initial FPS settling, when stationary on the ground or any time you are in the air.
     - Automatically recalulated if performance conditions are too low for the calculated target FPS, on the ground after arriving at a new destination, if you change graphics mode or if you uncheck then check the option again for a quick recalibration.
     - Will range from 96% of your current average FPS on the ground to 85% at or above 3000 ft, the latter being lower to give head room for Max TLOD that should likely be achievable at altitude.
-  - On Top - allows the app to overlay your MSFS session if desired, with MSFS having the focus. This is mainly useful for adjusting settings and seeing the outcome over the top of your flight as it progresses.
+  - On Top
+    - Allows the app to overlay your MSFS session if desired, with MSFS having the focus.
+    - Mainly useful for adjusting settings and seeing the outcome over the top of your flight as it progresses.
+    - Should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
   - Flight type
-       - VFR - your TLOD will be locked any time you are below 100 ft or are on the ground, except if TLOD Min + gets activated if enabled and performance conditions are good enough to boost your starting TLOD. Once in the air above 100 ft, your TLOD will dynamically change to achieve your target FPS. Once below 100 ft, your TLOD will lock to whatever it last was and will stay that way until you take off and climb above 100 ft.
-       - IFR - exactly like the old TLOD Min on ground/landing option whereby your TLOD will be locked to either a pre-determined (non-expert) or user-selectable (expert) TLOD Min. Again, TLOD Min + may increase this should performance conditions be good enough to boost your starting TLOD. Once in the air and above either a pre-determined (non-expert) or user-selectable (expert) TLOD base altitude, TLOD will be allowed to change to the lower of either the schedule based on your TLODs, FPS sensitivity and average descent rate settings or what your current performance dictates. On descent your TLOD will progressively work its way down to TLOD Min by the TLOD base altitude. As with VFR mode, TLOD will not change on the ground unless TLOD Min + is activated and performance conditions are met.
+       - VFR
+         - TLOD will be locked any time you are below 100 ft or are on the ground, except if TLOD Min + gets activated if enabled and performance conditions are good enough to boost your starting TLOD.
+         - Once in the air above 100 ft, your TLOD will dynamically change to achieve your target FPS.
+         - Once below 100 ft, your TLOD will lock to whatever it last was and will stay that way until you take off and climb above 100 ft.
+       - IFR
+         - Exactly like the old TLOD Min on ground/landing option whereby your TLOD will be locked to either a pre-determined (non-expert) or user-selectable (expert) TLOD Min.
+         - Again, TLOD Min + may increase this should performance conditions be good enough to boost your starting TLOD.
+         - Once in the air and above either a pre-determined (non-expert) or user-selectable (expert) TLOD base altitude, TLOD will be allowed to change to the lower of either the schedule based on your TLODs, FPS sensitivity and average descent rate settings or what your current performance dictates.
+         - On descent your TLOD will progressively work its way down to TLOD Min by the TLOD base altitude. As with VFR mode, TLOD will not change on the ground unless TLOD Min + is activated and performance conditions are met.
   - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
     - Auto Target FPS - user selectable 
     - FPS Sensitivity - 5%
@@ -147,11 +156,13 @@ Some Notes:
     - Cloud Recovery TLOD - 2/5 between TLOD Minimum and TLOD Maximum or + 50 over TLOD Min, whichever is lower
     - Auto OLOD - enabled
     - Pause when MSFS loses focus - disabled
-should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
   - Status Message - On app startup indicates key system messages, such as:
     - Before loading a flight - whether a newer version of the app is available to download and install
     - Loading in to a flight  - whether MSFS memory integrity test have failed, and
-    - Flight is loaded - showing detected DX version, Graphics Mode (PC, FG, or VR), and app pause or FPS settling time status as applicable. The FPS settling timer runs for 6 seconds to allow FPS to settle between pausing/unpausing and VR/PC/FG mode transitions. This allows the FPS to stabilise before engaging automatic functions and should lead to much smaller TLOD changes when seeking the target FPS on such transitions.
+    - Flight is loaded
+      - Shows detected DX version, Graphics Mode (PC, FG, or VR), app pause, FPS settling time, and/or app priority mode as applicable.
+      - The FPS settling timer runs for up to 20 seconds to allow FPS to settle between pausing/unpausing, auto target FPS calibration, TLOD Min + transitions and VR/PC/FG mode transitions. This allows the FPS to stabilise before engaging automatic functions and should lead to much smaller TLOD changes when seeking the target FPS on such transitions.
+      - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected.
 - MSFS Settings
   -  FPS Tolerance - Determines how much variance from your target FPS must occur before the app will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be. The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller. Vice versa for higher settings. When expert settings are disabled, the default value of 5% should provide the most balanced experience.
   -  TLOD Min on Ground/Landing option 
