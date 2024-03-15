@@ -3,7 +3,8 @@
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
 
 This utility is a new development that is a simplification of, and a slightly different concept to, DynamicLOD_ResetEdition. It aims to improve MSFS performance and smoothness by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use GUI and provides features such as:<br/>
-- Automatic TLOD adjustment, only in the air, to achieve a user-defined target FPS band based on pre or user-defined maximum and minimum TLODs,
+- Automatic TLOD adjustment when in the air to achieve a user-defined target FPS band based on pre or user-defined maximum and minimum TLODs,
+- (v0.4.2) Improved target FPS tracking for all modes by having much smaller TLOD changes the closer you are to your target FPS, giving more consistent FPS for a better flight experience.    
 - (v0.4.1) TLOD minimum on ground/landing option, which prioritises TLOD over FPS during these flight phases and also averts exacerbating existing texture tearing issues with DX12,
 - (v0.4.2) Choose between VFR and IFR flight types, which changes the flight phases where the app prioritises FPS or TLOD,
 - (v0.4.2) Auto raising and lowering of the minimum TLOD option, depending on low altitude performance being either very favourable or poor respectively,
@@ -13,18 +14,23 @@ This utility is a new development that is a simplification of, and a slightly di
 - Simultaneous PC, FG and VR mode compatibilty including correct FG FPS display and separate FPS targets for each mode,
 - A greatly simplified non-expert default UI option that uses pre-defined settings for an automated experience suited to most user scenarios,
 - Auto detection and protection from known similar apps already running or incompatibilities with newer MSFS versions, and
-- Auto restoration of original MSFS settings changed by the utility.<br/><br/
+- Auto restoration of original MSFS settings changed by the utility.<br><br>
 
-**Really, really important:**<br>
+**Really, really important:**
 - Do not even mention, let alone try to discuss, this app on the MSFS official forums, even in personal messages, as they have taken the view that this app modifies licenced data, regardless of how harmless the way in which the app does it, and is therefore a violation of their Terms of Service and Code of Conduct for that website. If you do so, your post/personal message will be flagged by moderators and you may get banned from the MSFS official forums. You have been warned!
 - Notwithstanding, there is a new MSFS wishlist item requesting simconnect variables access to MSFS settings, which would allow me to make this app legitimate in MS/Abobo's eyes and expand the range of possibilities of what this app could do in future. Please vote for it [here](https://forums.flightsimulator.com/t/expose-tlod-olod-clouds-etc-via-simconnect-l-vars/634075). 
 
 Important:<br/> 
-- This utility directly accesses active MSFS memory locations while MSFS is running to read and set TLOD and cloud quality settings on the fly at a maximum rate of one read and, if required, change per setting per second. The utility will first verify that the MSFS memory locations being used are still valid and if not, likely because of an MSFS version change, will attempt to find where they have been relocated. If it does find the new memory locations and they pass validation tests, the utility will update itself automatically and will function as normal. If it can't find or validate MSFS memory locations at any time when starting up, the utility will self-restrict to read only mode to prevent the utility making changes to unknown MSFS memory locations.<br/>
+- This utility directly accesses active MSFS memory locations while MSFS is running to read and set TLOD and cloud quality settings on the fly at a maximum rate of one read and, if required, change per setting per second. The utility will first verify that the MSFS memory locations being used are still valid and if not, likely because of an MSFS version change, will attempt to find where they have been relocated. If it does find the new memory locations and they pass validation tests, the utility will update itself automatically and will function as normal. If it can't find or validate MSFS memory locations at any time when starting up, the utility will self-restrict to read only mode to prevent the utility making changes to unknown MSFS memory locations.
 - As such, I believe the app to be robust in its interaction with validated MSFS memory locations and to be responsible in disabling itself if it can't guarantee that. Nonetheless, this utility is offered as is and no responsibility will be taken for unintended negative side effects. Use at your own risk!<br/><br/>
 
-I am a noob, or I don't care for all this technical jargon. What is the simplest way to use this app to make my MSFS experience better?
-- (v0.4.2) Simply start the app, preferably before you load your flight, leave Use Expert Settings unchecked, pick what type of flight you are doing via the radio buttons ie. either VFR (GA aircraft) or IFR (airliners), enter a realistic target FPS (or click on auto target FPS for the app to pick it for you), click back on MSFS and wait until any FPS settle timer has finished (20 seconds max), then go fly!
+(v0.4.2) I am a noob, or I don't care for all this technical jargon. What is the simplest way to use this app to make my MSFS experience better?
+- Start the app, preferably before you load your flight,
+- Leave Use Expert Settings unchecked,
+- Pick what type of flight you are doing via the radio buttons ie. either VFR (GA aircraft) or IFR (airliners),
+- Enter a realistic target FPS (or click on auto target FPS for the app to pick it for you),
+- Click back on MSFS and wait until any FPS settle timer has finished (20 seconds max), then
+- Go fly!
 
 Which app should I use? DynamicLOD_ResetEdition or MSFS2020_AutoFPS?:
 - Essentially both apps are intended to give you better overall performance but with different priorities to achieve it that result in a slightly different experience.  They both allow a lower TLOD down low and on the ground, when your viewing distance reduced anyway so the visual impact is minimal, and a higher TLOD when at higher altitude and not in close proximity to complex scenery or traffic. They also adjust OLOD and Cloud Quality but TLOD is usually the most important determiner of performance at these two extremes.
@@ -106,7 +112,8 @@ Some Notes:
   - Starting manually: anytime, but preferably before MSFS or in the Main Menu. The utility will stop itself when MSFS closes. 
   - Closing the Window does not close the utility, use the Context Menu of the SysTray Icon.
   - Clicking on the SysTray Icon opens the Window (again).
-  - Runnning as Admin NOT required (BUT: It is required to be run under the same User/Elevation as MSFS).
+  - If you wish to have the app window always open to the SysTray, close the app and manually change the openWindow key state in the config file to false.
+  - Runnning as Admin NOT usually required (BUT: It is required to be run under the same User/Elevation as MSFS).
   - Do not change TLOD, OLOD and Cloud Quality MSFS settings manually while in a flight with this app running as it will conflict with what the app is managing and they will not restore to what you set when you exit your flight. If you wish to change the defaults for these MSFS settings, you must do so either without this app running or, if it is, only while you are in the MSFS main menu (ie not in a flight). 
 - Connection Status
   - Red values indicate not connected, green is connected.
@@ -119,7 +126,10 @@ Some Notes:
   - Target FPS - The most important setting in this app.
     - Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
     - There is a setting for each graphics mode (PC, FG and VR) which you can only change while in that mode and on the ground or in a flight. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR. If using FG, the target FPS you set is your desired FG Active FPS, not the FG Inactive FPS you see when this app has the focus instead of MSFS. 
-    - If you use an FPS cap, or Vsync for the same purpose, you will need to set your target FPS to be around 10% lower than that cap. This allows the automated TLOD increase logic to function properly because it needs FPS to get above the target FPS plus the FPS tolerance to activate an increase in TLOD. If doing so causes unacceptable tearing of the image on your monitor, or breaks motion reprojection if you use it with VR, then this app isn't suitable for you.
+    - If you use an FPS cap, or Vsync for the same purpose, you will need to set your target FPS to be around 10% lower than that cap. This allows the automated TLOD increase logic to function properly because it needs FPS to get above the target FPS plus the FPS tolerance to activate an increase in TLOD. If doing so causes unacceptable tearing of the image on your monitor, or breaks motion reprojection if you use it with VR, then this app likely isn't suitable for you.
+    - Flight type
+       - VFR - your TLOD will be locked any time you are below 100 ft or are on the ground, except if TLOD Min + gets activated if enabled and performance conditions are good enough to boost your starting TLOD. Once in the air above 100 ft, your TLOD will dynamically change to achieve your target FPS. Once below 100 ft, your TLOD will lock to whatever it last was and will stay that way until you take off and climb above 100 ft.
+       - IFR - exactly like the old TLOD Min on ground/landing option whereby your TLOD will be locked to either a pre-determined (non-expert) or user-selectable (expert) TLOD Min. Again, TLOD Min + may increase this should performance conditions be good enough to boost your starting TLOD. Once in the air and above either a pre-determined (non-expert) or user-selectable (expert) TLOD base altitude, TLOD will be allowed to change to the lower of either the schedule based on your TLODs, FPS sensitivity and average descent rate settings or what your current performance dictates. On descent your TLOD will progressively work its way down to TLOD Min by the TLOD base altitude. As with VFR mode, TLOD will not change on the ground unless TLOD Min + is activated and performance conditions are met.
   - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
     - (v0.4.2) Auto Target FPS - user selectable 
     - FPS (v0.4.1) Tolerance (v0.4.2) Sensitivity - 5%
