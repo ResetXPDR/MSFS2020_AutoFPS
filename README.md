@@ -9,7 +9,7 @@ This app aims to improve the MSFS user experience by automatically changing key 
 - Auto raising and lowering of the minimum TLOD option, depending on low altitude performance being either very favourable or poor respectively,
 - Auto target FPS option, which is useful if you don't know what target FPS to choose or if your flight types are so varied that a single target FPS value is not always appropriate,
 - Cloud quality decrease option for when FPS can't be achieved at the lowest desired TLOD,
-- Automatic OLOD adjustment option based on an automatic or user-definable OLOD range and altitude band,
+- Automatic OLOD adjustment option based on an automatic or user-definable OLOD range and altitude band (AGL),
 - Simultaneous PC, FG and VR mode compatibilty including correct FG FPS display and separate FPS targets for each mode,
 - A greatly simplified non-expert default UI option that uses pre-defined settings for an automated experience suited to most user scenarios,
 - Auto detection and protection from known similar apps already running or incompatibilities with newer MSFS versions, and
@@ -175,7 +175,7 @@ Some Notes:
     - When + is checked and your system is achieving 15% or greater FPS than your target FPS, then your TLOD Min will increase by 50 - giving you additional graphics quality. 
     - TLOD Min + will only activate on the ground or when descending and transitioning from FPS to TLOD priority mode. Once activated on the ground, it will remain set so as not to tempt ground texture corruption occurring. On descent, if minimum performance can not be maintained for TLOD Min +, it will self-cancel before landing without any sudden TLOD changes.
   -  TLOD Max - Sets the maximum TLOD the automation algorithm will use. 
-  - Alt TLOD Base - only visible when flight type selected is IFR. This is the altitude at or below which TLOD will be at TLOD Min.
+  - Alt TLOD Base - only visible when flight type selected is IFR. This is the altitude (AGL) at or below which TLOD will be at TLOD Min.
   - Avg Descent Rate
     - Only visible when flight type selected is IFR.
     - Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
@@ -189,5 +189,5 @@ Some Notes:
   -  Auto OLOD
      -  When enabled, four user definable parameters relating to this feature will be revealed on the UI.
      -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base and top level and with OLOD values defined for each of these altitudes.
-     -  The app will set OLOD @ Base at or below the Alt OLOD Base, set the OLOD @ Top at or above Alt OLOD Top and interpolate in between. Note that OLOD @ Base can be higher, lower or the same value as the OLOD @ Top, depending on whether you want OLOD to decrease, increase or stay the same respectively as you ascend. 
+     -  The app will set OLOD @ Base at or below the Alt OLOD Base (AGL), set the OLOD @ Top at or above Alt OLOD Top (AGL) and interpolate in between. Note that OLOD @ Base can be higher, lower or the same value as the OLOD @ Top, depending on whether you want OLOD to decrease, increase or stay the same respectively as you ascend. 
 <br/><br/>
