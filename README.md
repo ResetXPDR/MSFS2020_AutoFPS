@@ -101,7 +101,7 @@ Some Notes:
   </Launch.Addon>
 </SimBase.Document>
 ```
-- To uninstall, run the installer and select remove on the first window. This will remove all traces of the app, including the desktop icon, MSFS or FSUIPC autostart entries if you used them, and the entire app folder, including your configuration file.
+- To uninstall, ensure you have completely exited the app (ie. it is not hiding still running in your Systray), run the installer and select remove on the first window. This will remove all traces of the app, including the desktop icon, MSFS or FSUIPC autostart entries if you used them, and the entire app folder, including your configuration file.
 
 <br/><br/>
 
