@@ -168,7 +168,7 @@ Some Notes:
     - Auto OLOD - enabled
     - Pause when MSFS loses focus - disabled
 - Expert Settings
-  - FPS Sensitivity - Determines how sensitive the app will be to variance from your target FPS before it will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be. The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller. Vice versa for higher settings. 
+  - FPS Sensitivity - Determines how sensitive the app will be to the variance between your current and target FPS. It will also determine the largest step size you will see, being double the FPS sensitivity number. The lower the setting, the less reactive the app will be, the less MSFS settings changes will occur and the changes will be smaller. Vice versa for higher settings. 
   - Pause when MSFS loses focus - This will stop LODs and, if applicable, cloud quality from changing while you are focused on another app and not MSFS. It is particularly useful for when using FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. 
   - TLOD Min with optional +
     - Sets the minimum TLOD the automation algorithm will use. 
