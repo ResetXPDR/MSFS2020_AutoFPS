@@ -130,9 +130,11 @@ Some Notes:
       - The FPS settling timer runs for up to 20 seconds to allow FPS to settle between pausing/unpausing, auto target FPS calibration, TLOD Min + transitions and VR/PC/FG mode transitions. This allows the FPS to stabilise before engaging automatic functions and should lead to much smaller TLOD changes when seeking the target FPS on such transitions.
       - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected.
       - Bonus GPU load display if the optional GPU-Z companion app, downloadable separately [here](https://www.techpowerup.com/download/techpowerup-gpu-z/), is installed and detected running when starting this app.
+      - (v0.4.2.5) Auto pause will activate if in flight and either MSFS is in active pause or the MSFS settings menu is being accessed.
   - Target FPS - The most important setting in this app.
     - Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
-    - There is a setting for each graphics mode (PC, FG and VR) which you can only change while in that mode and on the ground or in a flight. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR. If using FG, the target FPS you set is your desired FG Active FPS, not the FG Inactive FPS you see when this app has the focus instead of MSFS. 
+    - There is a setting for each graphics mode (PC, FG and VR) (v0.4.2.5) and each flight mode (VFR and IFR), which you can only change while in those mode pairs. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR.
+    - If using FG, the target FPS you set is your desired FG Active FPS, not the FG Inactive FPS you see when this app has the focus instead of MSFS. 
     - If you use an FPS cap, or Vsync for the same purpose, you will need to set your target FPS to be a few FPS lower than that cap. This allows the automated TLOD increase logic to function properly because it needs FPS to get above the target FPS to activate an increase in TLOD. If doing so causes unacceptable tearing of the image on your monitor, or breaks motion reprojection if you use it with VR, then this app likely isn't suitable for you.
   - Auto Target FPS
     - When checked, a target FPS will automatically be calculated, following any initial FPS settling, when stationary on the ground or any time you are in the air.
@@ -148,6 +150,7 @@ Some Notes:
          - TLOD will be locked any time you are below 100 ft or are on the ground, except if TLOD Min + is enabled and gets activated where it will be higher.
          - Once in the air above 100 ft, your TLOD will dynamically change to achieve your target FPS.
          - Once below 100 ft, your TLOD will lock to whatever it last was and will stay that way until you take off and climb above 100 ft.
+         - Between 1000 ft and 100 ft there is a sliding scale reduction in TLOD changes to minimise the possibility of stutters near airports.
        - IFR
          - Exactly like the TLOD Min on ground/landing option from app versions prior to 0.4.2 whereby your TLOD will be locked to either a pre-determined (non-expert) or user-selectable (expert) TLOD Min.
          - Once in the air and above either a pre-determined (non-expert) or user-selectable (expert) TLOD base altitude, TLOD will be allowed to change to the lower of either the schedule based on your TLODs, FPS sensitivity and average descent rate settings or what your current performance dictates.
@@ -166,12 +169,17 @@ Some Notes:
       - 2/5 between TLOD Minimum and TLOD Maximum or + 50 over TLOD Min, whichever is lower.
       - If excessive changing of cloud quality levels are detected, the app will automatically increase its calculated cloud recovery TLOD.
     - Auto OLOD - enabled
-    - Pause when MSFS loses focus - disabled
+    - Pause when MSFS loses focus - disabled, (v0.4.2.5) except enabled if using FG
 - Expert Settings
-  - FPS Sensitivity
-    - Determines how sensitive the app will be to the variance between your current and target FPS.
-    - Also determines the largest TLOD step size you will see, being double the FPS sensitivity number.
-    - The lower the setting the smaller the changes will be, which is useful if you are experiencing stuttering with the default value of 5. Vice versa for higher settings. 
+  - FPS Automation Method - FPS Sensitivity generally gives better results and hence is the default. Use FPS Tolerance if you experience stuttering issues.
+    - FPS Sensitivity (v0.4.2 and later) - smaller changes more often.
+      - Determines how sensitive the app will be to the variance between your current and target FPS.
+      - Also determines the largest TLOD step size you will see, being double the FPS sensitivity number.
+      - The lower the setting the smaller the changes will be, which is useful if you are experiencing stuttering with the default value of 5. Vice versa for higher settings.
+    - FPS Tolerance (all versions except 0.4.2) - larger changes less often.
+      - Determines how much variance from your target FPS must occur before the app will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be.
+      - The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller.
+      - TLOD changes are allowable on the ground in this mode with the VFR flight type, so be aware of potential ground texture tearing/flashing issues because of it.
   - Pause when MSFS loses focus
     - Will stop LODs and, if applicable, cloud quality from changing while you are focused on another app and not MSFS.
     - Particularly useful for when using FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. 
