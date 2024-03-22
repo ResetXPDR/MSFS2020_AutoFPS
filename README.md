@@ -85,7 +85,7 @@ Some Notes:
   - There is an issue with permissions and you may need to run the app as Administrator. This is by far the most likely cause and resolution.
   - You may have changed MSFS settings in your usercfg.opt file beyond what is possible to set in the MSFS settings menu. To rectify, go into MSFS settings at the main menu and reset to default (F12) the graphics settings for both PC and VR mode, then make all changes to MSFS within the MSFS settings menu.
   - A new version of MSFS has come out that has a different memory map to what the app expects, which has happened only once since MSFS 2020 was released, and the app can't auto adjust to the new memory location for MSFS settings. If so, I will likely be already aware of it and working on a solution, but if you may be one of the first to encounter it (eg. on an MSFS beta) then please do let me know.
-- If you get an exception 'System.IO.DirectoryNotFoundException' during AutoStartExe when trying to install with the autostart option for MSFS, it usually means that your MSFS installation is missing the required EXE.xml file in which to place the autostart entry. To resolve, you need to  go to your MSFS root user directory (MS Store Version: "C:\Users\YOUR_USERNAME\AppData\Local\Packages\Microsoft. FlightSimulator_8wekyb3d8bbwe\LocalCache\ or Steam Version: "C:\Users\YOUR_USERNAME\AppData\Roaming\Microsoft Flight Simulator\") and manually create an EXE.xml file and save it there. You can use the following EXE.xml template, inserting your Windows username where shown:
+- If you get an exception 'System.IO.DirectoryNotFoundException' during AutoStartExe (v0.4.2.5) or an error message saying "Required EXE.xml file not found for AutoStartExe" when trying to install with the autostart option for MSFS, it usually means that your MSFS installation is missing the required EXE.xml file in which to place the autostart entry. To resolve, you need to  go to your MSFS root user directory (MS Store Version: "C:\Users\YOUR_USERNAME\AppData\Local\Packages\Microsoft. FlightSimulator_8wekyb3d8bbwe\LocalCache\ or Steam Version: "C:\Users\YOUR_USERNAME\AppData\Roaming\Microsoft Flight Simulator\") and manually create an EXE.xml file and save it there. You can use the following EXE.xml template, inserting your Windows username where shown:
 ```
 <?xml version="1.0" encoding="Windows-1252"?>
 <SimBase.Document Type="Launch" version="1,0">
@@ -112,6 +112,7 @@ Some Notes:
   - Closing the Window does not close the app, use the Context Menu of the SysTray Icon.
   - Clicking on the SysTray Icon opens the Window (again).
   - If you wish to have the app window always open to the SysTray, close the app and manually change the openWindow key state in the config file to false.
+  - (v0.4.2.5) The app's window position will be remembered between sessions. If there are issues with the window not displaying correctly on startup, as can happen when auto-starting the app through MSFS of FSUIPC, either don't use auto-start or this feature can be manually disabled in the config file by setting the RememberWindowPos line to be false.
   - Runnning as Admin NOT usually required (BUT: It is required to be run under the same User/Elevation as MSFS).
   - Do not change TLOD, OLOD and Cloud Quality MSFS settings manually while in a flight with this app running as it will conflict with what the app is managing and they will not restore to what you set when you exit your flight. If you wish to change the defaults for these MSFS settings, you must do so either without this app running or, if it is, only while you are in the MSFS main menu (ie not in a flight).
   - If you wish to activate additional logging of settings changes and sim values, as currently happens automatically in test versions, you need to manually edit your config file and add a LogSimValues key, if it doesn't already exist, and set its value to true ie.  ```<add key="LogSimValues" value="true" />```
@@ -147,12 +148,12 @@ Some Notes:
     - Should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
   - Flight type
        - VFR
-         - TLOD will be locked any time you are below 100 ft or are on the ground, except if TLOD Min + is enabled and gets activated where it will be higher.
+         - TLOD will be locked any time you are below 100 ft or are on the ground, except if (v0.4.2.5) using FPS Tolerance or if TLOD Min + is enabled and gets activated where it will be higher.
          - Once in the air above 100 ft, your TLOD will dynamically change to achieve your target FPS.
          - Once below 100 ft, your TLOD will lock to whatever it last was and will stay that way until you take off and climb above 100 ft.
-         - Between 1000 ft and 100 ft there is a sliding scale reduction in TLOD changes to minimise the possibility of stutters near airports.
+         - (v0.4.2.5) Between 1000 ft and 100 ft there is a sliding scale reduction in TLOD changes to minimise the possibility of stutters near airports.
        - IFR
-         - Exactly like the TLOD Min on ground/landing option from app versions prior to 0.4.2 whereby your TLOD will be locked to either a pre-determined (non-expert) or user-selectable (expert) TLOD Min.
+         - TLOD will be locked to either a pre-determined (non-expert) or user-selectable (expert) TLOD Min.
          - Once in the air and above either a pre-determined (non-expert) or user-selectable (expert) TLOD base altitude, TLOD will be allowed to change to the lower of either the schedule based on your TLODs, FPS sensitivity and average descent rate settings or what your current performance dictates.
          - On descent your TLOD will progressively work its way down to TLOD Min by the TLOD base altitude. As with VFR mode, TLOD will not change on the ground unless TLOD Min + enabled and activated.
   - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
@@ -169,7 +170,7 @@ Some Notes:
       - 2/5 between TLOD Minimum and TLOD Maximum or + 50 over TLOD Min, whichever is lower.
       - If excessive changing of cloud quality levels are detected, the app will automatically increase its calculated cloud recovery TLOD.
     - Auto OLOD - enabled
-    - Pause when MSFS loses focus - disabled, (v0.4.2.5) except enabled if using FG
+    - Pause when MSFS loses focus - disabled, (v0.4.2.5) unless using FG then enabled
 - Expert Settings
   - FPS Automation Method - FPS Sensitivity generally gives better results and hence is the default. Use FPS Tolerance if you experience stuttering issues.
     - FPS Sensitivity (v0.4.2 and later) - smaller changes more often.
