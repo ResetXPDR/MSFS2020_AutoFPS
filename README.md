@@ -140,7 +140,7 @@ Some Notes:
     - Flight is loaded
       - Shows detected DX version, Graphics Mode (PC, FG, or VR), app pause, FPS settling time, and/or app priority mode as applicable.
       - The FPS settling timer runs for up to 20 seconds to allow FPS to settle between pausing/unpausing, auto target FPS calibration, TLOD Min + transitions and VR/PC/FG mode transitions. This allows the FPS to stabilise before engaging automatic functions and should lead to much smaller TLOD changes when seeking the target FPS on such transitions.
-      - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected.
+      - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected. Locked in VFR mode means TLOD is locked because your aircraft is below 100 ft AGL where TLOD doesn't change.
       - Bonus GPU load display if the optional GPU-Z companion app, downloadable separately [here](https://www.techpowerup.com/download/techpowerup-gpu-z/), is installed and detected running when starting this app.
       - (v0.4.2.5) Auto pause will activate if in flight and either MSFS is in active pause or the MSFS settings menu is being accessed.
   - Target FPS - The most important setting in this app.
@@ -159,7 +159,7 @@ Some Notes:
     - Should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
   - Flight type
        - VFR
-         - TLOD will be locked any time you are below 100 ft or are on the ground, except if (v0.4.2.5) using FPS Tolerance where it can change on the ground or if TLOD Min + is enabled and gets activated where it will be higher.
+         - TLOD will be locked any time you are below 100 ft or are on the ground, except if TLOD Min + is enabled and gets activated where it will be higher.
          - Once in the air above 100 ft, your TLOD will dynamically change to achieve your target FPS.
          - Once below 100 ft, your TLOD will lock to whatever it last was and will stay that way until you take off and climb above 100 ft.
          - (v0.4.2.5) Between 1000 ft and 100 ft there is a sliding scale reduction in TLOD changes to minimise the possibility of stutters near airports.
