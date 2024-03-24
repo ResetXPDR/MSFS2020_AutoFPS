@@ -38,6 +38,7 @@ I am getting major stuttering, freezes or CTDs in MSFS using this app. What can 
 - By far the most common reason is users have enabled expert settings and have modified the default settings to be way beyond what their system is capable of, even without running the app.
 - As such, the first step to resolve is to restore the app's default settings, which you can do by using the installer to uninstall (remove option) and reinstall, which will recreate your config file.
 - Rerun the app and try non-expert mode with IFR flight type and Auto Target FPS checked.
+- If you are running the GPU-Z companion app, try shutting it down completely (not just minimise to SysTray) before running this app.
 - If this doesn't resolve it, try enabling expert options and reducing the FPS Sensitivity setting to 2, to allow smaller TLOD changes.
 - (v0.4.2.6) If still not resolved, try the FPS Tolerance mode, which was the automation method in the original release version that had larger TLOD changes but they occurred less often, with a setting of 5.
 - Finally, if still not resolved, raise an issue here on github and I will do my best to help you, provided you have completed all of the aforementioned steps first.
