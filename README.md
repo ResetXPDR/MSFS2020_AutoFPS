@@ -5,7 +5,7 @@ Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by
 This app aims to improve the MSFS user experience by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use UI and provides features such as:<br/>
 - Automatic TLOD adjustment when in the air to achieve and maintain a target FPS,
 - Improved target FPS tracking for all modes by having much smaller TLOD changes the closer you are to your target FPS, giving more consistent FPS for a better flight experience.    
-- A choice between VFR (GA) and IFR (Airliner) flight types, which changes the flight phases where the app prioritises FPS or TLOD,
+- A choice between VFR (GA) and IFR (Airliner) flight types, which changes the flight phases where the app prioritises FPS or TLOD (v0.4.2.8) or which defaults to settings suitable to each flight type and is fully customisable in Expert mode. 
 - Auto raising and lowering of the minimum TLOD option, depending on low altitude performance being either very favourable or poor respectively,
 - Auto target FPS option, which is useful if you don't know what target FPS to choose or if your flight types are so varied that a single target FPS value is not always appropriate,
 - Cloud quality decrease option for when FPS can't be achieved at the lowest desired TLOD,
@@ -38,9 +38,8 @@ I am getting major stuttering, freezes or CTDs in MSFS using this app. What can 
 - By far the most common reason is users have enabled expert settings and have modified the default settings to be way beyond what their system is capable of, even without running the app.
 - As such, the first step to resolve is to restore the app's default settings, which you can do by using the installer to uninstall (remove option) and reinstall, which will recreate your config file.
 - Rerun the app and try non-expert mode with IFR flight type and Auto Target FPS checked.
-- If you are running the GPU-Z companion app, try shutting it down completely (not just minimise to SysTray) before running this app.
 - If this doesn't resolve it, try enabling expert options and reducing the FPS Sensitivity setting to 2, to allow smaller TLOD changes.
-- (v0.4.2.6) If still not resolved, try the FPS Tolerance mode, which was the automation method in the original release version that had larger TLOD changes but they occurred less often, with a setting of 5.
+- (v0.4.2.8) If still not resolved, try the FPS Tolerance mode, which was the automation method in the original release version that had larger TLOD changes but they occurred less often, with a setting of 5.
 - Finally, if still not resolved, raise an issue here on github and I will do my best to help you, provided you have completed all of the aforementioned steps first.
 
 Which app should I use? DynamicLOD_ResetEdition or MSFS2020_AutoFPS?:
@@ -98,7 +97,7 @@ Some Notes:
   - You may have changed MSFS settings in your usercfg.opt file beyond what is possible to set in the MSFS settings menu. To rectify, go into MSFS settings at the main menu and reset to default (F12) the graphics settings for both PC and VR mode, then make all changes to MSFS within the MSFS settings menu.
   - A new version of MSFS has come out that has a different memory map to what the app expects, which has happened only once since MSFS 2020 was released, and the app can't auto adjust to the new memory location for MSFS settings. If so, I will likely be already aware of it and working on a solution, but if you may be one of the first to encounter it (eg. on an MSFS beta) then please do let me know.
 - If you get a message when starting the app that you need to install .NET desktop runtime, manually download it from [here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0).
-- If you get an exception 'System.IO.DirectoryNotFoundException' during AutoStartExe (v0.4.2.6) or an error message saying "Required EXE.xml file not found for AutoStartExe" when trying to install with the autostart option for MSFS, it usually means that your MSFS installation is missing the required EXE.xml file in which to place the autostart entry. To resolve, you need to  go to your MSFS root user directory (MS Store Version: "C:\Users\YOUR_USERNAME\AppData\Local\Packages\Microsoft. FlightSimulator_8wekyb3d8bbwe\LocalCache\ or Steam Version: "C:\Users\YOUR_USERNAME\AppData\Roaming\Microsoft Flight Simulator\") and manually create an EXE.xml file and save it there. You can use the following EXE.xml template, inserting your Windows username where shown:
+- If you get an exception 'System.IO.DirectoryNotFoundException' during AutoStartExe (v0.4.2.8) or an error message saying "Required EXE.xml file not found for AutoStartExe" when trying to install with the autostart option for MSFS, it usually means that your MSFS installation is missing the required EXE.xml file in which to place the autostart entry. To resolve, you need to  go to your MSFS root user directory (MS Store Version: "C:\Users\YOUR_USERNAME\AppData\Local\Packages\Microsoft. FlightSimulator_8wekyb3d8bbwe\LocalCache\ or Steam Version: "C:\Users\YOUR_USERNAME\AppData\Roaming\Microsoft Flight Simulator\") and manually create an EXE.xml file and save it there. You can use the following EXE.xml template, inserting your Windows username where shown:
 ```
 <?xml version="1.0" encoding="Windows-1252"?>
 <SimBase.Document Type="Launch" version="1,0">
@@ -125,7 +124,7 @@ Some Notes:
   - Closing the Window does not close the app, use the Context Menu of the SysTray Icon.
   - Clicking on the SysTray Icon opens the Window (again).
   - If you wish to have the app window always open to the SysTray, close the app and manually change the openWindow key state in the config file to false.
-  - (v0.4.2.6) The app's window position will be remembered between sessions. If there are issues with the window not displaying correctly on startup, as can happen when auto-starting the app through MSFS of FSUIPC, either don't use auto-start or manually disable this feature in the config file by setting the RememberWindowPos line to be false.
+  - (v0.4.2.8) The app's window position will be remembered between sessions. If there are issues with the window not displaying correctly on startup, as can happen when auto-starting the app through MSFS of FSUIPC, either don't use auto-start or manually disable this feature in the config file by setting the RememberWindowPos line to be false.
   - Runnning as Admin NOT usually required (BUT: It is required to be run under the same User/Elevation as MSFS).
   - Do not change TLOD, OLOD and Cloud Quality MSFS settings manually while in a flight with this app running as it will conflict with what the app is managing and they will not restore to what you set when you exit your flight. If you wish to change the defaults for these MSFS settings, you must do so either without this app running or, if it is, only while you are in the MSFS main menu (ie not in a flight).
   - If you wish to activate additional logging of settings changes and sim values, as currently happens automatically in test versions, you need to manually edit your config file and add a LogSimValues key, if it doesn't already exist, and set its value to true ie.  ```<add key="LogSimValues" value="true" />```
@@ -142,12 +141,12 @@ Some Notes:
     - Flight is loaded
       - Shows detected DX version, Graphics Mode (PC, FG, or VR), app pause, FPS settling time, and/or app priority mode as applicable.
       - The FPS settling timer runs for up to 20 seconds to allow FPS to settle between pausing/unpausing, auto target FPS calibration, TLOD Min + transitions and VR/PC/FG mode transitions. This allows the FPS to stabilise before engaging automatic functions and should lead to much smaller TLOD changes when seeking the target FPS on such transitions.
-      - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected. (v0.4.2.6) Locked in VFR mode means TLOD is locked because your aircraft is below 100 ft AGL where TLOD doesn't change.
+      - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected. 
       - Bonus GPU load display if the optional GPU-Z companion app, downloadable separately [here](https://www.techpowerup.com/download/techpowerup-gpu-z/), is installed and detected running when starting any flight session.
-      - (v0.4.2.6) Auto pause will activate if in flight and either MSFS is in active pause or the MSFS settings menu is being accessed.
+      - (v0.4.2.8) Auto pause will activate if in flight and either MSFS is in active pause or the MSFS settings menu is being accessed.
   - Target FPS - The most important setting in this app.
     - Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
-    - There is a setting for each graphics mode (PC, FG and VR) (v0.4.2.6) and each flight mode (VFR and IFR), which you can only change while in those mode pairs. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR.
+    - There is a setting for each graphics mode (PC, FG and VR) (v0.4.2.8) and each flight mode (VFR and IFR), which you can only change while in those mode pairs. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR.
     - If using FG, the target FPS you set is your desired FG Active FPS, not the FG Inactive FPS you see when this app has the focus instead of MSFS. 
     - If you use an FPS cap, or Vsync for the same purpose, you will need to set your target FPS to be a few FPS lower than that cap. This allows the automated TLOD increase logic to function properly because it needs FPS to get above the target FPS to activate an increase in TLOD. If doing so causes unacceptable tearing of the image on your monitor, or breaks motion reprojection if you use it with VR, then this app likely isn't suitable for you.
   - Auto Target FPS
@@ -159,12 +158,18 @@ Some Notes:
     - Allows the app to overlay your MSFS session if desired, with MSFS having the focus.
     - Mainly useful for adjusting settings and seeing the outcome over the top of your flight as it progresses.
     - Should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
-  - Flight type
+  - Flight type - VFR or IFR
+    - (v0.4.2.8) In non-expert mode, VFR will use higher minimum and maximum TLODs and a lower TLOD base altitude than IFR to account for the greater performance expectation that GA flights in rural areas will have.
+    - (v0.4.2.8) Expert mode will default to similar settings differences, however the settings for each flight type are fully customisable and will save to and restore from separate profiles for VFR and IFR.
+    - (v0.4.2.8) On the ground, TLOD will be locked to either a pre-determined (non-expert) or user-selectable (expert) TLOD Min.
+    - (v0.4.2.8) Once in the air and above either a pre-determined (non-expert) or user-selectable (expert) TLOD base altitude, TLOD will be allowed to change to the lower of either the schedule based on your TLODs, FPS sensitivity/tolerance and average descent rate settings or what your current performance dictates.
+    - (v0.4.2.8) Once above a calculated altitude band above the the TLOD base altitude, the app priority will change from TLOD to FPS.
+    - (v0.4.2.8) App behaviour is reversed on descent.
        - VFR
          - TLOD will be locked any time you are below 100 ft or are on the ground, except if TLOD Min + is enabled and gets activated where it will be higher.
          - Once in the air above 100 ft, your TLOD will dynamically change to achieve your target FPS.
          - Once below 100 ft, your TLOD will lock to whatever it last was and will stay that way until you take off and climb above 100 ft.
-         - (v0.4.2.6) Between 1000 ft and 100 ft there is a sliding scale reduction in TLOD changes to minimise the possibility of stutters near airports.
+         - (v0.4.2.8) Between 1000 ft and 100 ft there is a sliding scale reduction in TLOD changes to minimise the possibility of stutters near airports.
        - IFR
          - TLOD will be locked to either a pre-determined (non-expert) or user-selectable (expert) TLOD Min.
          - Once in the air and above either a pre-determined (non-expert) or user-selectable (expert) TLOD base altitude, TLOD will be allowed to change to the lower of either the schedule based on your TLODs, FPS sensitivity and average descent rate settings or what your current performance dictates.
@@ -173,8 +178,8 @@ Some Notes:
     - Auto Target FPS - user selectable 
     - FPS Sensitivity - 5%
     - VFR or IFR flight type - user selectable
-    - Alt TLOD Base - 1000 ft
-    - Avg Descent Rate - 2000 fpm
+    - Alt TLOD Base - VFR 100 ft, IFR 1000 ft
+    - Avg Descent Rate - VFR 1000 fpm, IFR 2000 fpm
     - TLOD Minimum - 50% of your current MSFS TLOD setting
     - TLOD Maximum - 300% of your current MSFS TLOD setting
     - TLOD Min + - enabled
@@ -183,7 +188,7 @@ Some Notes:
       - 2/5 between TLOD Minimum and TLOD Maximum or + 50 over TLOD Min, whichever is lower.
       - If excessive changing of cloud quality levels are detected, the app will automatically increase its calculated cloud recovery TLOD.
     - Auto OLOD - enabled
-    - Pause when MSFS loses focus - disabled, (v0.4.2.6) unless using FG then enabled
+    - Pause when MSFS loses focus - disabled, (v0.4.2.8) unless using FG then enabled
 - Expert Settings
   - FPS Automation Method - FPS Sensitivity generally gives better results and hence is the default. Use FPS Tolerance if you experience stuttering issues.
     - FPS Sensitivity (v0.4.2 and later) - smaller changes more often.
