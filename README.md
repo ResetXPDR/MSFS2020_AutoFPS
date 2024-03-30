@@ -191,7 +191,7 @@ Some Notes:
     - Cloud Recovery TLOD
       - 2/5 between TLOD Minimum and TLOD Maximum or + 50 over TLOD Min, whichever is lower.
       - If excessive changing of cloud quality levels are detected, the app will automatically increase its calculated cloud recovery TLOD.
-    - Auto OLOD - enabled and VFR 100% of your current MSFS OLOD setting, IFR 150%
+    - Auto OLOD - enabled and VFR 150% of your current MSFS OLOD setting, IFR 100%
     - Pause when MSFS loses focus - disabled, (v0.4.2.8) unless using FG then enabled
 - Expert Settings
   - FPS Automation Method - FPS Sensitivity generally gives better results and hence is the default. Use FPS Tolerance if you experience stuttering issues.
