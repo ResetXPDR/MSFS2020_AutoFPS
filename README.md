@@ -124,7 +124,7 @@ Some Notes:
   - Closing the Window does not close the app, use the Context Menu of the SysTray Icon.
   - Clicking on the SysTray Icon opens the Window (again).
   - If you wish to have the app window always open to the SysTray, close the app and manually change the openWindow key state in the config file to false.
-  - (v0.4.2.8) The app's window position will be remembered between sessions. If there are issues with the window not displaying correctly on startup, as can happen when auto-starting the app through MSFS of FSUIPC, either don't use auto-start or manually disable this feature in the config file by setting the RememberWindowPos line to be false.
+  - (v0.4.2.8) The app's window position will be remembered between sessions, except movements to it made while in VR due to window restoration issues. If there are issues with the window not displaying correctly on startup, as can happen when auto-starting the app through MSFS of FSUIPC, either don't use auto-start or manually disable this feature in the config file by setting the RememberWindowPos line to be false.
   - Runnning as Admin NOT usually required (BUT: It is required to be run under the same User/Elevation as MSFS).
   - Do not change TLOD, OLOD and Cloud Quality MSFS settings manually while in a flight with this app running as it will conflict with what the app is managing and they will not restore to what you set when you exit your flight. If you wish to change the defaults for these MSFS settings, you must do so either without this app running or, if it is, only while you are in the MSFS main menu (ie not in a flight).
   - If you wish to activate additional logging of settings changes and sim values, as currently happens automatically in test versions, you need to manually edit your config file and add a LogSimValues key, if it doesn't already exist, and set its value to true ie.  ```<add key="LogSimValues" value="true" />```
@@ -180,14 +180,14 @@ Some Notes:
     - VFR or IFR flight type - user selectable
     - Alt TLOD Base - VFR 100 ft, IFR 1000 ft
     - Avg Descent Rate - VFR 1000 fpm, IFR 2000 fpm
-    - TLOD Minimum - 50% of your current MSFS TLOD setting
-    - TLOD Maximum - 300% of your current MSFS TLOD setting
+    - TLOD Minimum - VFR 100% of your current MSFS TLOD setting, IFR 50%
+    - TLOD Maximum - VFR 300% of your current MSFS TLOD setting, IFR 200%
     - TLOD Min + - enabled
     - Decrease Cloud Quality - enabled
     - Cloud Recovery TLOD
       - 2/5 between TLOD Minimum and TLOD Maximum or + 50 over TLOD Min, whichever is lower.
       - If excessive changing of cloud quality levels are detected, the app will automatically increase its calculated cloud recovery TLOD.
-    - Auto OLOD - enabled
+    - Auto OLOD - enabled and VFR 100% of your current MSFS OLOD setting, IFR 150%
     - Pause when MSFS loses focus - disabled, (v0.4.2.8) unless using FG then enabled
 - Expert Settings
   - FPS Automation Method - FPS Sensitivity generally gives better results and hence is the default. Use FPS Tolerance if you experience stuttering issues.
