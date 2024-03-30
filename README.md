@@ -173,7 +173,6 @@ Some Notes:
          - TLOD will be locked any time you are below 100 ft or are on the ground, except if TLOD Min + is enabled and gets activated where it will be higher.
          - Once in the air above 100 ft, your TLOD will dynamically change to achieve your target FPS.
          - Once below 100 ft, your TLOD will lock to whatever it last was and will stay that way until you take off and climb above 100 ft.
-         - (v0.4.2.9) Between 1000 ft and 100 ft there is a sliding scale reduction in TLOD changes to minimise the possibility of stutters near airports.
        - IFR
          - TLOD will be locked to either a pre-determined (non-expert) or user-selectable (expert) TLOD Min.
          - Once in the air and above either a pre-determined (non-expert) or user-selectable (expert) TLOD base altitude, TLOD will be allowed to change to the lower of either the schedule based on your TLODs, FPS sensitivity and average descent rate settings or what your current performance dictates.
@@ -211,10 +210,8 @@ Some Notes:
     - When + is checked and your system is achieving 15% or greater FPS than your target FPS, then your TLOD Min will increase by 50 - giving you additional graphics quality. 
     - TLOD Min + will only activate on the ground or when descending and transitioning from FPS to TLOD priority mode. Once activated on the ground, it will remain set so as not to tempt ground texture corruption occurring. On descent, if minimum performance can not be maintained for TLOD Min +, it will self-cancel before landing without any sudden TLOD changes.
   -  TLOD Max - Sets the maximum TLOD the automation algorithm will use. 
-  - Alt TLOD Base - only visible when flight type selected is IFR. This is the altitude (AGL) at or below which TLOD will be at TLOD Min.
-  - Avg Descent Rate
-    - Only visible when flight type selected is IFR.
-    - Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
+  - Alt TLOD Base - Altitude (AGL) at or below which TLOD will be at TLOD Min.
+  - Avg Descent Rate- Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
     - This band ensures that, if you descend at your set Avg Descent Rate or less, that the app can decrement TLOD from TLOD Max to TLOD Min by the Alt TLOD Base without exceeding the LOD Step rate associated with the FPS sensitivity level you have set.
   - Decrease Cloud Quality - When enabled, will reduce cloud quality by one level if TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance. 
   - Cloud Recovery TLOD with optional +
