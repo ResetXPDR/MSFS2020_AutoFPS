@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Security.RightsManagement;
 using System.Xml;
 
 namespace MSFS2020_AutoFPS
@@ -34,6 +35,11 @@ namespace MSFS2020_AutoFPS
             xmlDoc.Save(App.ConfigFile);
         }
 
+        public bool SettingExists(string key) 
+        {
+            if (appSettings.ContainsKey(key)) return true;
+            else return false;
+        }
         public string GetSetting(string key, string defaultValue = "")
         {
             if (appSettings.ContainsKey(key))
@@ -58,6 +64,19 @@ namespace MSFS2020_AutoFPS
             }
         }
 
+        public void RemoveSetting(string key)
+        {
+            if (appSettings.ContainsKey(key))
+            {
+                XmlNode nodeToRemove = xmlDoc.SelectSingleNode($"//add[@key='{key}']");
+                if (nodeToRemove != null)
+                {
+                    nodeToRemove.ParentNode.RemoveChild(nodeToRemove);
+                    appSettings.Remove(key);
+                    SaveConfiguration();
+                }
+            }
+        }
         public void SetSetting(string key, string value)
         {
             if (appSettings.ContainsKey(key))

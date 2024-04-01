@@ -8,12 +8,12 @@
     <StartupObject>MSFS2020_AutoFPS.App</StartupObject>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
-    <Authors>Fragtality</Authors>
+    <Authors>ResetXPDR</Authors>
     <Description>Another Adapative LOD Implementation based on muumimorko and Fratality
 Work</Description>
     <Copyright>Copyright © 2024</Copyright>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-    <Version>0.4.1</Version>
+    <Version>0.4.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -44,6 +44,9 @@ Work</Description>
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="GpuzShMem.x64">
+      <HintPath>GpuzShMem.x64.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.FlightSimulator.SimConnect">
       <HintPath>Microsoft.FlightSimulator.SimConnect.dll</HintPath>
     </Reference>
@@ -54,6 +57,9 @@ Work</Description>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Microsoft.FlightSimulator.SimConnect.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="README.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="SimConnect.dll">

@@ -136,6 +136,11 @@ namespace Installer
                 string path = Parameters.msExeSteam;
                 if (!File.Exists(path))
                     path = Parameters.msExeStore;
+                if (!File.Exists(path))
+                {
+                    MessageBox.Show($"Required EXE.xml file not found for AutoStartExe. See readme for resolution.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
 
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(File.ReadAllText(path));

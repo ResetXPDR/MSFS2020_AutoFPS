@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -14,12 +15,14 @@ namespace MSFS2020_AutoFPS
     {
         private ServiceModel Model;
         private ServiceController Controller;
+        protected int Interval = 1000;
 
         private TaskbarIcon notifyIcon;
 
         public static new App Current => Application.Current as App;
         public static string ConfigFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\MSFS2020_AutoFPS\MSFS2020_AutoFPS.config";
         public static string AppDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\MSFS2020_AutoFPS\bin";
+        public static string MSFSDefaultsFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\MSFS2020_AutoFPS\MSFSDefaults.config";
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -42,6 +45,13 @@ namespace MSFS2020_AutoFPS
             if (Process.GetProcessesByName("DynamicLOD").Length > 0)
             {
                 MessageBox.Show("A pre-ResetEdition version of DynamicLOD is already running!", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown();
+                return;
+            }
+
+            if (Process.GetProcessesByName("SmoothFlight").Length > 0)
+            {
+                MessageBox.Show("SmoothFlight is already running!", "Critical Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();
                 return;
             }
@@ -86,6 +96,7 @@ namespace MSFS2020_AutoFPS
             if (Model != null)
             {
                 Model.CancellationRequested = true;
+                Thread.Sleep(Interval); // Ensure Runtick finishes its last MSFS settings changes
                 if (Model.DefaultSettingsRead && Model.IsSessionRunning)
                 {
                     Logger.Log(LogLevel.Information, "App:OnExit", $"Resetting LODs to {Model.DefaultTLOD} / {Model.DefaultOLOD} and VR {Model.DefaultTLOD_VR} / {Model.DefaultOLOD_VR}");
@@ -93,9 +104,18 @@ namespace MSFS2020_AutoFPS
                     Model.MemoryAccess.SetTLOD_VR(Model.DefaultTLOD_VR);
                     Model.MemoryAccess.SetOLOD_PC(Model.DefaultOLOD);
                     Model.MemoryAccess.SetOLOD_VR(Model.DefaultOLOD_VR);
-                    Logger.Log(LogLevel.Information, "App:OnExit", $"Resetting cloud quality to {Model.DefaultCloudQ} / VR {Model.DefaultCloudQ_VR}");
+                    Logger.Log(LogLevel.Information, "App:OnExit", $"Resetting cloud quality to {Model.CloudQualityText(Model.DefaultCloudQ)} / VR {Model.CloudQualityText(Model.DefaultCloudQ_VR)}");
                     Model.MemoryAccess.SetCloudQ(Model.DefaultCloudQ);
                     Model.MemoryAccess.SetCloudQ_VR(Model.DefaultCloudQ_VR);
+                    if (Model.MemoryAccess.GetTLOD_PC() == Model.DefaultTLOD) // As long as one setting restoration stuck
+                    {
+                        Model.ConfigurationFile.RemoveSetting("defaultTLOD");
+                        Model.ConfigurationFile.RemoveSetting("defaultTLOD_VR");
+                        Model.ConfigurationFile.RemoveSetting("defaultOLOD");
+                        Model.ConfigurationFile.RemoveSetting("defaultOLOD_VR");
+                        Model.ConfigurationFile.RemoveSetting("defaultCloudQ");
+                        Model.ConfigurationFile.RemoveSetting("defaultCloudQ_VR");
+                    }
                 }
             }
             notifyIcon?.Dispose();

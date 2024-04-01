@@ -21,7 +21,7 @@ namespace Installer
             InitializeComponent();
 
             string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            assemblyVersion = assemblyVersion.Substring(0, assemblyVersion.LastIndexOf('.'));
+            assemblyVersion = assemblyVersion.Substring(0, assemblyVersion.LastIndexOf('.')) + "";
             Title += " (" + assemblyVersion + ")";
 
             if (Directory.Exists(Parameters.appDir))

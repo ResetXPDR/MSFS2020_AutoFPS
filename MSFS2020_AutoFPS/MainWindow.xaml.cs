@@ -29,27 +29,33 @@ namespace MSFS2020_AutoFPS
 
         private int logTimer = 0;
         private int logTimerInterval = 8;
-
+        private float altAboveGndLast = -1;
+        private float tlodLast = -1;
+        private float olodLast = -1;
+        private bool decCloudQActiveLast = true;
+        private bool IsAppPriorityFPSLast = false;
+        private bool LoadSettingsRecursed = false;
+ 
         public MainWindow(NotifyIconViewModel notifyModel, ServiceModel serviceModel)
         {
             InitializeComponent();
             this.notifyModel = notifyModel;
             this.serviceModel = serviceModel;
 
-             string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')];
-            Title += " (" + assemblyVersion + (ServiceModel.TestVersion ? "-test" : "")+ ")";
+            string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')] + ".10";
+            Title += " (" + assemblyVersion + (ServiceModel.TestVersion ? "-test" : "") + ")";
 
-            if (serviceModel.UseExpertOptions) stkpnlMSFSSettings.Visibility = Visibility.Visible;
-            else stkpnlMSFSSettings.Visibility = Visibility.Collapsed;
-            if (ServiceModel.TestVersion) chkTestLogSimValues.Visibility = Visibility.Visible;
-            else chkTestLogSimValues.Visibility = Visibility.Hidden;
+            if (serviceModel.UseExpertOptions) stkpnlExpertSettings.Visibility = Visibility.Visible;
+            else stkpnlExpertSettings.Visibility = Visibility.Collapsed;
  
             timer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1)
             };
             timer.Tick += OnTick;
+
+            this.Resources["CustomLabelColor"] = new SolidColorBrush(Colors.Aqua);
 
             string latestAppVersionStr = GetFinalRedirect("https://github.com/ResetXPDR/MSFS2020_AutoFPS/releases/latest");
             lblappUrl.Visibility = Visibility.Hidden;
@@ -64,6 +70,11 @@ namespace MSFS2020_AutoFPS
                         lblStatusMessage.Foreground = new SolidColorBrush(Colors.Green);
                         lblappUrl.Visibility = Visibility.Visible;
                     }
+                    else if (ServiceModel.TestVersion)
+                    {
+                        lblStatusMessage.Content = "Test version installed";
+                        lblStatusMessage.Foreground = new SolidColorBrush(Colors.Green);
+                    }
                     else
                     {
                         lblStatusMessage.Content = "Latest app version is installed";
@@ -71,7 +82,7 @@ namespace MSFS2020_AutoFPS
                     }
                 }   
             }
-            if (ServiceModel.TestVersion)
+            else if (ServiceModel.TestVersion)
             {
                 lblStatusMessage.Content = "Test version installed";
                 lblStatusMessage.Foreground = new SolidColorBrush(Colors.Green);
@@ -140,35 +151,98 @@ namespace MSFS2020_AutoFPS
         }
         protected void LoadSettings()
         {
-            chkOpenWindow.IsChecked = serviceModel.OpenWindow;
+            if (serviceModel.RememberWindowPos)
+            {
+                Top = serviceModel.windowTop;
+                Left = serviceModel.windowLeft;
+            }
+            if (serviceModel.TLODAutoMethod[serviceModel.activeProfile] == 2)
+            {
+                txtFPSTolerance.Visibility = Visibility.Hidden;
+                lblTLODMin.Content = "TLOD @ Base";
+                lblTLODMax.Content = "TLOD @ Top";
+                lblAltTLOD1.Content = "Alt TLOD Top";
+                lblAltTLOD2.Content = "ft";
+                txtAvgDescentRate.ToolTip = "TLOD Max will be locked above this altitude";
+                txtAvgDescentRate.Text = Convert.ToString(serviceModel.AltTLODTop[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+                chkMinTLODExtra.Visibility = Visibility.Hidden;
+                stkpnlCloudQualityOptions.Visibility = Visibility.Collapsed;
+                serviceModel.AutoTargetFPS = false;
+                chkAutoTargetFPS.Visibility = Visibility.Hidden;
+                lblTargetFPS.Visibility= Visibility.Hidden;
+                txtTargetFPS.Visibility = Visibility.Hidden;
+                chkPauseMSFSFocusLost.Visibility = Visibility.Hidden;
+                serviceModel.PauseMSFSFocusLost = false;
+            }
+            else
+            {
+                txtFPSTolerance.Visibility = Visibility.Visible;
+                lblTLODMin.Content = "TLOD Min    +";
+                lblTLODMax.Content = "TLOD Max";
+                lblAltTLOD1.Content = "Avg Descent Rate";
+                lblAltTLOD2.Content = "fpm";
+                txtAvgDescentRate.ToolTip = "Determines what altitude TLOD will start reducing towards TLOD Min";
+                txtAvgDescentRate.Text = Convert.ToString(serviceModel.AvgDescentRate[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+                chkMinTLODExtra.Visibility = Visibility.Visible;
+                chkMinTLODExtra.IsChecked = serviceModel.MinTLODExtra[serviceModel.activeProfile];
+                stkpnlCloudQualityOptions.Visibility = Visibility.Visible;
+                serviceModel.AutoTargetFPS = Convert.ToBoolean(serviceModel.ConfigurationFile.GetSetting("AutoTargetFPS", "false"));
+                chkAutoTargetFPS.Visibility = Visibility.Visible;
+                lblTargetFPS.Visibility = Visibility.Visible;
+                txtTargetFPS.Visibility = Visibility.Visible;
+                chkPauseMSFSFocusLost.Visibility = Visibility.Visible;
+                serviceModel.PauseMSFSFocusLost = Convert.ToBoolean(serviceModel.ConfigurationFile.GetSetting("PauseMSFSFocusLost", "false"));
+            }
             chkUseExpertOptions.IsChecked = serviceModel.UseExpertOptions;
-            chkCustomAutoOLOD.IsChecked = serviceModel.CustomAutoOLOD;
-            if (serviceModel.CustomAutoOLOD && serviceModel.UseExpertOptions) stkpnlCustomAutoOLOD.Visibility = Visibility.Visible;
-            else stkpnlCustomAutoOLOD.Visibility = Visibility.Collapsed;
-            chkTestLogSimValues.IsChecked = serviceModel.TestLogSimValues;
+            if (serviceModel.FlightTypeIFR) optIFRFlight.IsChecked = true;
+            else optVFRFlight.IsChecked= true;
+            chkAutoTargetFPS.IsChecked = serviceModel.AutoTargetFPS;
+            if (serviceModel.AutoTargetFPS || serviceModel.TLODAutoMethod[serviceModel.activeProfile] == 2) txtTargetFPS.IsEnabled = false;
+            else txtTargetFPS.IsEnabled = true;
             if (serviceModel.OnTop) AutoFPS.Topmost = true; 
             else AutoFPS.Topmost = false;
             chkOnTop.IsChecked = serviceModel.OnTop;
-            if (serviceModel.ActiveGraphicsMode == "VR") txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS_VR, CultureInfo.CurrentUICulture);
-            else if (serviceModel.ActiveGraphicsMode == "FG") txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS_FG, CultureInfo.CurrentUICulture);
-            else txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS_PC, CultureInfo.CurrentUICulture);
+            if (!serviceModel.UseExpertOptions) serviceModel.activeProfile = (int)ServiceModel.appProfiles.NonExpert;
+            else if (serviceModel.FlightTypeIFR) serviceModel.activeProfile = (int)ServiceModel.appProfiles.IFR_Expert;
+            else serviceModel.activeProfile = (int)ServiceModel.appProfiles.VFR_Expert;
+
+            if (serviceModel.AutoTargetFPS && serviceModel.ForceAutoFPSCal) txtTargetFPS.Text = "auto";
+            else if (serviceModel.AutoTargetFPS) txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS, CultureInfo.CurrentUICulture);
+            else if (serviceModel.ActiveGraphicsMode == "VR") txtTargetFPS.Text = Convert.ToString(serviceModel.FlightTypeIFR ? serviceModel.TargetFPS_VR : serviceModel.TargetFPS_VR_VFR, CultureInfo.CurrentUICulture);
+            else if (serviceModel.ActiveGraphicsMode == "FG") txtTargetFPS.Text = Convert.ToString(serviceModel.FlightTypeIFR ? serviceModel.TargetFPS_FG : serviceModel.TargetFPS_FG_VFR, CultureInfo.CurrentUICulture);
+            else txtTargetFPS.Text = Convert.ToString(serviceModel.FlightTypeIFR ? serviceModel.TargetFPS_PC : serviceModel.TargetFPS_PC_VFR, CultureInfo.CurrentUICulture);
             serviceModel.ActiveGraphicsModeChanged = false;
-            txtFPSTolerance.Text = Convert.ToString(serviceModel.FPSTolerance, CultureInfo.CurrentUICulture);
-            txtMinTLod.Text = Convert.ToString(serviceModel.MinTLOD, CultureInfo.CurrentUICulture);
-            txtMaxTLod.Text = Convert.ToString(serviceModel.MaxTLOD, CultureInfo.CurrentUICulture);
-            txtOLODAtBase.Text = Convert.ToString(serviceModel.OLODAtBase, CultureInfo.CurrentUICulture);
-            txtOLODAtTop.Text = Convert.ToString(serviceModel.OLODAtTop, CultureInfo.CurrentUICulture);
-            txtAltOLODBase.Text = Convert.ToString(serviceModel.AltOLODBase, CultureInfo.CurrentUICulture);
-            txtAltOLODTop.Text = Convert.ToString(serviceModel.AltOLODTop, CultureInfo.CurrentUICulture);
-            txtAltTLODBase.Text = Convert.ToString(serviceModel.AltTLODBase, CultureInfo.CurrentUICulture);
-            txtAvgDescentRate.Text = Convert.ToString(serviceModel.AvgDescentRate, CultureInfo.CurrentUICulture);
-            chkDecCloudQ.IsChecked = serviceModel.DecCloudQ;
+            txtFPSTolerance.Text = Convert.ToString(serviceModel.FPSTolerance[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+            cbTLODAutoMethod.SelectedIndex = serviceModel.TLODAutoMethod[serviceModel.activeProfile];
+            if (serviceModel.TLODAutoMethod[serviceModel.activeProfile] == 1) lblFPSTolPercent.Visibility = Visibility.Visible;
+            else lblFPSTolPercent.Visibility= Visibility.Hidden;
+            txtMinTLod.Text = Convert.ToString(serviceModel.MinTLOD[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+            txtMaxTLod.Text = Convert.ToString(serviceModel.MaxTLOD[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+            chkCustomAutoOLOD.IsChecked = serviceModel.CustomAutoOLOD[serviceModel.activeProfile];
+            if (serviceModel.CustomAutoOLOD[serviceModel.activeProfile] && serviceModel.UseExpertOptions) stkpnlCustomAutoOLOD.Visibility = Visibility.Visible;
+            else stkpnlCustomAutoOLOD.Visibility = Visibility.Collapsed;
+            txtOLODAtBase.Text = Convert.ToString(serviceModel.OLODAtBase[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+            txtOLODAtTop.Text = Convert.ToString(serviceModel.OLODAtTop[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+            txtAltOLODBase.Text = Convert.ToString(serviceModel.AltOLODBase[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+            txtAltOLODTop.Text = Convert.ToString(serviceModel.AltOLODTop[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+            txtAltTLODBase.Text = Convert.ToString(serviceModel.AltTLODBase[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+            chkDecCloudQ.IsChecked = serviceModel.DecCloudQ[serviceModel.activeProfile];
             chkPauseMSFSFocusLost.IsChecked = serviceModel.PauseMSFSFocusLost;
-            chkTLODMinGndLanding.IsChecked = serviceModel.TLODMinGndLanding;
-            if (serviceModel.TLODMinGndLanding && serviceModel.UseExpertOptions) stkpnlTLODMinOptions.Visibility = Visibility.Visible;
-            else stkpnlTLODMinOptions.Visibility = Visibility.Collapsed;
-            txtCloudRecoveryTLOD.Text = Convert.ToString(serviceModel.CloudRecoveryTLOD, CultureInfo.CurrentUICulture);
-            if (ServiceModel.TestVersion && serviceModel.TestLogSimValues) Logger.Log(LogLevel.Information, "MainWindow:LoadSettings", $"Expert: {serviceModel.UseExpertOptions} Mode: {serviceModel.ActiveGraphicsMode} Target: {txtTargetFPS.Text} Tol: {txtFPSTolerance.Text} TMin: {txtMinTLod.Text} TMax: {txtMaxTLod.Text} CloudQ: {serviceModel.DecCloudQ} CRecovT: {txtCloudRecoveryTLOD.Text} Pause: {serviceModel.PauseMSFSFocusLost} TMinGL: {serviceModel.TLODMinGndLanding} TLODBAlt: {serviceModel.AltTLODBase} MaxDescRate {serviceModel.AvgDescentRate} CustomOLOD: {serviceModel.CustomAutoOLOD} OLODB: {serviceModel.OLODAtBase} OLODT: {serviceModel.OLODAtTop} OLODBAlt: {serviceModel.AltOLODBase} OLODTAlt: {serviceModel.AltOLODTop}");
+            txtCloudRecoveryTLOD.Text = Convert.ToString(serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile], CultureInfo.CurrentUICulture);
+            chkCloudRecoveryPlus.IsChecked = serviceModel.CloudRecoveryPlus[serviceModel.activeProfile];
+            if (serviceModel.UseExpertOptions && !LoadSettingsRecursed && serviceModel.CloudRecoveryPlus[serviceModel.activeProfile] && serviceModel.MinTLOD[serviceModel.activeProfile] + serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile] > serviceModel.MaxTLOD[serviceModel.activeProfile])
+            {
+                serviceModel.SetSetting(serviceModel.activeProfile == (int)ServiceModel.appProfiles.IFR_Expert ? "CloudRecoveryTLOD" : "CloudRecoveryTLOD_VFR", Convert.ToString((int)(2 * (serviceModel.MaxTLOD[serviceModel.activeProfile] - serviceModel.MinTLOD[serviceModel.activeProfile]) / 5), CultureInfo.InvariantCulture));
+                LoadSettingsRecursed = true;
+                LoadSettings();
+            }
+            else if (serviceModel.UseExpertOptions && !LoadSettingsRecursed && !serviceModel.CloudRecoveryPlus[serviceModel.activeProfile] && (serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile] <= serviceModel.MinTLOD[serviceModel.activeProfile] || serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile] >= serviceModel.MaxTLOD[serviceModel.activeProfile]))
+            {
+                serviceModel.SetSetting(serviceModel.activeProfile == (int)ServiceModel.appProfiles.IFR_Expert ? "CloudRecoveryTLOD" : "CloudRecoveryTLOD_VFR", Convert.ToString((int)(serviceModel.MinTLOD[serviceModel.activeProfile] + 2 * (float)(serviceModel.MaxTLOD[serviceModel.activeProfile] - serviceModel.MinTLOD[serviceModel.activeProfile]) / 5), CultureInfo.InvariantCulture));
+                LoadSettingsRecursed = true;
+                LoadSettings();
+            }
+            if (ServiceModel.TestVersion || serviceModel.LogSimValues) Logger.Log(LogLevel.Information, "MainWindow:LoadSettings", $"Expert: {serviceModel.UseExpertOptions} Mode: {serviceModel.ActiveGraphicsMode} ATgtFPS: {serviceModel.AutoTargetFPS} FltType: {(serviceModel.FlightTypeIFR ? "IFR" : "VFR")} TgtFPS: {txtTargetFPS.Text} TLODAMtd: {serviceModel.TLODAutoMethod[serviceModel.activeProfile]} Tol: {txtFPSTolerance.Text}" + (!serviceModel.UseExpertOptions && serviceModel.MemoryAccess == null ? "" : $" TMin: {txtMinTLod.Text} TMax: {txtMaxTLod.Text} OLODB: {serviceModel.OLODAtBase[serviceModel.activeProfile]} OLODT: {serviceModel.OLODAtTop[serviceModel.activeProfile]} OLODBAlt: {serviceModel.AltOLODBase[serviceModel.activeProfile]}") +$" TMinEx: {(!serviceModel.UseExpertOptions || serviceModel.MinTLODExtra[serviceModel.activeProfile] ? "true" : "false")} CloudQ: {serviceModel.DecCloudQ[serviceModel.activeProfile]} CRecovT: {txtCloudRecoveryTLOD.Text} Pause: {serviceModel.PauseMSFSFocusLost} TLODBAlt: {serviceModel.AltTLODBase[serviceModel.activeProfile]} MaxDesRate {serviceModel.AvgDescentRate[serviceModel.activeProfile]} CustomOLOD: {serviceModel.CustomAutoOLOD[serviceModel.activeProfile]} OLODTAlt: {serviceModel.AltOLODTop[serviceModel.activeProfile]}");
         }
 
         protected void UpdateStatus()
@@ -189,15 +263,6 @@ namespace MSFS2020_AutoFPS
                 lblConnStatSession.Foreground = new SolidColorBrush(Colors.Red);
         }
 
-        protected string CloudQualityLabel(int CloudQuality)
-        {
-            if (CloudQuality == 0) return "Low";
-            else if (CloudQuality == 1) return "Medium";
-            else if (CloudQuality == 2) return "High";
-            else if (CloudQuality == 3) return "Ultra";
-            else return "n/a";
-        }
-
         protected float GetAverageFPS()
         {
             if (serviceModel.MemoryAccess != null && serviceModel.FgModeEnabled && serviceModel.ActiveWindowMSFS)
@@ -214,92 +279,70 @@ namespace MSFS2020_AutoFPS
                 lblSimFPS.Content = "n/a";
                 lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
             }
- 
+
             if (serviceModel.MemoryAccess != null)
             {
                 lblappUrl.Visibility = Visibility.Hidden;
                 lblStatusMessage.Foreground = new SolidColorBrush(Colors.Black);
                 lblSimTLOD.Content = serviceModel.tlod.ToString("F0");
                 lblSimOLOD.Content = serviceModel.olod.ToString("F0");
-                if (serviceModel.MemoryAccess.MemoryWritesAllowed())
+                lblStatusMessage.Content = serviceModel.MemoryAccess.IsDX12() ? "DX12" : " DX11";
+                if (serviceModel.VrModeActive)
                 {
-                    lblStatusMessage.Content = serviceModel.MemoryAccess.IsDX12() ? "DX12" : " DX11";
-                    if (serviceModel.VrModeActive)
-                    {
-                        lblSimCloudQs.Content = CloudQualityLabel(serviceModel.cloudQ_VR);
-                        lblStatusMessage.Content += " | VR Mode";
-                    }
-                    else
-                    {
-                        lblSimCloudQs.Content = CloudQualityLabel(serviceModel.cloudQ);
-                        lblStatusMessage.Content += (serviceModel.FgModeEnabled ? (serviceModel.ActiveWindowMSFS ? " | FG Active" : " | FG Inactive") : " | PC Mode");
-                    }
-                    if (!serviceModel.ActiveWindowMSFS && serviceModel.UseExpertOptions && serviceModel.PauseMSFSFocusLost) lblStatusMessage.Content += " | Auto PAUSED";
-                    else if (serviceModel.FPSSettleCounter > 0) lblStatusMessage.Content += " | FPS Settling for " + serviceModel.FPSSettleCounter.ToString("F0") + " second" + (serviceModel.FPSSettleCounter != 1 ? "s" : "");
-                    else lblStatusMessage.Content += serviceModel.IsAppPriorityFPS ? " | FPS priority" : " | TLOD Min priority";
+                    lblSimCloudQs.Content = serviceModel.CloudQualityText(serviceModel.cloudQ_VR);
+                    lblStatusMessage.Content += " | VR Mode";
                 }
                 else
                 {
-                    lblStatusMessage.Content = "MSFS compatibility test failed - Read Only mode";
-                    lblStatusMessage.Foreground = new SolidColorBrush(Colors.Red);
+                    lblSimCloudQs.Content = serviceModel.CloudQualityText(serviceModel.cloudQ);
+                    lblStatusMessage.Content += (serviceModel.FgModeEnabled ? (serviceModel.ActiveWindowMSFS ? " | FG Active" : " | FG Inactive") : " | PC Mode");
                 }
                 if (serviceModel.IsSessionRunning)
                 {
-                    bool TLODMinGndLanding;
-                    float MinTLOD = serviceModel.MinTLOD;
-                    float MaxTLOD = serviceModel.MaxTLOD;
                     float TargetFPS = (serviceModel.FgModeEnabled && !serviceModel.ActiveWindowMSFS ? serviceModel.TargetFPS / 2 : serviceModel.TargetFPS);
-                    if (serviceModel.UseExpertOptions)
-                    {
-                        TLODMinGndLanding = serviceModel.TLODMinGndLanding;
-                        MinTLOD = serviceModel.MinTLOD;
-                        MaxTLOD = serviceModel.MaxTLOD;
-                    }
-                    else
-                    {
-                        TLODMinGndLanding = true;
-                        if (serviceModel.VrModeActive)
-                        {
-                            MinTLOD = Math.Max(serviceModel.DefaultTLOD_VR * 0.5f, 10);
-                            MaxTLOD = serviceModel.DefaultTLOD_VR * 2.0f;
-                        }
-                        else
-                        {
-                            MinTLOD = Math.Max(serviceModel.DefaultTLOD * 0.5f, 10);
-                            MaxTLOD = serviceModel.DefaultTLOD * 2.0f;
-                        }
-                    }
+                    if (serviceModel.TLODAutoMethod[serviceModel.activeProfile] != 2 && serviceModel.FPSSettleCounter > 0) lblStatusMessage.Content += " | FPS Settling " + serviceModel.FPSSettleCounter.ToString("F0") + "s";
+                    else if (serviceModel.TLODAutoMethod[serviceModel.activeProfile] == 2) lblStatusMessage.Content += " | Auto TLOD";
+                    else lblStatusMessage.Content += serviceModel.IsAppPriorityFPS ? " | FPS Priority" : " | TLOD" + ((!serviceModel.UseExpertOptions || serviceModel.MinTLODExtra[serviceModel.activeProfile]) && serviceModel.MinTLODExtraActive ? "+ " : " ") + serviceModel.activeMinTLOD.ToString("F0") + " Priority";
+                    if (serviceModel.gpuUsage >= 0) lblStatusMessage.Content += " | GPU " + serviceModel.gpuUsage.ToString("F0") + "%";
+                    if (serviceModel.AppPaused) lblStatusMessage.Content += " | Auto PAUSED";
 
                     lblTargetFPS.Content = "Target " + serviceModel.ActiveGraphicsMode + (serviceModel.ActiveGraphicsMode == "FG" ? " Active" : "") + " FPS";
                     if (serviceModel.ActiveGraphicsModeChanged) LoadSettings();
-                    float ToleranceFPS = TargetFPS * (serviceModel.UseExpertOptions ? serviceModel.FPSTolerance : 5.0f) / 100.0f;
-                    if (TLODMinGndLanding)
-                    {
-                        if (GetAverageFPS() < TargetFPS - ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Red);
-                        else if (GetAverageFPS() > TargetFPS + ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Green);
-                        else lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
-                    }
-                    else
-                    {
-                        if (GetAverageFPS() < TargetFPS - ToleranceFPS && serviceModel.tlod == MinTLOD) lblSimFPS.Foreground = new SolidColorBrush(Colors.Red);
-                        else if (Math.Abs(GetAverageFPS() - TargetFPS) <= ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Green);
-                        else lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
-                    }
-                    if (serviceModel.tlod == MinTLOD && (!TLODMinGndLanding || GetAverageFPS() < TargetFPS)) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Red);
-                    else if ((!TLODMinGndLanding && serviceModel.tlod == MaxTLOD) || (TLODMinGndLanding && serviceModel.tlod == MinTLOD && GetAverageFPS() > TargetFPS)) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Green);
-                    else if (serviceModel.tlod_step) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Orange);
+
+                    float ToleranceFPS = TargetFPS * serviceModel.FPSTolerance[serviceModel.activeProfile] / 100.0f;
+                    if (serviceModel.TLODAutoMethod[serviceModel.activeProfile] == 2) lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
+                    else if (GetAverageFPS() < TargetFPS - ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Red);
+                    else if (GetAverageFPS() > TargetFPS + ToleranceFPS) lblSimFPS.Foreground = new SolidColorBrush(Colors.Green);
+                    else lblSimFPS.Foreground = new SolidColorBrush(Colors.Black);
+ 
+                    if ((serviceModel.tlod == serviceModel.activeMinTLOD || serviceModel.tlod == serviceModel.activeMaxTLOD) && (GetAverageFPS() > TargetFPS || serviceModel.TLODAutoMethod[serviceModel.activeProfile] == 2)) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Green);
+                    else if (serviceModel.tlod == serviceModel.activeMinTLOD && GetAverageFPS() < TargetFPS) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Red);
+                    else if (serviceModel.tlod_step && !serviceModel.AppPaused) lblSimTLOD.Foreground = new SolidColorBrush(Colors.Orange);
                     else lblSimTLOD.Foreground = new SolidColorBrush(Colors.Black);
 
-                    if (serviceModel.DecCloudQ && serviceModel.DecCloudQActive) lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Red);
+                    if (serviceModel.DecCloudQ[serviceModel.activeProfile] && serviceModel.DecCloudQActive) lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Red);
                     else lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Black);
-                    if (serviceModel.CustomAutoOLOD && serviceModel.UseExpertOptions && (serviceModel.olod == serviceModel.OLODAtBase || serviceModel.olod == serviceModel.OLODAtTop)) lblSimOLOD.Foreground = new SolidColorBrush(Colors.Green);
-                    else if (serviceModel.olod_step) lblSimOLOD.Foreground = new SolidColorBrush(Colors.Orange);
-                    else lblSimOLOD.Foreground= new SolidColorBrush(Colors.Black);
+ 
+                    if ((!serviceModel.UseExpertOptions || serviceModel.CustomAutoOLOD[serviceModel.activeProfile]) && (serviceModel.olod == serviceModel.activeOLODAtBase || serviceModel.olod == serviceModel.activeOLODAtTop)) lblSimOLOD.Foreground = new SolidColorBrush(Colors.Green);
+                    else if (serviceModel.olod_step && !serviceModel.AppPaused) lblSimOLOD.Foreground = new SolidColorBrush(Colors.Orange);
+                    else lblSimOLOD.Foreground = new SolidColorBrush(Colors.Black);
 
-                    if (ServiceModel.TestVersion && serviceModel.TestLogSimValues && logTimer == 0 && serviceModel.FPSSettleCounter == 0 && !(!serviceModel.ActiveWindowMSFS && serviceModel.UseExpertOptions && serviceModel.PauseMSFSFocusLost))
+                    if (serviceModel.AutoTargetFPS && serviceModel.UpdateTargetFPS)
                     {
-                        Logger.Log(LogLevel.Information, "MainWindow:UpdateLiveValues", $"FPS: {lblSimFPS.Content} TLOD: {lblSimTLOD.Content} OLOD: {lblSimOLOD.Content} AGL: {lblPlaneAGL.Content} FPM: {lblPlaneVS.Content} Clouds: {lblSimCloudQs.Content}");
+                        txtTargetFPS.Text = Convert.ToString(serviceModel.TargetFPS, CultureInfo.CurrentUICulture);
+                        serviceModel.UpdateTargetFPS = false;
+                    }
+
+                    if ((ServiceModel.TestVersion || serviceModel.LogSimValues) && logTimer == 0 && serviceModel.FPSSettleCounter == 0 && (Math.Round(serviceModel.altAboveGnd) != Math.Round(altAboveGndLast) || Math.Round(serviceModel.tlod) != Math.Round(tlodLast) || Math.Round(serviceModel.olod) != Math.Round(olodLast) || decCloudQActiveLast != serviceModel.DecCloudQActive || IsAppPriorityFPSLast != serviceModel.IsAppPriorityFPS) && !(!serviceModel.ActiveWindowMSFS && serviceModel.UseExpertOptions && serviceModel.PauseMSFSFocusLost))
+                    {
+                        Logger.Log(LogLevel.Information, "MainWindow:UpdateLiveValues", $"FPS: {lblSimFPS.Content}" + (serviceModel.FgModeEnabled ? " FGAct: " + serviceModel.ActiveWindowMSFS : "") + $" Pri: {(serviceModel.IsAppPriorityFPS ? "FPS" : "TLOD")} TLOD: {lblSimTLOD.Content} OLOD: {lblSimOLOD.Content} AGL: {lblPlaneAGL.Content} FPM: {lblPlaneVS.Content} Clouds: {lblSimCloudQs.Content}" + (serviceModel.gpuUsage >= 0 ? $" GPU: {serviceModel.gpuUsage}%" : ""));
                         logTimer = logTimerInterval;
+                        altAboveGndLast = serviceModel.altAboveGnd;
+                        tlodLast = serviceModel.tlod;
+                        olodLast = serviceModel.olod;
+                        decCloudQActiveLast = serviceModel.DecCloudQActive;
+                        IsAppPriorityFPSLast = serviceModel.IsAppPriorityFPS;
+
                     }
                     else if (--logTimer < 0) logTimer = 0;
                 }
@@ -334,8 +377,40 @@ namespace MSFS2020_AutoFPS
 
         protected void OnTick(object sender, EventArgs e)
         {
+
+            if (serviceModel.RememberWindowPos && !serviceModel.VrModeActive)
+            {
+                if ((int)Top != serviceModel.windowTop)
+                {
+                    serviceModel.windowTop = (int)Top;
+                    serviceModel.SetSetting("windowTop", serviceModel.windowTop.ToString().ToLower());
+                }
+                if ((int)Left != serviceModel.windowLeft)
+                {
+                    serviceModel.windowLeft = (int)Left;
+                    serviceModel.SetSetting("windowLeft", serviceModel.windowLeft.ToString().ToLower());
+                }
+            }
+
             UpdateStatus();
-            UpdateLiveValues();
+            if (serviceModel.AppEnabled) UpdateLiveValues();
+            else
+            {
+                lblStatusMessage.Content = "MSFS compatibility test failed - app disabled. See readme to resolve.";
+                lblStatusMessage.Foreground = new SolidColorBrush(Colors.Red);
+                lblSimTLOD.Content = "n/a";
+                lblSimTLOD.Foreground = new SolidColorBrush(Colors.Red);
+                lblSimOLOD.Content = "n/a";
+                lblSimOLOD.Foreground = new SolidColorBrush(Colors.Red);
+                lblSimCloudQs.Content = "n/a";
+                lblSimCloudQs.Foreground = new SolidColorBrush(Colors.Red);
+                lblSimFPS.Content = "n/a";
+                lblSimFPS.Foreground = new SolidColorBrush(Colors.Red);
+                lblPlaneAGL.Content = "n/a";
+                lblPlaneAGL.Foreground = new SolidColorBrush(Colors.Red);
+                lblPlaneVS.Content = "n/a";
+                lblPlaneVS.Foreground = new SolidColorBrush(Colors.Red);
+            }
             UpdateAircraftValues();
         }
 
@@ -361,9 +436,21 @@ namespace MSFS2020_AutoFPS
             Hide();
         }
 
-        private void chkTestLogSimValues_Click(object sender, RoutedEventArgs e)
+        private void chkAutoTargetFPS_Click(object sender, RoutedEventArgs e)
         {
-            serviceModel.SetSetting("testLogSimValues", chkTestLogSimValues.IsChecked.ToString().ToLower());
+            serviceModel.SetSetting("AutoTargetFPS", chkAutoTargetFPS.IsChecked.ToString().ToLower());
+            if ((bool)chkAutoTargetFPS.IsChecked)
+            {
+                serviceModel.ForceAutoFPSCal = true;
+                serviceModel.FPSSettleCounter = ServiceModel.FPSSettleSeconds;
+            }
+            else
+            {
+                if (serviceModel.VrModeActive) serviceModel.TargetFPS = serviceModel.FlightTypeIFR ? serviceModel.TargetFPS_VR : serviceModel.TargetFPS_VR_VFR;
+                else if (serviceModel.FgModeEnabled) serviceModel.TargetFPS = serviceModel.FlightTypeIFR ? serviceModel.TargetFPS_FG : serviceModel.TargetFPS_FG_VFR;
+                else serviceModel.TargetFPS = serviceModel.FlightTypeIFR ? serviceModel.TargetFPS_PC : serviceModel.TargetFPS_PC_VFR;
+            }
+            serviceModel.ResetCloudsTLOD(); 
             LoadSettings();
         }
         private void chkOnTop_Click(object sender, RoutedEventArgs e)
@@ -371,38 +458,52 @@ namespace MSFS2020_AutoFPS
             serviceModel.SetSetting("OnTop", chkOnTop.IsChecked.ToString().ToLower());
             LoadSettings();
         }
+        private void chkFlightType_Click(object sender, RoutedEventArgs e)
+        {
+            serviceModel.SetSetting("FlightTypeIFR", optIFRFlight.IsChecked.ToString().ToLower());
+            serviceModel.ResetCloudsTLOD();
+            LoadSettings();
+        }
         private void chkUseExpertOptions_Click(object sender, RoutedEventArgs e)
         {
             serviceModel.SetSetting("useExpertOptions", chkUseExpertOptions.IsChecked.ToString().ToLower());
+            serviceModel.ResetCloudsTLOD();
             LoadSettings();
-            if (serviceModel.UseExpertOptions) stkpnlMSFSSettings.Visibility = Visibility.Visible;
-            else stkpnlMSFSSettings.Visibility = Visibility.Collapsed;
+            if (serviceModel.UseExpertOptions) stkpnlExpertSettings.Visibility = Visibility.Visible;
+            else stkpnlExpertSettings.Visibility = Visibility.Collapsed;
+        }
+        private void cbTLODAutoMethod_SelectionChange(object sender, EventArgs e)
+        {
+            if (serviceModel != null)
+            {
+                serviceModel.SetSetting(serviceModel.activeProfile == (int)ServiceModel.appProfiles.IFR_Expert ? "TLODAutoMethod" : "TLODAutoMethod_VFR", cbTLODAutoMethod.SelectedIndex.ToString());
+                serviceModel.TLODAutoMethod[serviceModel.activeProfile] = cbTLODAutoMethod.SelectedIndex;
+                serviceModel.ResetCloudsTLOD();
+                LoadSettings();
+            }
         }
         private void chkCustomAutoOLOD_Click(object sender, RoutedEventArgs e)
         {
-            serviceModel.SetSetting("customAutoOLOD", chkCustomAutoOLOD.IsChecked.ToString().ToLower());
+            serviceModel.SetSetting(serviceModel.activeProfile == (int)ServiceModel.appProfiles.IFR_Expert ? "customAutoOLOD" : "customAutoOLOD_VFR", chkCustomAutoOLOD.IsChecked.ToString().ToLower());
             LoadSettings();
         }
-        private void chkOpenWindow_Click(object sender, RoutedEventArgs e)
+        private void chkCloudRecoveryPlus_Click(object sender, RoutedEventArgs e)
         {
-            serviceModel.SetSetting("openWindow", chkOpenWindow.IsChecked.ToString().ToLower());
+            serviceModel.SetSetting(serviceModel.activeProfile == (int)ServiceModel.appProfiles.IFR_Expert ? "CloudRecoveryPlus" : "CloudRecoveryPlus_VFR", chkCloudRecoveryPlus.IsChecked.ToString().ToLower());
+            if (((bool)chkCloudRecoveryPlus.IsChecked && (serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile] < 5 || serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile] > serviceModel.MaxTLOD[serviceModel.activeProfile] - serviceModel.MinTLOD[serviceModel.activeProfile] - 5)) || (!(bool)chkCloudRecoveryPlus.IsChecked && (serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile] < serviceModel.MinTLOD[serviceModel.activeProfile] + 5 || serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile] > serviceModel.MaxTLOD[serviceModel.activeProfile] - 5))) serviceModel.SetSetting(serviceModel.activeProfile == (int)ServiceModel.appProfiles.IFR_Expert ? "CloudRecoveryTLOD" : "CloudRecoveryTLOD_VFR", Convert.ToString(Math.Round(((bool)chkCloudRecoveryPlus.IsChecked ? 0 : serviceModel.MinTLOD[serviceModel.activeProfile]) + 2 * (serviceModel.MaxTLOD[serviceModel.activeProfile] - serviceModel.MinTLOD[serviceModel.activeProfile]) / 5), CultureInfo.InvariantCulture));
+            serviceModel.ResetCloudsTLOD();
             LoadSettings();
         }
-
-        private void chkTLODMinGndLanding_Click(object sender, RoutedEventArgs e)
+        private void chkMinTLODExtra_Click(object sender, RoutedEventArgs e)
         {
-            serviceModel.SetSetting("TLODMinGndLanding", chkTLODMinGndLanding.IsChecked.ToString().ToLower());
+            serviceModel.SetSetting(serviceModel.activeProfile == (int)ServiceModel.appProfiles.IFR_Expert ? "MinTLODExtra" : "MinTLODExtra_VFR", chkMinTLODExtra.IsChecked.ToString().ToLower());
+            serviceModel.ResetCloudsTLOD();
             LoadSettings();
-            if (serviceModel.MemoryAccess != null)
-            {
-                if (serviceModel.VrModeActive) serviceModel.MemoryAccess.SetCloudQ_VR(serviceModel.DefaultCloudQ_VR);
-                else serviceModel.MemoryAccess.SetCloudQ(serviceModel.DefaultCloudQ);
-                serviceModel.DecCloudQActive = false;
-            }
         }
+ 
         private void chkDecCloudQ_Click(object sender, RoutedEventArgs e)
         {
-            serviceModel.SetSetting("DecCloudQ", chkDecCloudQ.IsChecked.ToString().ToLower());
+            serviceModel.SetSetting(serviceModel.activeProfile == (int)ServiceModel.appProfiles.IFR_Expert ? "DecCloudQ" : "DecCloudQ_VFR", chkDecCloudQ.IsChecked.ToString().ToLower());
             LoadSettings();
             chkCloudRecoveryTLOD_WindowVisibility();
 
@@ -489,12 +590,13 @@ namespace MSFS2020_AutoFPS
                 {
                     case "targetFps":
                         if (iValue < 10 || iValue > 200) iValue = serviceModel.TargetFPS;
-                        if (serviceModel.ActiveGraphicsMode == "VR") key = "targetFpsVR";
-                        else if (serviceModel.ActiveGraphicsMode == "FG") key = "targetFpsFG";
-                        else key = "targetFpsPC";
+                        if (serviceModel.ActiveGraphicsMode == "VR") key = serviceModel.FlightTypeIFR ? "targetFpsVR" : "targetFpsVRVFR";
+                        else if (serviceModel.ActiveGraphicsMode == "FG") key = serviceModel.FlightTypeIFR ? "targetFpsFG" : "targetFpsFGVFR";
+                        else key = serviceModel.FlightTypeIFR ? "targetFpsPC" : "targetFpsPCVFR";
                         break;
                     case "FpsTolerance":
-                        if (iValue > 20) iValue = serviceModel.FPSTolerance;
+                        if (iValue > 20) iValue = serviceModel.FPSTolerance[serviceModel.activeProfile];
+                        if (serviceModel.activeProfile != (int)ServiceModel.appProfiles.IFR_Expert) key += "_VFR";
                         break;
                     default:
                         break;
@@ -509,37 +611,44 @@ namespace MSFS2020_AutoFPS
                 switch (key)
                 {
                     case "minTLod":
-                        if (fValue < 10 || fValue > ServiceModel.TLODMinLockAlt || fValue > serviceModel.MaxTLOD - 10) fValue = serviceModel.MinTLOD;
-                        if (serviceModel.CloudRecoveryTLOD < fValue + 10) serviceModel.SetSetting("CloudRecoveryTLOD", Convert.ToString(Math.Round(2 * (fValue + serviceModel.MaxTLOD) / 5), CultureInfo.InvariantCulture));
+                        if (fValue < 10 || fValue > serviceModel.MaxTLOD[serviceModel.activeProfile] - 10) fValue = serviceModel.MinTLOD[serviceModel.activeProfile];
+                        if (serviceModel.CloudRecoveryPlus[serviceModel.activeProfile] ? serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile] + fValue > serviceModel.MaxTLOD[serviceModel.activeProfile] - 10 : serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile] < fValue + 10) serviceModel.SetSetting(serviceModel.activeProfile == (int)ServiceModel.appProfiles.IFR_Expert ? "CloudRecoveryTLOD" : "CloudRecoveryTLOD_VFR", Convert.ToString(Math.Round((serviceModel.CloudRecoveryPlus[serviceModel.activeProfile] ? 0 : serviceModel.MinTLOD[serviceModel.activeProfile]) + 2 * (serviceModel.MaxTLOD[serviceModel.activeProfile] - fValue) / 5), CultureInfo.InvariantCulture));
                         break;
                     case "maxTLod":
-                        if (fValue < serviceModel.MinTLOD + 10 || fValue > 1000) fValue = serviceModel.MaxTLOD;
-                        if (serviceModel.CloudRecoveryTLOD > fValue - 10) serviceModel.SetSetting("CloudRecoveryTLOD", Convert.ToString(Math.Round(2 * (fValue + serviceModel.MinTLOD) / 5), CultureInfo.InvariantCulture));
+                        if (fValue < serviceModel.MinTLOD[serviceModel.activeProfile] + 10 || fValue > 1000) fValue = serviceModel.MaxTLOD[serviceModel.activeProfile];
+                        if ((serviceModel.CloudRecoveryPlus[serviceModel.activeProfile] ? serviceModel.MinTLOD[serviceModel.activeProfile] : 0) + serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile] > fValue - 10) serviceModel.SetSetting(serviceModel.activeProfile == (int)ServiceModel.appProfiles.IFR_Expert ? "CloudRecoveryTLOD" : "CloudRecoveryTLOD_VFR", Convert.ToString(Math.Round((serviceModel.CloudRecoveryPlus[serviceModel.activeProfile] ? 0 : serviceModel.MinTLOD[serviceModel.activeProfile]) + 2 * (fValue - serviceModel.MinTLOD[serviceModel.activeProfile]) / 5), CultureInfo.InvariantCulture));
                         break;
                     case "CloudRecoveryTLOD":
-                        if (fValue < serviceModel.MinTLOD + 5 || fValue > serviceModel.MaxTLOD - 5) fValue = serviceModel.CloudRecoveryTLOD;
+                        if (serviceModel.CloudRecoveryPlus[serviceModel.activeProfile] && (fValue < 5 || fValue > serviceModel.MaxTLOD[serviceModel.activeProfile] - serviceModel.MinTLOD[serviceModel.activeProfile] - 5)) fValue = serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile];
+                        else if (!serviceModel.CloudRecoveryPlus[serviceModel.activeProfile] && (fValue < serviceModel.MinTLOD[serviceModel.activeProfile] + 5 || fValue > serviceModel.MaxTLOD[serviceModel.activeProfile] - 5)) fValue = serviceModel.CloudRecoveryTLOD[serviceModel.activeProfile];
                         break;
                     case "OLODAtBase":
-                        if (fValue < 10 || fValue > 1000) fValue = serviceModel.OLODAtBase;
+                        if (fValue < 10 || fValue > 1000) fValue = serviceModel.OLODAtBase[serviceModel.activeProfile];
                         break;
                     case "OLODAtTop":
-                        if (fValue < 10 || fValue > 1000) fValue = serviceModel.OLODAtTop;
+                        if (fValue < 10 || fValue > 1000) fValue = serviceModel.OLODAtTop[serviceModel.activeProfile];
                         break;
                     case "AltOLODBase":
-                        if (fValue < 1000 || fValue >= 100000 || fValue > serviceModel.AltOLODTop - 1) fValue = serviceModel.AltOLODBase;
+                        if (fValue < 1000 || fValue >= 100000 || fValue > serviceModel.AltOLODTop[serviceModel.activeProfile] - 1) fValue = serviceModel.AltOLODBase[serviceModel.activeProfile];
                         break;
                     case "AltOLODTop":
-                        if (fValue < 2000 || fValue > 100000 || fValue < serviceModel.AltOLODBase + 1) fValue = serviceModel.AltOLODTop;
+                        if (fValue < 2000 || fValue > 100000 || fValue < serviceModel.AltOLODBase[serviceModel.activeProfile] + 1) fValue = serviceModel.AltOLODTop[serviceModel.activeProfile];
                         break;
                     case "AltTLODBase":
-                        if (fValue < 0 || fValue >= 100000) fValue = serviceModel.AltTLODBase;
+                        if (fValue < 0 || fValue >= 100000) fValue = serviceModel.AltTLODBase[serviceModel.activeProfile];
                         break;
                     case "AvgDescentRate":
-                        if (fValue < 200 || fValue > 10000) fValue = serviceModel.AvgDescentRate;
+                        if (serviceModel.TLODAutoMethod[serviceModel.activeProfile] == 2)
+                        {
+                            key = "AltTLODTop";
+                            if (fValue < 1000 || fValue > 100000 || fValue < serviceModel.AltTLODBase[serviceModel.activeProfile] + 1) fValue = serviceModel.AltTLODTop[serviceModel.activeProfile];
+                        }
+                        if (fValue < 200 || fValue > 10000) fValue = serviceModel.AvgDescentRate[serviceModel.activeProfile];
                         break;
                     default:
                         break;
                 }
+                if (serviceModel.activeProfile != (int)ServiceModel.appProfiles.IFR_Expert) key += "_VFR";
                 serviceModel.SetSetting(key, Convert.ToString(fValue, CultureInfo.InvariantCulture));
             }
 
@@ -565,11 +674,7 @@ namespace MSFS2020_AutoFPS
         {
 
         }
-        private void chkTLODMinGndLanding_Checked(object sender, RoutedEventArgs e)
-        {
-
-        }
-
+ 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             try
@@ -587,19 +692,31 @@ namespace MSFS2020_AutoFPS
         }
         private void chkCloudRecoveryTLOD_WindowVisibility()
         {
-            if (serviceModel.DecCloudQ)
+            if (serviceModel.DecCloudQ[serviceModel.activeProfile])
             {
                 lblCloudRecoveryTLOD.Visibility = Visibility.Visible;
                 txtCloudRecoveryTLOD.Visibility = Visibility.Visible;
+                lblCloudPlus.Visibility = Visibility.Visible;
+                chkCloudRecoveryPlus.Visibility = Visibility.Visible;
             }
             else
             {
                 lblCloudRecoveryTLOD.Visibility = Visibility.Hidden;
                 txtCloudRecoveryTLOD.Visibility = Visibility.Hidden;
+                lblCloudPlus.Visibility = Visibility.Hidden;
+                chkCloudRecoveryPlus.Visibility = Visibility.Hidden;
             }
         }
 
         private void chkCustomAutoOLOD_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void chkCloudRecoveryPlus_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void chkMinTLODExtra_Checked(object sender, RoutedEventArgs e)
         {
 
         }
