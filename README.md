@@ -3,7 +3,7 @@
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
 
 This app aims to improve the MSFS user experience by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use UI and provides features such as:<br/>
-- Automatic TLOD adjustment when in the air to either achieve and maintain a target FPS or an optional altitude schedule,
+- Automatic TLOD adjustment when in the air to either achieve and maintain a target FPS or, as an expert option, an altitude schedule,
 - Improved target FPS tracking for all modes by having much smaller TLOD changes the closer you are to your target FPS, giving more consistent FPS for a better flight experience.    
 - A choice between VFR (GA) and IFR (Airliner) flight types, which defaults to settings suitable to each flight type and is fully customisable in Expert mode. 
 - Auto raising and lowering of the minimum TLOD option, depending on low altitude performance being either very favourable or poor respectively,
@@ -194,6 +194,11 @@ Some Notes:
       - Determines how much variance from your target FPS must occur before the app will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be.
       - The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller.
       - TLOD changes are allowable on the ground in this mode with the VFR flight type, so be aware of potential ground texture tearing/flashing issues because of it.
+    - Auto TLOD - functions the same way that Auto OLOD does ie. independent of FPS.
+      - TLOD will adjust based on an altitude band with a base and top level and with TLOD values defined for each of these altitudes.
+      - The app will set TLOD @ Base at or below the Alt TLOD Base (AGL), set the TLOD @ Top at or above Alt TLOD Top (AGL) and interpolate in between.
+      - As this function completely ignores FPS, all FPS-related settings are removed from the UI when using this method. These are Target FPS, Auto Target FPS, TLOD Min + and Pause on MSFS losing Focus.
+      - FPS settling time is also disabled as it does not apply to this automation method.
   - Pause when MSFS loses focus
     - Will stop LODs and, if applicable, cloud quality from changing while you are focused on another app and not MSFS.
     - Particularly useful for when using FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. 
