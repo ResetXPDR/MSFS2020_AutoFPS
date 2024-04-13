@@ -87,7 +87,7 @@ namespace MSFS2020_AutoFPS
             timer.Start();
 
             MainWindow = new MainWindow(notifyIcon.DataContext as NotifyIconViewModel, Model);
-            if (Model.OpenWindow)
+            if (Model.OpenWindow && !Model.StartMinimized)
                 MainWindow.Show();
         }
 

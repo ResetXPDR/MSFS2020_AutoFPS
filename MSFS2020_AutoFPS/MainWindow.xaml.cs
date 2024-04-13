@@ -243,6 +243,7 @@ namespace MSFS2020_AutoFPS
                 LoadSettings();
             }
             if (ServiceModel.TestVersion || serviceModel.LogSimValues) Logger.Log(LogLevel.Information, "MainWindow:LoadSettings", $"Expert: {serviceModel.UseExpertOptions} Mode: {serviceModel.ActiveGraphicsMode} ATgtFPS: {serviceModel.AutoTargetFPS} FltType: {(serviceModel.FlightTypeIFR ? "IFR" : "VFR")} TgtFPS: {txtTargetFPS.Text} TLODAMtd: {serviceModel.TLODAutoMethod[serviceModel.activeProfile]} Tol: {txtFPSTolerance.Text}" + (!serviceModel.UseExpertOptions && serviceModel.MemoryAccess == null ? "" : $" TMin: {txtMinTLod.Text} TMax: {txtMaxTLod.Text} OLODB: {serviceModel.OLODAtBase[serviceModel.activeProfile]} OLODT: {serviceModel.OLODAtTop[serviceModel.activeProfile]} OLODBAlt: {serviceModel.AltOLODBase[serviceModel.activeProfile]}") +$" TMinEx: {(!serviceModel.UseExpertOptions || serviceModel.MinTLODExtra[serviceModel.activeProfile] ? "true" : "false")} CloudQ: {serviceModel.DecCloudQ[serviceModel.activeProfile]} CRecovT: {txtCloudRecoveryTLOD.Text} Pause: {serviceModel.PauseMSFSFocusLost} TLODBAlt: {serviceModel.AltTLODBase[serviceModel.activeProfile]} MaxDesRate {serviceModel.AvgDescentRate[serviceModel.activeProfile]} CustomOLOD: {serviceModel.CustomAutoOLOD[serviceModel.activeProfile]} OLODTAlt: {serviceModel.AltOLODTop[serviceModel.activeProfile]}");
+            chkStartMinimized.IsChecked = serviceModel.StartMinimized;
         }
 
         protected void UpdateStatus()
@@ -456,6 +457,12 @@ namespace MSFS2020_AutoFPS
         private void chkOnTop_Click(object sender, RoutedEventArgs e)
         {
             serviceModel.SetSetting("OnTop", chkOnTop.IsChecked.ToString().ToLower());
+            LoadSettings();
+        }
+
+        private void chkStartMinimized_Click(object sender, RoutedEventArgs e)
+        {
+            serviceModel.SetSetting("StartMinimized", chkStartMinimized.IsChecked.ToString().ToLower());
             LoadSettings();
         }
         private void chkFlightType_Click(object sender, RoutedEventArgs e)

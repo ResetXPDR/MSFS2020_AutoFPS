@@ -105,6 +105,7 @@ namespace MSFS2020_AutoFPS
         public bool RememberWindowPos { get; set; }
 
         public bool OnTop { get; set; }
+        public bool StartMinimized { get; set; }
         public string SimBinary { get; set; }
         public string SimModule { get; set; }
         public long OffsetModuleBase { get; set; }
@@ -160,6 +161,7 @@ namespace MSFS2020_AutoFPS
             LogSimValues = Convert.ToBoolean(ConfigurationFile.GetSetting("LogSimValues", "false"));
             AutoTargetFPS = Convert.ToBoolean(ConfigurationFile.GetSetting("AutoTargetFPS", "false"));
             OnTop = Convert.ToBoolean(ConfigurationFile.GetSetting("OnTop", "false"));
+            StartMinimized = Convert.ToBoolean(ConfigurationFile.GetSetting("StartMinimized", "false"));
             PauseMSFSFocusLost = Convert.ToBoolean(ConfigurationFile.GetSetting("PauseMSFSFocusLost", "false"));
             TargetFPS_PC = Convert.ToInt32(ConfigurationFile.GetSetting("targetFpsPC", "40"));
             TargetFPS_VR = Convert.ToInt32(ConfigurationFile.GetSetting("targetFpsVR", "40"));

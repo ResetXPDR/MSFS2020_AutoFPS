@@ -97,9 +97,10 @@
                             <RowDefinition MinHeight="32" Height="*"/>
                         </Grid.RowDefinitions>
                         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0" Grid.ColumnSpan="2">
-                            <Label Name="lblTargetFPS" Content="Target PC FPS" MinWidth="120"/>
-                            <TextBox x:Name="txtTargetFPS" ToolTip ="Achievable for your system" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42"   LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp"/>
-                            <CheckBox x:Name="chkOnTop" VerticalContentAlignment="Center" Width="76"  Height="24" MaxHeight="24" MinHeight="24" Click="chkOnTop_Click" Content="On top" Margin="13,0,0,0"/>
+                            <Label Name="lblTargetFPS" Content="Target PC FPS" MinWidth="75" Width="64"/>
+                            <TextBox x:Name="txtTargetFPS" ToolTip ="Achievable for your system" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="40"   LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp"/>
+                            <CheckBox x:Name="chkStartMinimized" VerticalContentAlignment="Center" Width="80"  Height="24" MaxHeight="24" MinHeight="24" Click="chkStartMinimized_Click" Content="Minimized"/>
+                            <CheckBox x:Name="chkOnTop" VerticalContentAlignment="Center" Width="65"  Height="24" MaxHeight="24" MinHeight="24" Click="chkOnTop_Click" Content="On top"/>
                             <CheckBox x:Name="chkAutoTargetFPS" VerticalContentAlignment="Center" ToolTip ="Recommended for VFR flights" Height="24" MaxHeight="24" MinHeight="24" Click="chkAutoTargetFPS_Click" Content="Auto Target FPS" IsChecked="False"/>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,8,0,0">
