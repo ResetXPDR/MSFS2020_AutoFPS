@@ -125,11 +125,11 @@ Some Notes:
 ## Usage / Configuration
 
 - General
-  - Starting manually: anytime, but preferably before MSFS or in the Main Menu. The app will stop itself when MSFS closes. 
+  - The app can be started anytime, but preferably before MSFS or in the Main Menu to minimise sudden MSFS settings changes when the app is initialising. The app will stop itself when MSFS closes. 
   - Closing the Window does not close the app, use the Context Menu of the SysTray Icon.
   - Clicking on the SysTray Icon opens the Window (again).
   - If you wish to have the app window always open to the SysTray, close the app and manually change the openWindow key state in the config file to false.
-  - The app's window position will be remembered between sessions, except movements to it made while in VR due to window restoration issues. If there are issues with the window not displaying correctly on startup, as can happen when auto-starting the app through MSFS of FSUIPC, either don't use auto-start or manually disable this feature in the config file by setting the RememberWindowPos line to be false.
+  - The app's window position will be remembered between sessions, except movements to it made while in VR due to window restoration issues. If there are issues with the window not displaying correctly on startup, as can happen when auto-starting the app through MSFS of FSUIPC, either don't use auto-start, restart the app within 10 seconds of last closing it to auto reset the window position, or manually permanently disable this feature in the config file by setting the RememberWindowPos line to be false.
   - Runnning as Admin NOT usually required (BUT: It is required to be run under the same User/Elevation as MSFS).
   - Do not change TLOD, OLOD and Cloud Quality MSFS settings manually while in a flight with this app running as it will conflict with what the app is managing and they will not restore to what you set when you exit your flight. If you wish to change the defaults for these MSFS settings, you must do so either without this app running or, if it is, only while you are in the MSFS main menu (ie not in a flight).
   - If you wish to activate additional logging of settings changes and sim values, as currently happens automatically in test versions, you need to manually edit your config file and add a LogSimValues key, if it doesn't already exist, and set its value to true ie.  ```<add key="LogSimValues" value="true" />```
@@ -147,7 +147,7 @@ Some Notes:
       - Shows detected DX version, Graphics Mode (PC, FG, or VR), app pause, FPS settling time, and/or app priority mode as applicable.
       - The FPS settling timer runs for up to 20 seconds to allow FPS to settle between pausing/unpausing, auto target FPS calibration, TLOD Min + transitions and VR/PC/FG mode transitions. This allows the FPS to stabilise before engaging automatic functions and should lead to much smaller TLOD changes when seeking the target FPS on such transitions.
       - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected. 
-      - Bonus GPU load display if the optional GPU-Z companion app, downloadable separately [here](https://www.techpowerup.com/download/techpowerup-gpu-z/), is installed and detected running when starting any flight session.
+      - Bonus GPU load display if the optional GPU-Z companion app, downloadable separately [here](https://www.techpowerup.com/download/techpowerup-gpu-z/), is installed and detected running when starting any flight session. Note, the GPU-Z companion app is required to be running if the Decrease Cloud Quality option is selected in conjunction with the GPU Load activation method, as GPU-Z provides the necessary GPU load information to the app for this method to function.
       - Auto pause will activate if in flight and either MSFS is in active pause or the MSFS settings menu is being accessed.
   - Target FPS - The most important setting in this app.
     - Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
@@ -198,6 +198,7 @@ Some Notes:
     - Auto TLOD - functions the same way that Auto OLOD does ie. independent of FPS.
       - TLOD will adjust based on an altitude band with a base and top level and with TLOD values defined for each of these altitudes.
       - The app will set TLOD @ Base at or below the Alt TLOD Base (AGL), set the TLOD @ Top at or above Alt TLOD Top (AGL) and interpolate in between.
+      - The nominal LOD Step Size can be set to allow users experiencing stuttering issues to try different LOD step sizes to help resolve the issue. The default value is 5. 
       - As this function completely ignores FPS, all FPS-related settings are removed from the UI when using this method. These are Target FPS, Auto Target FPS, TLOD Min + and Pause on MSFS losing Focus.
       - FPS settling time is also disabled as it does not apply to this automation method.
   - Pause when MSFS loses focus
@@ -212,19 +213,20 @@ Some Notes:
   - Avg Descent Rate- Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
     - This band ensures that, if you descend at your set Avg Descent Rate or less, that the app can decrement TLOD from TLOD Max to TLOD Min by the Alt TLOD Base without exceeding the LOD Step rate associated with the FPS sensitivity level you have set.
   - Decrease Cloud Quality - When enabled, will reduce/restore cloud quality by one level if the activation condition is met.
-  - Activation Methods - TLOD is the original method and is most suitable for systems where TLOD has the largest impact on desired MSFS performance. GPU Load is the new method that allows cloud quality changes to occur independently of TLOD and is most suitable for systems where cloud quality has a similar or larger impact on desired MSFS performance than TLOD does.
-    - TLOD (FPS Sensitivity and FPS Tolerance TLOD Automation Methods)
-      - Decreases when TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance.
-      - Cloud Recovery TLOD with optional +
-        - The TLOD level required to cancel an active cloud quality reduction state and restore cloud quality back to its initial higher quality level.
-        - Ideally set to 50 TLOD or more above TLOD Min to provide a TLOD buffer to minimise the chance that cloud quality will constantly change down and up.
-        - When + is checked, Cloud Recovery TLOD becomes relative to TLOD Min instead of absolute.
-    - GPU Load (All TLOD Automation Methods)
-      - Decreases when the GPU load, as measured by the GPU-Z companion app that is required to be running for this functionality to work, is higher than the user-defined Decrease GPU Load percentage.
-      - Cloud Recovery GPU load
-        - Recovers when the GPU load is lower than the user-defined Recover GPU Load percentage.
-        - Provides a GPU Load buffer to account for the decreased GPU load achieved by reducing cloud quality and will minimise the chance that cloud quality will constantly change down and up.
-        - Ideally set to at least 15% lower than the Decrease GPU Load percentage to provide a GPU load buffer to minimise the chance that cloud quality will constantly change down and up.
+    - Activation Methods - TLOD is the original method and is most suitable for systems where TLOD has the largest impact on desired MSFS performance. GPU Load is the new method that allows cloud quality changes to occur independently of TLOD and is most suitable for systems where cloud quality has a similar or larger impact on desired MSFS performance than TLOD does. IFR and VFR flight modes will use the same cloud reduction method.
+      - TLOD (FPS Sensitivity and FPS Tolerance TLOD Automation Methods)
+        - Decreases when TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance.
+        - Cloud Recovery TLOD with optional +
+          - The TLOD level required to cancel an active cloud quality reduction state and restore cloud quality back to its initial higher quality level.
+          - Ideally set to 50 TLOD or more above TLOD Min to provide a TLOD buffer to minimise the chance that cloud quality will constantly change down and up.
+          - When + is checked, Cloud Recovery TLOD becomes relative to TLOD Min instead of absolute.
+      - GPU Load (All TLOD Automation Methods)
+        - Requires the GPU-Z companion app to be installed and running for this method to work. If GPU-Z is not running, the user will be alerted to start it in on the app status line in the General section.
+        - Decreases when the GPU load, as measured by the GPU-Z companion app that is required to be running for this functionality to work, is higher than the user-defined Decrease GPU Load percentage.
+        - Cloud Recovery GPU load
+          - Recovers when the GPU load is lower than the user-defined Recover GPU Load percentage.
+          - Provides a GPU Load buffer to account for the decreased GPU load achieved by reducing cloud quality and will minimise the chance that cloud quality will constantly change down and up.
+          - Ideally set to at least 15% lower than the Decrease GPU Load percentage to provide a GPU load buffer to minimise the chance that cloud quality will constantly change down and up.
   -  Auto OLOD
      -  When enabled, four user definable parameters relating to this feature will be revealed on the UI.
      -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base and top level and with OLOD values defined for each of these altitudes.
