@@ -180,7 +180,7 @@ Some Notes:
     - TLOD Minimum - VFR 100% of your current MSFS TLOD setting, IFR 50%
     - TLOD Maximum - VFR 300% of your current MSFS TLOD setting, IFR 200%
     - TLOD Min + - enabled
-    - Decrease Cloud Quality - enabled
+    - Decrease Cloud Quality - enabled and with TLOD activation method
     - Cloud Recovery TLOD
       - 2/5 between TLOD Minimum and TLOD Maximum or + 50 over TLOD Min, whichever is lower.
       - If excessive changing of cloud quality levels are detected, the app will automatically increase its calculated cloud recovery TLOD.
