@@ -187,7 +187,7 @@ Some Notes:
     - Auto OLOD - enabled and VFR 150% of your current MSFS OLOD setting, IFR 100%
     - Pause when MSFS loses focus - disabled, unless using FG then enabled
 - Expert Settings
-  - FPS Automation Method - FPS Sensitivity generally gives better results and hence is the default. Use FPS Tolerance if you experience stuttering issues. Use Auto TLOD if you are using an FPS cap and it interferes with setting a suitable target FPS.
+  - Auto Method - FPS Sensitivity generally gives better results and hence is the default. Use FPS Tolerance if you experience stuttering issues. Use Auto TLOD if you are using an FPS cap and it interferes with setting a suitable target FPS.
     - FPS Sensitivity (v0.4.2 and later) - smaller changes more often.
       - Determines how sensitive the app will be to the variance between your current and target FPS.
       - Also determines the largest TLOD step size you will see, being double the FPS sensitivity number.
@@ -214,20 +214,23 @@ Some Notes:
   - Avg Descent Rate- Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
     - This band ensures that, if you descend at your set Avg Descent Rate or less, that the app can decrement TLOD from TLOD Max to TLOD Min by the Alt TLOD Base without exceeding the LOD Step rate associated with the FPS sensitivity level you have set.
   - Decrease Cloud Quality - When enabled, will reduce/restore cloud quality by one level if the activation condition is met.
-    - Activation Methods - TLOD is the original method and is most suitable for systems where TLOD has the largest impact on desired MSFS performance. GPU Load is the new method that allows cloud quality changes to occur independently of TLOD and is most suitable for systems where cloud quality has a similar or larger impact on desired MSFS performance than TLOD does. IFR and VFR flight modes will use the same cloud reduction method.
-      - TLOD (FPS Sensitivity and FPS Tolerance TLOD Automation Methods)
-        - Decreases when TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance.
-        - Cloud Recovery TLOD with optional +
-          - The TLOD level required to cancel an active cloud quality reduction state and restore cloud quality back to its initial higher quality level.
-          - Ideally set to 50 TLOD or more above TLOD Min to provide a TLOD buffer to minimise the chance that cloud quality will constantly change down and up.
-          - When + is checked, Cloud Recovery TLOD becomes relative to TLOD Min instead of absolute.
-      - GPU Load (All TLOD Automation Methods)
-        - Requires the GPU-Z companion app to be installed and running for this method to work. If GPU-Z is not running, the user will be alerted to start it in on the app status line in the General section.
-        - Decreases when the GPU load, as measured by the GPU-Z companion app, is higher than the user-defined Decrease GPU Load percentage.
-        - Cloud Recovery GPU load
-          - Recovers when the GPU load is lower than the user-defined Recover GPU Load percentage.
-          - Provides a GPU Load buffer to account for the decreased GPU load achieved by reducing cloud quality and will minimise the chance that cloud quality will constantly change down and up.
-          - Ideally set to at least 15% lower than the Decrease GPU Load percentage to provide a GPU load buffer to minimise the chance that cloud quality will constantly change down and up.
+    - Activation Methods
+      - TLOD is the original method and is most suitable for systems where TLOD has the largest impact on desired MSFS performance.
+      - GPU Load is the new method that allows cloud quality changes to occur independently of TLOD and is most suitable for systems where cloud quality has a similar or larger impact on desired MSFS performance than TLOD does.
+      - IFR and VFR flight modes will use the same cloud reduction method.
+    - TLOD (FPS Sensitivity and FPS Tolerance TLOD Automation Methods)
+      - Decreases when TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance.
+      - Cloud Recovery TLOD with optional +
+        - The TLOD level required to cancel an active cloud quality reduction state and restore cloud quality back to its initial higher quality level.
+        - Ideally set to 50 TLOD or more above TLOD Min to provide a TLOD buffer to minimise the chance that cloud quality will constantly change down and up.
+        - When + is checked, Cloud Recovery TLOD becomes relative to TLOD Min instead of absolute.
+    - GPU Load (All TLOD Automation Methods)
+      - Requires the GPU-Z companion app to be installed and running for this method to work. If GPU-Z is not running, the user will be alerted to start it in on the app status line in the General section.
+      - Decreases when the GPU load, as measured by the GPU-Z companion app, is higher than the user-defined Decrease GPU Load percentage.
+      - Cloud Recovery GPU load
+        - Recovers when the GPU load is lower than the user-defined Recover GPU Load percentage.
+        - Provides a GPU Load buffer to account for the decreased GPU load achieved by reducing cloud quality and will minimise the chance that cloud quality will constantly change down and up.
+        - Ideally set to at least 15% lower than the Decrease GPU Load percentage to provide a GPU load buffer to minimise the chance that cloud quality will constantly change down and up.
   -  Auto OLOD
      -  When enabled, four user definable parameters relating to this feature will be revealed on the UI.
      -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base and top level and with OLOD values defined for each of these altitudes.
