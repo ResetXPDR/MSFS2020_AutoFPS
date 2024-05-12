@@ -229,7 +229,6 @@ Some Notes:
       - Decreases when the GPU load, as measured by the GPU-Z companion app, is higher than the user-defined Decrease GPU Load percentage.
       - Cloud Recovery GPU load
         - Recovers when the GPU load is lower than the user-defined Recover GPU Load percentage.
-        - Provides a GPU Load buffer to account for the decreased GPU load achieved by reducing cloud quality and will minimise the chance that cloud quality will constantly change down and up.
         - Ideally set to at least 15% lower than the Decrease GPU Load percentage to provide a GPU load buffer to minimise the chance that cloud quality will constantly change down and up.
   -  Auto OLOD
      -  When enabled, four user definable parameters relating to this feature will be revealed on the UI.
