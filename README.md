@@ -1,7 +1,7 @@
 # MSFS2020_AutoFPS
 
 ## Notice
-Once MSFS_AutoFPS version 0.4.2.16 is released very soon, my development efforts on this app will wind down significantly. I will no longer be adding new functionality and will only be fixing any major issues found that do not have a practical workaround, such as a future MSFS update that is incompatible with the core functionality of this app. I have really enjoyed developing this app and hope that users have found it has improved their MSFS experience. 
+Following MSFS_AutoFPS version 0.4.2.16 formal release, my development efforts on this app will wind down significantly. I will no longer be adding new functionality and will only be fixing any major issues found that do not have a practical workaround, such as a future MSFS update that is incompatible with the core functionality of this app. I have really enjoyed developing this app and hope that users have found it has improved their MSFS experience. 
 
 If anyone wishes to fork this final release and continue their own development work on it, have at it. All I ask is for a small acknowledgement of my, and may I suggest my predecessors', original development effort in your user documentation. 
 
