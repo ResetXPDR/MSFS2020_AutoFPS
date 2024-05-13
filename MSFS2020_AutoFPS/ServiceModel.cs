@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
@@ -22,7 +23,7 @@ namespace MSFS2020_AutoFPS
         public MemoryManager MemoryAccess { get; set; } = null;
         public int VerticalTrend { get; set; }
         public bool OnGround { get; set; } = true;
-        public int groundSpeed { get; set; } = 0;
+        public float groundSpeed { get; set; } = 0;
 
         public float tlod { get; set; } = 0;
         public float olod { get; set; } = 0;
@@ -70,6 +71,9 @@ namespace MSFS2020_AutoFPS
         public float[] AltTLODTop { get; set; } = new float[3];
         public float[] AvgDescentRate { get; set; } = new float [3];
         public bool[] DecCloudQ { get; set; } = new bool[3];
+        public int[] DecCloudQMethod { get; set; } = new int[3];
+        public float CloudDecreaseGPUPct { get; set; }
+        public float CloudRecoverGPUPct { get; set; }
         public float[] CloudRecoveryTLOD { get; set; } = new float[3];
         public bool[] CloudRecoveryPlus { get; set; } = new bool[3];
         public bool[] CustomAutoOLOD { get; set; } = new bool[3];
@@ -102,7 +106,11 @@ namespace MSFS2020_AutoFPS
         public bool OpenWindow { get; set; }
         public int windowTop {  get; set; }
         public int windowLeft { get; set; }
+        public bool windowIsVisible { get; set; }
         public bool RememberWindowPos { get; set; }
+        public int windowPanelState { get; set; } = 0;
+
+        private bool resetWindowPosition;
 
         public bool OnTop { get; set; }
         public string SimBinary { get; set; }
@@ -137,7 +145,10 @@ namespace MSFS2020_AutoFPS
             CustomAutoOLOD[(int)appProfiles.NonExpert] = false;
             AltOLODBase[(int)appProfiles.NonExpert] = 2000;
             AltOLODTop[(int)appProfiles.NonExpert] = 10000;
- 
+            DecCloudQMethod[(int)appProfiles.NonExpert] = 0;
+
+            if (File.GetLastWriteTime(App.ConfigFile) > DateTime.Now.AddSeconds(-10)) resetWindowPosition = true;
+            
             LoadConfiguration();
         }
 
@@ -150,8 +161,16 @@ namespace MSFS2020_AutoFPS
             ConfigVersion = Convert.ToInt32(ConfigurationFile.GetSetting("ConfigVersion", "1"));
             OpenWindow = Convert.ToBoolean(ConfigurationFile.GetSetting("openWindow", "true"));
             RememberWindowPos = Convert.ToBoolean(ConfigurationFile.GetSetting("RememberWindowPos", "true"));
+            if (resetWindowPosition)
+            {
+                SetSetting("windowTop", "50", true);
+                SetSetting("windowLeft", "50", true);
+                resetWindowPosition = false;
+            }
             windowTop = Convert.ToInt32(ConfigurationFile.GetSetting("windowTop", "50"));
             windowLeft = Convert.ToInt32(ConfigurationFile.GetSetting("windowLeft", "50"));
+            windowIsVisible = Convert.ToBoolean(ConfigurationFile.GetSetting("windowIsVisible", "true"));
+            windowPanelState = Convert.ToInt32(ConfigurationFile.GetSetting("windowPanelState", "0"));
             WaitForConnect = Convert.ToBoolean(ConfigurationFile.GetSetting("waitForConnect", "true"));
             FlightTypeIFR = Convert.ToBoolean(ConfigurationFile.GetSetting("FlightTypeIFR", "true"));
             SimBinary = Convert.ToString(ConfigurationFile.GetSetting("simBinary", "FlightSimulator"));
@@ -183,7 +202,7 @@ namespace MSFS2020_AutoFPS
             OffsetPointerVrMode = Convert.ToInt64(ConfigurationFile.GetSetting("offsetPointerVrMode", "0x1C"), 16);
             OffsetPointerFgMode = Convert.ToInt64(ConfigurationFile.GetSetting("offsetPointerFgMode", "0x4A"), 16);
             SimMinLOD = Convert.ToSingle(ConfigurationFile.GetSetting("simMinLod", "10"), new RealInvariantFormat(ConfigurationFile.GetSetting("simMinLod", "10")));
-
+ 
             if (!UseExpertOptions) activeProfile = (int)appProfiles.NonExpert;
             else if (FlightTypeIFR) activeProfile = (int)appProfiles.IFR_Expert;
             else activeProfile = (int)appProfiles.VFR_Expert;
@@ -196,6 +215,7 @@ namespace MSFS2020_AutoFPS
             AltTLODTop[(int)appProfiles.IFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("AltTLODTop", "5000"));
             AvgDescentRate[(int)appProfiles.IFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("AvgDescentRate", "2000"));
             DecCloudQ[(int)appProfiles.IFR_Expert] = Convert.ToBoolean(ConfigurationFile.GetSetting("DecCloudQ", "true"));
+            DecCloudQMethod[(int)appProfiles.IFR_Expert] = Convert.ToInt32(ConfigurationFile.GetSetting("DecCloudQMethod", "0"));
             CloudRecoveryTLOD[(int)appProfiles.IFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("CloudRecoveryTLOD", "100"));
             CloudRecoveryPlus[(int)appProfiles.IFR_Expert] = Convert.ToBoolean(ConfigurationFile.GetSetting("CloudRecoveryPlus", "false"));
             CustomAutoOLOD[(int)appProfiles.IFR_Expert] = Convert.ToBoolean(ConfigurationFile.GetSetting("customAutoOLOD", "true"));
@@ -213,6 +233,7 @@ namespace MSFS2020_AutoFPS
             AltTLODTop[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("AltTLODTop_VFR", "3000"));
             AvgDescentRate[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("AvgDescentRate_VFR", "1000"));
             DecCloudQ[(int)appProfiles.VFR_Expert] = Convert.ToBoolean(ConfigurationFile.GetSetting("DecCloudQ_VFR", DecCloudQ[(int)appProfiles.IFR_Expert].ToString()));
+            DecCloudQMethod[(int)appProfiles.VFR_Expert] = Convert.ToInt32(ConfigurationFile.GetSetting("DecCloudQMethod_VFR", DecCloudQMethod[(int)appProfiles.IFR_Expert].ToString()));
             CloudRecoveryTLOD[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("CloudRecoveryTLOD_VFR", CloudRecoveryTLOD[(int)appProfiles.IFR_Expert].ToString()));
             CloudRecoveryPlus[(int)appProfiles.VFR_Expert] = Convert.ToBoolean(ConfigurationFile.GetSetting("CloudRecoveryPlus_VFR", CloudRecoveryPlus[(int)appProfiles.IFR_Expert].ToString()));
             CustomAutoOLOD[(int)appProfiles.VFR_Expert] = Convert.ToBoolean(ConfigurationFile.GetSetting("customAutoOLOD_VFR", CustomAutoOLOD[(int)appProfiles.IFR_Expert].ToString()));
@@ -220,6 +241,8 @@ namespace MSFS2020_AutoFPS
             OLODAtTop[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("OLODAtTop_VFR", OLODAtTop[(int)appProfiles.IFR_Expert].ToString()));
             AltOLODBase[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("AltOLODBase_VFR", AltOLODBase[(int)appProfiles.IFR_Expert].ToString()));
             AltOLODTop[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("AltOLODTop_VFR", AltOLODTop[(int)appProfiles.IFR_Expert].ToString()));
+            CloudDecreaseGPUPct = Convert.ToSingle(ConfigurationFile.GetSetting("CloudDecreaseGPUPct", "95"));
+            CloudRecoverGPUPct = Convert.ToSingle(ConfigurationFile.GetSetting("CloudRecoverGPUPct", "80"));
 
             if (ConfigVersion < BuildConfigVersion)
             {

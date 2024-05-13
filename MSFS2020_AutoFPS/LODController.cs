@@ -23,6 +23,8 @@ namespace MSFS2020_AutoFPS
         private float[] verticalStatsVS = new float[5];
         private int verticalIndex = 0;
         private float vs;
+        private float[] gpuUsage = new float[5];
+        private int gpuIndex = 0;
         private const float CloudRecoveryExtraTolerance = 0.15f;
         private const float MinTLODExtraActiveTolerance = 0.15f;
         private const float AutoTargetFPSRecalTolerance = 0.20f;
@@ -32,8 +34,6 @@ namespace MSFS2020_AutoFPS
         private int CloudRecoveryExtraNonExpert = 0;
         private int CloudRecoveryTickMark = 0;
         private int TotalTicks = 0;
-        private float altAboveGnd = 0;
-        private float groundSpeed = 0;
         private float altAboveGndLast = 0;
         private float groundSpeedLast = 0;
         private float TLODStep;
@@ -44,9 +44,16 @@ namespace MSFS2020_AutoFPS
         private float AltTLODBase;
         private const float FPSPriorityBaseAlt = 1000.0f;
 
+        private int logTimer = 0;
+        private int logTimerInterval = 9;
+        private float logAltAboveGndLast = -1;
+        private float logTlodLast = -1;
+        private float logOlodLast = -1;
+        private bool logDecCloudQActiveLast = true;
+        private bool logIsAppPriorityFPSLast = false;
 
         GpuzWrapper gpuz = new GpuzWrapper();
-        int gpuzGPULoadSensorIndex;
+        int gpuzGPULoadSensorIndex = -1;
 
         public LODController(ServiceModel model)
         {
@@ -59,18 +66,7 @@ namespace MSFS2020_AutoFPS
             SimConnect.SubscribeSimVar("SIM ON GROUND", "Bool");
             SimConnect.SubscribeSimVar("GROUND VELOCITY", "knots");
             GetMSFSState();
-            if (gpuz.Open())
-            {
-                Logger.Log(LogLevel.Information, "LODController:LODController", "GPU-Z companion app running");
-                for (gpuzGPULoadSensorIndex = 0; gpuz.SensorName(gpuzGPULoadSensorIndex) != String.Empty && gpuz.SensorName(gpuzGPULoadSensorIndex) != "GPU Load"; gpuzGPULoadSensorIndex++) ;
-                if (gpuz.SensorName(gpuzGPULoadSensorIndex) != "GPU Load")
-                {
-                    Logger.Log(LogLevel.Information, "LODController:LODController", "GPU-Z GPU Load sensor not found");
-                    gpuzGPULoadSensorIndex = -1;
-                }
-                else Logger.Log(LogLevel.Information, "LODController:LODController", "GPU-Z GPU Load sensor found");
-            }
-            else
+            if (!gpuzRunning())
             {
                 Logger.Log(LogLevel.Information, "LODController:LODController", "GPU-Z companion app not running");
                 gpuzGPULoadSensorIndex = -1;
@@ -96,22 +92,40 @@ namespace MSFS2020_AutoFPS
 
             Model.VerticalTrend = VerticalAverage();
 
-            Model.altAboveGnd = (int)(altAboveGnd = SimConnect.ReadSimVar("PLANE ALT ABOVE GROUND", "feet"));
+            Model.altAboveGnd = SimConnect.ReadSimVar("PLANE ALT ABOVE GROUND", "feet");
             if (Model.altAboveGnd == 0 && !Model.OnGround)
-                Model.altAboveGnd = (int)SimConnect.ReadSimVar("PLANE ALT ABOVE GROUND MINUS CG", "feet");
+                Model.altAboveGnd = SimConnect.ReadSimVar("PLANE ALT ABOVE GROUND MINUS CG", "feet");
 
-            Model.groundSpeed = (int)(groundSpeed = SimConnect.ReadSimVar("GROUND VELOCITY", "knots"));
+            Model.groundSpeed = SimConnect.ReadSimVar("GROUND VELOCITY", "knots");
             GetMSFSState();
-            if (gpuzGPULoadSensorIndex >= 0) Model.gpuUsage = (float)gpuz.SensorValue(gpuzGPULoadSensorIndex);
+            if (gpuzRunning())
+            {
+                gpuUsage[gpuIndex++] = (float)gpuz.SensorValue(gpuzGPULoadSensorIndex);
+                if (gpuIndex >= gpuUsage.Length) gpuIndex = 0;
+                Model.gpuUsage = gpuUsage.Average();
+            }
             else Model.gpuUsage = -1;
 
-            if (groundSpeed > 1 && altAboveGnd == altAboveGndLast && groundSpeed == groundSpeedLast) Model.SimPaused = true;
+            if (Model.groundSpeed > 1 && Model.altAboveGnd == altAboveGndLast && Model.groundSpeed == groundSpeedLast) Model.SimPaused = true;
             else Model.SimPaused = false;
-            altAboveGndLast = altAboveGnd;
-            groundSpeedLast = groundSpeed;
+            altAboveGndLast = Model.altAboveGnd;
+            groundSpeedLast = Model.groundSpeed;
             if ((!Model.ActiveWindowMSFS && ((Model.UseExpertOptions && Model.PauseMSFSFocusLost) || (!Model.UseExpertOptions && Model.FgModeEnabled))) || Model.SimPaused) Model.AppPaused = true;
             else Model.AppPaused = false;
             SetActiveLODs();
+
+            if ((ServiceModel.TestVersion || Model.LogSimValues) && logTimer == 0 && (Model.FPSSettleCounter == 0 || Model.TLODAutoMethod[Model.activeProfile] == 2) && (Math.Round(Model.altAboveGnd) != Math.Round(logAltAboveGndLast) || Math.Round(Model.tlod) != Math.Round(logTlodLast) || Math.Round(Model.olod) != Math.Round(logOlodLast) || logDecCloudQActiveLast != Model.DecCloudQActive || logIsAppPriorityFPSLast != Model.IsAppPriorityFPS) && !(!Model.ActiveWindowMSFS && Model.UseExpertOptions && Model.PauseMSFSFocusLost))
+            {
+                Logger.Log(LogLevel.Information, "LODController:UpdateVariables", $"FPS: {GetAverageFPS()}" + (Model.FgModeEnabled ? " FGAct: " + Model.ActiveWindowMSFS : "") + $" Pri: {(Model.IsAppPriorityFPS ? "FPS" : "TLOD")} TLOD: {Math.Round(Model.tlod)} OLOD: {Math.Round(Model.olod)} AGL: {Math.Round(Model.altAboveGnd)} FPM: {Math.Round(vs * 60.0f)} Clouds: {(Model.VrModeActive ? Model.CloudQualityText(Model.cloudQ_VR) : Model.CloudQualityText(Model.cloudQ))}" + (Model.gpuUsage >= 0 ? $" GPU: {Math.Round(Model.gpuUsage)}%" : ""));
+                logTimer = logTimerInterval;
+                logAltAboveGndLast = Model.altAboveGnd;
+                logTlodLast = Model.tlod;
+                logOlodLast = Model.olod;
+                logDecCloudQActiveLast = Model.DecCloudQActive;
+                logIsAppPriorityFPSLast = Model.IsAppPriorityFPS;
+
+            }
+            else if (--logTimer < 0) logTimer = 0;
         }
 
         public void RunTick()
@@ -127,7 +141,7 @@ namespace MSFS2020_AutoFPS
             TLODStep = Math.Max(2.0f, Model.FPSTolerance[Model.activeProfile]);
             TLODMinAltBand = Model.AvgDescentRate[Model.activeProfile] / 60 * ((Model.activeMaxTLOD - MinTLODNoExtra) / TLODStep);
 
-            if (Model.altAboveGnd >= AltTLODBase + TLODMinAltBand) Model.IsAppPriorityFPS = true; 
+            if (Model.altAboveGnd >= AltTLODBase + TLODMinAltBand) Model.IsAppPriorityFPS = true;
             else Model.IsAppPriorityFPS = false;
 
             if (Model.altAboveGnd >= AltTLODBase + TLODMinAltBand)
@@ -135,12 +149,12 @@ namespace MSFS2020_AutoFPS
                 AutoFPSInFlightPhase = true;
                 if (!Model.UseExpertOptions || Model.MinTLODExtra[Model.activeProfile])
                 {
-                    if (!MinTLODExtraActiveForDescentPrimed && Model.tlod > Model.MinTLOD[Model.activeProfile] + MinTLODExtraAmount) 
+                    if (!MinTLODExtraActiveForDescentPrimed && Model.tlod > Model.MinTLOD[Model.activeProfile] + MinTLODExtraAmount)
                         MinTLODExtraActiveForDescentPrimed = true;
                     Model.MinTLODExtraActive = false;
                 }
             }
-            else if ((!Model.UseExpertOptions || Model.MinTLODExtra[Model.activeProfile]) && MinTLODExtraActiveForDescentPrimed && Model.tlod > Model.MinTLOD[Model.activeProfile] + MinTLODExtraAmount) 
+            else if ((!Model.UseExpertOptions || Model.MinTLODExtra[Model.activeProfile]) && MinTLODExtraActiveForDescentPrimed && Model.tlod > Model.MinTLOD[Model.activeProfile] + MinTLODExtraAmount)
             {
                 if (Model.TLODAutoMethod[Model.activeProfile] != 2)
                 {
@@ -155,7 +169,7 @@ namespace MSFS2020_AutoFPS
                 Model.FPSSettleCounter = ServiceModel.FPSSettleSeconds;
                 AutoFPSInFlightPhase = false;
                 Model.ForceAutoFPSCal = true;
-                Model.ResetCloudsTLOD(); 
+                Model.ResetCloudsTLOD();
                 Logger.Log(LogLevel.Information, "LODController:RunTick", "Recalibrating Auto Target FPS on arrival at new location");
             }
 
@@ -163,7 +177,7 @@ namespace MSFS2020_AutoFPS
             {
                 float deltaFPS = GetAverageFPS() - Model.TargetFPS;
 
-                if (Model.AutoTargetFPS && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && (Model.ForceAutoFPSCal || (!(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && ((deltaFPS <= -Model.TargetFPS * AutoTargetFPSRecalTolerance && (!Model.DecCloudQ[Model.activeProfile] || Model.DecCloudQActive) && Model.tlod == Model.activeMinTLOD))))) 
+                if (Model.AutoTargetFPS && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && (Model.ForceAutoFPSCal || (!(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && ((deltaFPS <= -Model.TargetFPS * AutoTargetFPSRecalTolerance && (!Model.DecCloudQ[Model.activeProfile] || Model.DecCloudQActive) && Model.tlod == Model.activeMinTLOD)))))
                 {
                     if (!Model.ForceAutoFPSCal && (!Model.UseExpertOptions || Model.MinTLODExtra[Model.activeProfile]) && Model.MinTLODExtraActive) Model.MinTLODExtraActive = false;
                     else
@@ -187,9 +201,9 @@ namespace MSFS2020_AutoFPS
                     else
                     {
                         newTLOD = Model.MinTLOD[Model.activeProfile] + (Model.MaxTLOD[Model.activeProfile] - Model.MinTLOD[Model.activeProfile]) * (Model.altAboveGnd - Model.AltTLODBase[Model.activeProfile]) / (Model.AltTLODTop[Model.activeProfile] - Model.AltTLODBase[Model.activeProfile]);
-                        if (Math.Abs(newTLOD - Model.tlod) < 5) newTLOD = Model.tlod;
-                        else if (Math.Abs(newTLOD - Model.tlod) > 10) newTLOD = Model.tlod + Math.Sign(newTLOD - Model.tlod) * 10;
-                        else newTLOD = Model.tlod + Math.Sign(newTLOD - Model.tlod) * 5;
+                        if (Math.Abs(newTLOD - Model.tlod) < Model.FPSTolerance[Model.activeProfile]) newTLOD = Model.tlod;
+                        else if (Math.Abs(newTLOD - Model.tlod) > Model.FPSTolerance[Model.activeProfile] * 2) newTLOD = Model.tlod + Math.Sign(newTLOD - Model.tlod) * Model.FPSTolerance[Model.activeProfile] * 2;
+                        else newTLOD = Model.tlod + Math.Sign(newTLOD - Model.tlod) * Model.FPSTolerance[Model.activeProfile];
                     }
                 }
                 else if ((!Model.UseExpertOptions || Model.MinTLODExtra[Model.activeProfile]) && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && !Model.DecCloudQActive && !Model.MinTLODExtraActive && Model.OnGround && deltaFPS >= Model.TargetFPS * MinTLODExtraActiveTolerance)
@@ -224,7 +238,7 @@ namespace MSFS2020_AutoFPS
                 if ((!Model.UseExpertOptions || Model.MinTLODExtra[Model.activeProfile]) && Model.MinTLODExtraActive && !Model.OnGround && deltaFPS <= -Model.TargetFPS * Model.FPSTolerance[Model.activeProfile] / 100)
                     Model.MinTLODExtraActive = false;
 
-                if (Model.TLODAutoMethod[Model.activeProfile] != 2 && Model.DecCloudQ[Model.activeProfile] && !Model.DecCloudQActive && Model.tlod == Model.activeMinTLOD && deltaFPS <= -Model.TargetFPS * Model.FPSTolerance[Model.activeProfile] / 100)
+                if (Model.DecCloudQ[Model.activeProfile] && !Model.DecCloudQActive && ((Model.TLODAutoMethod[Model.activeProfile] != 2 && Model.DecCloudQMethod[Model.activeProfile] != 1 && Model.tlod == Model.activeMinTLOD && deltaFPS <= -Model.TargetFPS * Model.FPSTolerance[Model.activeProfile] / 100) || ((Model.TLODAutoMethod[Model.activeProfile] == 2 || Model.DecCloudQMethod[Model.activeProfile] == 1) && Model.gpuUsage > Model.CloudDecreaseGPUPct)))
                 {
                     if (Model.VrModeActive && Model.DefaultCloudQ_VR >= 1)
                     {
@@ -239,9 +253,9 @@ namespace MSFS2020_AutoFPS
                     CloudRecoveryTickMark = TotalTicks;
                 }
 
-                if (Model.DecCloudQ[Model.activeProfile] && Model.DecCloudQActive && ((deltaFPS >= Model.TargetFPS * CloudRecoveryExtraTolerance) || (newTLOD >= (Model.UseExpertOptions && Model.CloudRecoveryPlus[Model.activeProfile] ? Model.activeMinTLOD + Model.CloudRecoveryTLOD[Model.activeProfile] : Model.CloudRecoveryTLOD[Model.activeProfile]) && deltaFPS >= 0)))  
+                if (Model.DecCloudQ[Model.activeProfile] && Model.DecCloudQActive && ((Model.TLODAutoMethod[Model.activeProfile] != 2 && Model.DecCloudQMethod[Model.activeProfile] != 1 && ((deltaFPS >= Model.TargetFPS * CloudRecoveryExtraTolerance) || (newTLOD >= (Model.UseExpertOptions && Model.CloudRecoveryPlus[Model.activeProfile] ? Model.activeMinTLOD + Model.CloudRecoveryTLOD[Model.activeProfile] : Model.CloudRecoveryTLOD[Model.activeProfile]) && deltaFPS >= 0))) || ((Model.TLODAutoMethod[Model.activeProfile] == 2 || Model.DecCloudQMethod[Model.activeProfile] == 1) && Model.gpuUsage <= Model.CloudRecoverGPUPct)))
                 {
-                    Model.ResetCloudsTLOD(false); 
+                    Model.ResetCloudsTLOD(false);
                     if ((!Model.UseExpertOptions || Model.MinTLODExtra[Model.activeProfile]) && !Model.MinTLODExtraActive && Model.OnGround) Model.FPSSettleCounter = ServiceModel.FPSSettleSeconds;
                     if (!Model.UseExpertOptions && Model.altAboveGnd > AltTLODBase && TotalTicks < CloudRecoveryTickMark + 30) CloudRecoveryExtraNonExpert += 20;
                 }
@@ -254,9 +268,9 @@ namespace MSFS2020_AutoFPS
                     else
                     {
                         newOLOD = Model.activeOLODAtBase + (Model.activeOLODAtTop - Model.activeOLODAtBase) * (Model.altAboveGnd - Model.AltOLODBase[Model.activeProfile]) / (Model.AltOLODTop[Model.activeProfile] - Model.AltOLODBase[Model.activeProfile]);
-                        if (Math.Abs(newOLOD - Model.olod) < 5) newOLOD = Model.olod;
-                        else if (Math.Abs(newOLOD - Model.olod) > 10) newOLOD = Model.olod + Math.Sign(newOLOD - Model.olod) * 10;
-                        else newOLOD = Model.olod + Math.Sign(newOLOD - Model.olod) * 5;
+                        if (Math.Abs(newOLOD - Model.olod) < Model.FPSTolerance[Model.activeProfile]) newOLOD = Model.olod;
+                        else if (Math.Abs(newOLOD - Model.olod) > Model.FPSTolerance[Model.activeProfile] * 2) newOLOD = Model.olod + Math.Sign(newOLOD - Model.olod) * Model.FPSTolerance[Model.activeProfile] * 2;
+                        else newOLOD = Model.olod + Math.Sign(newOLOD - Model.olod) * Model.FPSTolerance[Model.activeProfile];
                     }
                     if (newOLOD != Model.olod && Math.Abs(newOLOD - Model.olod) >= 1)
                     {
@@ -288,6 +302,23 @@ namespace MSFS2020_AutoFPS
             return verticalStatsVS.Average();
         }
 
+        public bool gpuzRunning()
+        {
+            if (gpuzGPULoadSensorIndex >= 0) return true;
+            else if (gpuzGPULoadSensorIndex == -1 && gpuz.Open())
+            {
+                Logger.Log(LogLevel.Information, "LODController:LODController", "GPU-Z companion app running");
+                for (gpuzGPULoadSensorIndex = 0; gpuz.SensorName(gpuzGPULoadSensorIndex) != String.Empty && gpuz.SensorName(gpuzGPULoadSensorIndex) != "GPU Load"; gpuzGPULoadSensorIndex++) ;
+                if (gpuz.SensorName(gpuzGPULoadSensorIndex) != "GPU Load")
+                {
+                    Logger.Log(LogLevel.Information, "LODController:LODController", "GPU-Z GPU Load sensor not found");
+                    gpuzGPULoadSensorIndex = -2;
+                }
+                else Logger.Log(LogLevel.Information, "LODController:LODController", "GPU-Z GPU Load sensor found");
+                return true;
+            }
+            else return false;
+        }
         public void SetActiveLODs()
         {
             if (Model.UseExpertOptions)

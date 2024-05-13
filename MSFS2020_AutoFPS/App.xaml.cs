@@ -71,7 +71,7 @@ namespace MSFS2020_AutoFPS
                     File.Copy(ConfigFileDefault, ConfigFile);
                 }
             }
-
+ 
             Model = new();
             InitLog();
             InitSystray();
@@ -87,7 +87,7 @@ namespace MSFS2020_AutoFPS
             timer.Start();
 
             MainWindow = new MainWindow(notifyIcon.DataContext as NotifyIconViewModel, Model);
-            if (Model.OpenWindow)
+            if (Model.OpenWindow && Model.windowIsVisible)
                 MainWindow.Show();
         }
 
@@ -126,6 +126,7 @@ namespace MSFS2020_AutoFPS
 
         protected void OnTick(object sender, EventArgs e)
         {
+            if ((MainWindow.Visibility == Visibility.Visible && !Model.windowIsVisible) || (MainWindow.Visibility == Visibility.Hidden && Model.windowIsVisible)) Model.SetSetting("windowIsVisible", Model.windowIsVisible ? "false" : "true");
             if (Model.ServiceExited)
             {
                 Current.Shutdown();
@@ -149,7 +150,7 @@ namespace MSFS2020_AutoFPS
             Log.Logger = loggerConfiguration.CreateLogger();
             Log.Information($"-----------------------------------------------------------------------");
             string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')];
+            //assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')];
             Logger.Log(LogLevel.Information, "App:InitLog", $"MSFS2020_AutoFPS v{assemblyVersion} started! Log Level: {logLevel} Log File: {logFilePath}");
         }
 
