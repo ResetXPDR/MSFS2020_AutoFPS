@@ -151,7 +151,7 @@ Some Notes:
     - Before loading a flight - whether a newer version of the app is available to download and install,
     - Loading in to a flight  - whether MSFS memory integrity test have failed, and
     - Flight is loaded
-      - Shows detected Graphics Mode (PC, FG, LSFG or VR) and DX version, app pause, FPS settle, TLOD + seek, app priority mode and/or TLOD range as applicable.
+      - Shows detected Graphics Mode (PC, FG, LSFG or VR) and DX version, app pause, FPS settle, TLOD+ seek, Mtn+, app priority mode and/or TLOD range as applicable.
       - The FPS settle timer runs for up to 20 seconds to allow FPS to settle between pausing/unpausing, auto target FPS calibration, TLOD Min + transitions and VR/PC/FG/LSFG mode transitions. This allows the FPS to stabilise before engaging automatic functions and should lead to much smaller TLOD changes when seeking the target FPS on such transitions.
       - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected. Similarly, a + next to ATLOD indicates that TLOD Base + has been activated and that a higher TLOD offset across the entire altitude schedule should be expected. 
       - Bonus GPU load display if the optional GPU-Z companion app, downloadable separately [here](https://www.techpowerup.com/download/techpowerup-gpu-z/), is installed and detected running when starting any flight session. Note, the GPU-Z companion app is required to be running if the Decrease Cloud Quality option is selected in conjunction with the GPU Load activation method, as GPU-Z provides the necessary GPU load information to the app for this method to function.
@@ -183,14 +183,14 @@ Some Notes:
     - Once above a calculated altitude band above the the TLOD base altitude, the app priority will change from TLOD to FPS.
     - On descent your TLOD will progressively work its way down to TLOD Min by the TLOD base altitude. 
   - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
-    - Auto Target FPS - user selectable. Enabling automatically disables TLOD Min + 
+    - Auto Target FPS - user selectable. Enabling automatically disables TLOD Min + due to automation control ambiguity
     - FPS Sensitivity - 5%
     - VFR or IFR flight type - user selectable
     - Alt TLOD Base - VFR 100 ft, IFR 1000 ft
     - Avg Descent Rate - VFR 1000 fpm, IFR 2000 fpm
     - TLOD Minimum - VFR 100% of your current MSFS TLOD setting, IFR 50%
     - TLOD Maximum - VFR 300% of your current MSFS TLOD setting, IFR 200%
-    - TLOD Min + - enabled, unless Auto Target FPS is enabled
+    - TLOD Min + - enabled, unless Auto Target FPS is enabled then disabled
     - TLOD Max + - disabled
     - Decrease Cloud Quality
       - enabled by default and uses TLOD activation method
@@ -236,13 +236,13 @@ Some Notes:
     - This seeking process can be manually restarted by pressing the Reset button, should flight conditions change such that the original TLOD Min + is no longer valid.
     - On the ground, after FPS settles, TLOD Min + will progressively increase, more aggressively at first, until a higher TLOD Min with 15% FPS headroom is still available.
     - It is strongly recommended to maintain the same view while TLOD Min + is seeking, which is usually completed within 60 seconds, the progress of which will be shown on the status line.
-    - On climb out, TLOD Min Extra will remain set until your aircraft passes the calculated altitude threshold for the app priority mode to transition from TLOD to FPS priority.
-    - While in FPS priority mode, TLOD Min + will calculate to be 50% of the lower of either whatever TLOD you are currently getting or TLOD Max without TLOD Max Extra, but no lower than TLOD Min.
+    - On climb out, TLOD Min + will remain set until your aircraft passes the calculated altitude threshold for the app priority mode to transition from TLOD to FPS priority.
+    - While in FPS priority mode, TLOD Min + will calculate to be 50% of the lower of either whatever TLOD you are currently getting or TLOD Max without TLOD Mtn Amt, but no lower than TLOD Min.
     - On descent through a calculated altitude threshold above ground that gives the app time to reduce TLOD to Min at a moderate rate, TLOD Min + will lock until landed.
-    - At any time, there is an automatic 20% reduction of TLOD Min Extra should conditions deteriorate after TLOD Min + is set such that TLOD Min is causing FPS to drop too far below target.
+    - At any time, there is an automatic 20% reduction of TLOD Min + should conditions deteriorate after TLOD Min + is set such that TLOD Min is causing FPS to drop too far below target.
   - TLOD Max - Sets the maximum TLOD the automation algorithm will use.
   - TLOD Max + - additional TLOD Max in high elevation areas.
-    - When enabled, extends TLOD Max in areas where the terrain is higher than Mtn Alt Min by the TLOD Max Extra amount.
+    - When enabled, extends TLOD Max in areas where the terrain is higher than Mtn Alt Min by the TLOD Mtn Amt amount.
     - If terrain drops below Mtn Alt Min, TLOD Max + will remain fixed for 5 minutes then progressively reduce by the TLOD step size per second until completely deactivated.
   - Alt TLOD Base - Altitude (AGL) at or below which TLOD will be at TLOD Min.
   - Avg Descent Rate- Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
