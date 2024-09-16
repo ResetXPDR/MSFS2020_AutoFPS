@@ -210,9 +210,11 @@ Some Notes:
       - The nominal LOD Step Size can be set to allow users experiencing stuttering issues to try different LOD step sizes to help resolve the issue. The default value is 5.
       - When not using TLOD Base +, this method completely ignores FPS hence all FPS-related settings are removed from the UI when using this method.
       - TLOD Base +
-        - When enabled, a target FPS will be required for the logic to work, which you should set to, or slightly lower than, your FPS cap if you use one.
-        - On activating, TLOD Base + will increase in steps of the original TLOD Base until either TLOD Top is achieved or the FPS cannot consistently achieve the target FPS.
-        - If the latter, TLOD Base + will backtrack to the previous TLOD Base +, where the FPS target was easily achieved.
+        - When enabled, a target FPS will be required for the logic to work, which you should preferably set to your FPS cap if you use one, slightly lower than your normally achievable FPS if not.
+        - The TLOD Base + seek process will automatically start when commencing a flight, regardless of your aircraft's position, and at the conclusion of a flight when on the ground and stopped.
+        - This seek process can be manually restarted by pressing the Reset button, should flight conditions change such that the original TLOD Base + is no longer valid.
+        - When seeking, TLOD Base + will increase in steps of the original TLOD Base until either TLOD Top is achieved or the FPS cannot consistently achieve the target FPS.
+        - If the increase is halted by the latter, TLOD Base + will backtrack to the previous TLOD Base +, where the FPS target was easily achieved.
         - At any time, if the 10 second FPS trend drops below a small threshold under the target FPS then TLOD Base + will automatically reduce by a step of the original TLOD base, down to zero if necessary. In external view, this threshold is greater to account for anticipated temporary FPS dips when scenery gets cached when panning.
         - If the FPS drops temporarily below the target FPS when taking off and TLOD automatically decreases, an attempt will be made to progressive restorely the lost TLOD should conditions return to being favourable after climbing through Alt TLOD Base.
   - Pause when MSFS loses focus
