@@ -175,6 +175,7 @@ Some Notes:
   - Reset button
     - Resets TLOD, Cloud, LSFG, and FG settings to initial app flight start values.
     - Useful to reintialise and recommence the seek process for TLOD Min/Top + should conditions change significantly from what they were on initial startup.
+    - Can be activated by pressing ALT-R while the app has the focus, making it suitable to be assigned as a VR-friendly voice command with an app like VoiceAttack.
   - Flight type - VFR or IFR
     - In non-expert mode, VFR will use higher minimum and maximum TLODs and a lower TLOD base altitude than IFR to account for the greater performance expectation that GA flights in rural areas will have.
     - Expert mode will default to similar settings differences, however the settings for each flight type are fully customisable and will save to and restore from separate profiles for VFR and IFR.
