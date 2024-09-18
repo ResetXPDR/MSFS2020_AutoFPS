@@ -216,14 +216,15 @@ Some Notes:
       - The nominal LOD Step Size can be set to allow users experiencing stuttering issues to try different LOD step sizes to help resolve the issue. The default value is 5.
       - When TLOD Base + is unchecked, this method completely ignores FPS hence all FPS-related settings are removed from the UI.
       - TLOD Base + - additional TLOD with favourable performance conditions.
-        - Cannot be enabled with TLOD Top + due to conflicting control over TLOD Top. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
         - When enabled, a target FPS will be required for the logic to work, which you should preferably set to your FPS cap if you use one or, if not, slightly lower than your normally achievable FPS.
         - The TLOD Base + seek process will automatically start when commencing a flight, regardless of your aircraft's position, and at the conclusion of a flight when on the ground and stopped.
         - This seek process can be manually restarted by pressing the Reset button, should flight conditions change such that the original TLOD Base + is no longer valid.
         - When seeking, TLOD Base + will increase in steps of the original TLOD Base until either TLOD Top is achieved or the FPS cannot consistently achieve the target FPS. If the the latter, TLOD Base + will backtrack to the previous TLOD Base +, where the FPS target was easily achieved.
         - At any time, if the 10 second FPS trend drops below a small threshold under the target FPS then TLOD Base + will automatically reduce by a step of the original TLOD base, down to zero if necessary. In external view, this threshold is greater to account for anticipated temporary FPS dips when scenery gets cached when panning.
+        - Avoid rapidly changing views or panning your external view too quickly, especially intially as uncached scenery loads in, as you will induce temporary FPS drops that may trigger an unnecessary TLOD Top + reduction.    
         - If the FPS drops temporarily below the target FPS when taking off and TLOD automatically decreases, an attempt will be made to progressive restorely the lost TLOD should conditions return to being favourable after climbing through Alt TLOD Base.
         - The calculated TLOD Base + will be applied as an offset that increasies the entire TLOD altitude schedule by that amount.
+        - Cannot be enabled with TLOD Top + due to conflicting control over TLOD Top. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
       - TLOD Top + - additional TLOD Top in high elevation areas.
         - Operates the same as TLOD Max + except that it cannot be enabled with TLOD Base + due to conflicting control over TLOD Top. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
   - Pause when MSFS loses focus
@@ -232,15 +233,15 @@ Some Notes:
   - TLOD Min - Sets the minimum TLOD the automation algorithm will use. 
   - TLOD Min + - additional TLOD Min with favourable performance conditions.
     - Requires at least 15% FPS headroom above target FPS to work at all. If you use an FPS cap, set your target FPS to at least 15% below it, preferably more.
-    - Cannot be enabled at the same time as Auto Target FPS due to automation control ambiguity. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
     - When enabled, the TLOD Min + seek process will automatically start when commencing a flight, regardless of your aircraft's position, and at the conclusion of a flight when on the ground and stopped.
     - This seeking process can be manually restarted by pressing the Reset button, should flight conditions change such that the original TLOD Min + is no longer valid.
-    - On the ground, after FPS settles, TLOD Min + will progressively increase, more aggressively at first, until a higher TLOD Min with 15% FPS headroom is still available.
-    - It is strongly recommended to maintain the same view while TLOD Min + is seeking, which is usually completed within 60 seconds, the progress of which will be shown on the status line.
+    - When seeking on the ground, TLOD Min + will progressively increase, in larger steps at first, until a higher TLOD Min with 15% FPS headroom is still available.
     - On climb out, TLOD Min + will remain set until your aircraft passes the calculated altitude threshold for the app priority mode to transition from TLOD to FPS priority.
     - While in FPS priority mode, TLOD Min + will calculate to be 50% of the lower of either whatever TLOD you are currently getting or TLOD Max without TLOD Mtn Amt, but no lower than TLOD Min.
     - On descent through a calculated altitude threshold above ground that gives the app time to reduce TLOD to Min at a moderate rate, TLOD Min + will lock until landed.
     - At any time, there is an automatic 20% reduction of TLOD Min + should conditions deteriorate after TLOD Min + is set such that TLOD Min is causing FPS to drop too far below target.
+    - Avoid rapidly changing views or panning your external view too quickly, especially intially as uncached scenery loads in, as you will induce temporary FPS drops that may trigger an unnecessary TLOD Min + reduction.    
+    - Cannot be enabled at the same time as Auto Target FPS due to automation control ambiguity. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
   - TLOD Max - Sets the maximum TLOD the automation algorithm will use.
   - TLOD Max + - additional TLOD Max in high elevation areas.
     - When enabled, extends TLOD Max in areas where the terrain is higher than Mtn Alt Min by the TLOD Mtn Amt amount.
