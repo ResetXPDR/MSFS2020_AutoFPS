@@ -173,7 +173,7 @@ Some Notes:
     - Mainly useful for adjusting settings and seeing the outcome over the top of your flight as it progresses.
     - Should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
   - Reset button
-    - Resets TLOD, Cloud, LSFG, and FG settings to initial app flight start values.
+    - Resets TLOD, Clouds, Auto Target FPS and graphics mode detection to initial state.
     - Useful to reintialise and recommence the seek process for TLOD Min/Top + should conditions change significantly from what they were on initial startup.
     - Can be activated by pressing ALT-R while the app has the focus, making it suitable to be assigned as a VR-friendly voice command with an app like VoiceAttack.
   - Flight type - VFR or IFR
@@ -202,7 +202,7 @@ Some Notes:
     - Auto OLOD - enabled and VFR 150% of your current MSFS OLOD setting, IFR 100%
     - Pause when MSFS loses focus - disabled, unless using MSFS FG then enabled
 - Expert Settings
-  - Auto Method - FPS Sensitivity generally gives better results and hence is the default. Use FPS Tolerance if you experience stuttering issues. Use Auto TLOD if you are using an FPS cap and it interferes with setting a suitable target FPS.
+  - Auto Method - FPS Sensitivity generally gives the best results for most users and hence is the default. Use FPS Tolerance if you experience stuttering issues. Use Auto TLOD if you want a DynamicLOD-like experience or are using an FPS cap.
     - FPS Sensitivity (v0.4.2 and later) - smaller changes more often.
       - Determines how sensitive the app will be to the variance between your current and target FPS.
       - Also determines the largest TLOD step size you will see, being double the FPS sensitivity number.
@@ -210,8 +210,7 @@ Some Notes:
     - FPS Tolerance (all versions except 0.4.2) - larger changes less often.
       - Determines how much variance from your target FPS must occur before the app will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be.
       - The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller.
-      - TLOD changes are allowable on the ground in this mode with the VFR flight type, so be aware of potential ground texture tearing/flashing issues because of it.
-    - Auto TLOD - functions similar to Auto OLOD by using an altitude schedule.
+    - Auto TLOD - functions similar to Auto OLOD by using an altitude schedule and is best for when using system FPS caps.
       - TLOD will adjust based on an altitude band with a base and top level and with TLOD values defined for each of these altitudes.
       - The app will set TLOD Base at or below the Alt TLOD Base (AGL), set the TLOD Top at or above Alt TLOD Top (AGL) and interpolate in between.
       - The nominal LOD Step Size can be set to allow users experiencing stuttering issues to try different LOD step sizes to help resolve the issue. The default value is 5.
@@ -232,6 +231,7 @@ Some Notes:
     - Particularly useful for when using MSFS FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. 
   - TLOD Min - Sets the minimum TLOD the automation algorithm will use. 
   - TLOD Min + - additional TLOD Min with favourable performance conditions.
+    - Requires at least 15% FPS headroom above target FPS to work at all. If you use an FPS cap, set your target FPS to at least 15% below it, preferably more.
     - Cannot be enabled at the same time as Auto Target FPS due to automation control ambiguity. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
     - When enabled, the TLOD Min + seek process will automatically start when commencing a flight, regardless of your aircraft's position, and at the conclusion of a flight when on the ground and stopped.
     - This seeking process can be manually restarted by pressing the Reset button, should flight conditions change such that the original TLOD Min + is no longer valid.
