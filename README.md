@@ -238,8 +238,8 @@ Some Notes:
     - When seeking on the ground, TLOD Min + will progressively increase, in larger steps at first, until a higher TLOD Min with less than 15% FPS headroom is available.
     - On climb out, TLOD Min + will remain set until your aircraft passes the calculated altitude threshold for the app priority mode to transition from TLOD to FPS priority.
     - While in FPS priority mode, TLOD Min + will calculate to be 50% of the lower of either whatever TLOD you are currently getting or TLOD Max without TLOD Mtn Amt, but no lower than TLOD Min.
-    - On descent through a calculated altitude threshold above ground that gives the app time to reduce TLOD to Min at a moderate rate, TLOD Min + will lock until landed.
-    - At any time, there is an automatic 20% reduction of TLOD Min + should conditions deteriorate after TLOD Min + is set such that TLOD Min is causing FPS to drop too far below target.
+    - On descent through the calculated TLOD priority mode transition altitude, TLOD Min + will lock until landed to give the app time to reduce TLOD to Min at a moderate rate.
+    - If at any time conditions deteriorate after TLOD Min + is set, there is an automatic 20% reduction of TLOD Min + in order to maintain target FPS. 
     - Avoid rapidly changing views or panning your external view too quickly, especially initially as un-cached scenery loads in, as you will induce temporary FPS drops that may trigger an unnecessary TLOD Min + reduction.    
     - Cannot be enabled at the same time as Auto Target FPS due to automation control ambiguity. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
   - TLOD Max - Sets the maximum TLOD the automation algorithm will use.
