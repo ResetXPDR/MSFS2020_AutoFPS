@@ -156,7 +156,7 @@ Some Notes:
       - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected. Similarly, a + next to ATLOD indicates that TLOD Base + has been activated and that a higher TLOD offset across the entire altitude schedule should be expected. 
       - Bonus GPU load display if the optional GPU-Z companion app, downloadable separately [here](https://www.techpowerup.com/download/techpowerup-gpu-z/), is installed and detected running when starting any flight session. Note, the GPU-Z companion app is required to be running if the Decrease Cloud Quality option is selected in conjunction with the GPU Load activation method, as GPU-Z provides the necessary GPU load information to the app for this method to function.
       - Auto pause will activate if in flight and either MSFS is in active pause or the MSFS settings menu is being accessed.
-  - Target FPS - The most important setting in this app.
+  - Target FPS - The most important setting in this app. (10 - 200 allowable)
     - Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
     - There is a setting for each graphics mode (PC, FG, LSFG and VR) and each flight mode (VFR and IFR), which you can only change while in those mode pairs. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR.
     - If using MSFS FG, the target FPS you set is your desired FG Active FPS, not the FG Inactive FPS you see when this app has the focus instead of MSFS. 
@@ -206,14 +206,14 @@ Some Notes:
     - FPS Sensitivity (v0.4.2 and later) - smaller changes more often.
       - Determines how sensitive the app will be to the variance between your current and target FPS.
       - Also determines the largest TLOD step size you will see, being double the FPS sensitivity number.
-      - The lower the setting the smaller the changes will be, which is useful if you are experiencing stuttering with the default value of 5. Vice versa for higher settings.
+      - The lower the setting the smaller the changes will be, which is useful if you are experiencing stuttering with the default value of 5. Vice versa for higher settings. (1 - 20 allowable)
     - FPS Tolerance (all versions except 0.4.2) - larger changes less often.
       - Determines how much variance from your target FPS must occur before the app will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be.
-      - The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller.
+      - The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller. (1% - 20% allowable)
     - Auto TLOD - functions similar to Auto OLOD by using an altitude schedule and is best for when using system FPS caps.
       - TLOD will adjust based on an altitude band with a base and top level and with TLOD values defined for each of these altitudes.
       - The app will set TLOD Base at or below the Alt TLOD Base (AGL), set the TLOD Top at or above Alt TLOD Top (AGL) and interpolate in between.
-      - The nominal LOD Step Size can be set to allow users experiencing stuttering issues to try different LOD step sizes to help resolve the issue. The default value is 5.
+      - The nominal LOD Step Size can be set to allow users experiencing stuttering issues to try different LOD step sizes to help resolve the issue. The default value is 5. (1 - 20 allowable)
       - When TLOD Base + is unchecked, this method completely ignores FPS hence all FPS-related settings are removed from the UI.
       - TLOD Base + - additional TLOD with favourable performance conditions.
         - When enabled, a target FPS will be required for the logic to work, which you should preferably set to your FPS cap if you use one or, if not, slightly lower than your normally achievable FPS.
@@ -230,7 +230,7 @@ Some Notes:
   - Pause when MSFS loses focus
     - Will stop LODs and, if applicable, cloud quality from changing while you are focused on another app and not MSFS.
     - Particularly useful for when using MSFS FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. 
-  - TLOD Min - Sets the minimum TLOD the automation algorithm will use. 
+  - TLOD Min - Sets the minimum TLOD the automation algorithm will use. (10 - TLOD Max-10 allowable)
   - TLOD Min + - additional TLOD Min with favourable performance conditions.
     - Requires at least 15% FPS headroom above target FPS to work at all. If you use an FPS cap, set your target FPS to at least 15% below it, preferably more.
     - When enabled, the TLOD Min + seek process will automatically start when commencing a flight, regardless of your aircraft's position, and at the conclusion of a flight when on the ground and stopped.
@@ -242,12 +242,12 @@ Some Notes:
     - If at any time conditions deteriorate after TLOD Min + is set, there is an automatic 20% reduction of TLOD Min + in order to maintain target FPS. 
     - Avoid rapidly changing views or panning your external view too quickly, especially initially as un-cached scenery loads in, as you will induce temporary FPS drops that may trigger an unnecessary TLOD Min + reduction.    
     - Cannot be enabled at the same time as Auto Target FPS due to automation control ambiguity. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
-  - TLOD Max - Sets the maximum TLOD the automation algorithm will use.
-  - TLOD Max + - additional TLOD Max in high elevation areas.
-    - When enabled, extends TLOD Max in areas where the terrain is higher than Mtn Alt Min by the TLOD Mtn Amt amount.
+  - TLOD Max - Sets the maximum TLOD the automation algorithm will use. (TLOD Min+10 - 1000 allowable)
+  - TLOD Max + - additional TLOD Max in high elevation areas. 
+    - When enabled, extends TLOD Max in areas where the terrain is higher than Mtn Alt Min (100ft - 100000ft allowable) by the TLOD Mtn Amt amount (10 - 1000 allowable).
     - If terrain drops below Mtn Alt Min, TLOD Max + will remain fixed for 5 minutes then progressively reduce by the TLOD step size per second until completely deactivated.
   - Alt TLOD Base - Altitude (AGL) at or below which TLOD will be at TLOD Min.
-  - Avg Descent Rate- Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
+  - Avg Descent Rate- Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude. (200fpm - 10000fpm allowable)
     - This band ensures that, if you descend at your set Avg Descent Rate or less, that the app can decrement TLOD from TLOD Max to TLOD Min by the Alt TLOD Base without exceeding the LOD Step rate associated with the FPS sensitivity level you have set.
   - Decrease Cloud Quality - When enabled, will reduce/restore cloud quality by one level if the activation condition is met.
     - Activation Methods
@@ -256,18 +256,18 @@ Some Notes:
       - IFR and VFR flight modes will use the same cloud reduction method.
     - TLOD (FPS Sensitivity and FPS Tolerance TLOD Automation Methods)
       - Decreases when TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance.
-      - Cloud Recovery TLOD with optional +
+      - Cloud Recovery TLOD with optional + (resultant TLOD must fall within TLOD Min+5 and TLOD Max-5)
         - The TLOD level required to cancel an active cloud quality reduction state and restore cloud quality back to its initial higher quality level.
         - Ideally set to 50 TLOD or more above TLOD Min to provide a TLOD buffer to minimise the chance that cloud quality will constantly change down and up.
         - When + is checked, Cloud Recovery TLOD becomes relative to TLOD Min instead of absolute.
     - GPU Load (All TLOD Automation Methods)
       - Requires the GPU-Z companion app to be installed and running for this method to work. If GPU-Z is not running, the user will be alerted to start it in on the app status line in the General section.
-      - Decreases when the GPU load, as measured by the GPU-Z companion app, is higher than the user-defined Decrease GPU Load percentage.
-      - Cloud Recovery GPU load
+      - Decreases when the GPU load, as measured by the GPU-Z companion app, is higher than the user-defined Decrease GPU Load percentage. (50% - 100% allowable)
+      - Cloud Recovery GPU load (5% - 90% and at least 10% less than Decrease GPU Load allowable)
         - Recovers when the GPU load is lower than the user-defined Recover GPU Load percentage.
         - Ideally set to at least 15% lower than the Decrease GPU Load percentage to provide a GPU load buffer to minimise the chance that cloud quality will constantly change down and up.
   -  Auto OLOD
      -  When enabled, four user definable parameters relating to this feature will be revealed on the UI.
-     -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base and top level and with OLOD values defined for each of these altitudes.
+     -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base (1000ft minimum and less than top) and top level (2000ft minimum, 100000ft maximum and greater than base) and with OLOD values defined for each of these altitudes (10 - 1000 allowable).
      -  The app will set OLOD @ Base at or below the Alt OLOD Base (AGL), set the OLOD @ Top at or above Alt OLOD Top (AGL) and interpolate in between. Note that OLOD @ Base can be higher, lower or the same value as the OLOD @ Top, depending on whether you want OLOD to decrease, increase or stay the same respectively as you ascend. 
 <br/><br/>
