@@ -1,11 +1,7 @@
 # MSFS2020_AutoFPS
 
 ## Notice
-Once MSFS_AutoFPS version 0.4.2.16 is released very soon, my development efforts on this app will wind down significantly. I will no longer be adding new functionality and will only be fixing any major issues found that do not have a practical workaround, such as a future MSFS update that is incompatible with the core functionality of this app. I have really enjoyed developing this app and hope that users have found it has improved their MSFS experience. 
-
-If anyone wishes to fork this final release and continue their own development work on it, have at it. All I ask is for a small acknowledgement of my, and may I suggest my predecessors', original development effort in your user documentation. 
-
-Thanks for all the mostly-positive feedback I have received for this development effort, which has made it all very worthwhile!
+Following MSFS2020_AutoFPS version 0.4.3.0 formal release, my development efforts on this app will be limited to maintenance of existing functionalty only until the release of MSFS 2024 in Nov 24. When MSFS 2024 is released I hope that much of the functionality of this app becomes native to MSFS and hence this app will no longer be required. If this is not largely the case, I will attempt to update this app to work with MSFS 2024, but since MSFS 2024 is currently an unknown entity, I make no promises that this will be successful or even possible.
 
 ## Summary
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
@@ -14,11 +10,11 @@ This app aims to improve the MSFS user experience by automatically changing key 
 - Automatic TLOD adjustment when in the air to either achieve and maintain a target FPS or to an altitude schedule, the latter as an expert option,
 - Improved target FPS tracking for all modes by having much smaller TLOD changes the closer you are to your target FPS, giving more consistent FPS for a better flight experience.    
 - A choice between VFR (GA) and IFR (Airliner) flight types, which defaults to settings suitable to each flight type and is fully customisable in Expert mode. 
-- Auto raising and lowering of the minimum TLOD option, depending on low altitude performance being either very favourable or poor respectively,
+- Auto raising and lowering of the minimum or base TLOD option, depending on low altitude performance being either very favourable or poor respectively,
 - Auto target FPS option, which is useful if you don't know what target FPS to choose or if your flight types are so varied that a single target FPS value is not always appropriate,
 - Cloud quality decrease option for when either FPS can't be achieved at the lowest desired TLOD or when the GPU load is too high,
 - Automatic OLOD adjustment option based on an automatic or user-definable OLOD range and altitude band (AGL),
-- Simultaneous PC, FG and VR mode compatibilty including correct FG FPS display and separate FPS targets for each mode,
+- Simultaneous PC, FG (native nVidia, FG mod and Lossless Scaling) and VR mode compatibilty, including correct FG FPS display, and separate FPS targets for each mode,
 - A greatly simplified non-expert default UI option that uses pre-defined settings for an automated experience suited to most user scenarios,
 - Auto detection and protection from known similar apps already running or incompatibilities with newer MSFS versions, and
 - Auto restoration of original MSFS settings changed by the app, recently enhanced to withstand MSFS CTDs.<br><br>
@@ -28,7 +24,7 @@ This app aims to improve the MSFS user experience by automatically changing key 
 - Notwithstanding, there is a new MSFS wishlist item requesting simconnect variables access to MSFS settings, which would allow me to make this app legitimate in MS/Abobo's eyes and expand the range of possibilities of what this app could do in future. Please vote for it [here](https://forums.flightsimulator.com/t/expose-tlod-olod-clouds-etc-via-simconnect-l-vars/634075). 
 
 Important:<br/> 
-- This app directly accesses active MSFS memory locations while MSFS is running to read and set TLOD and cloud quality settings on the fly at a maximum rate of one read and, if required, change per setting per second. The app will first verify that the MSFS memory locations being used are still valid and if not, likely because of an MSFS version change, will attempt to find where they have been relocated. If it does find the new memory locations and they pass validation tests, the app will update itself automatically and will function as normal. If it can't find or validate MSFS memory locations at any time when starting up, the app will self-restrict to read only mode to prevent the app making changes to unknown MSFS memory locations.
+- This app directly accesses active MSFS memory locations while MSFS is running to read and set TLOD, OLOD and cloud quality settings on the fly at a maximum rate of one read and change per setting per second, normally much less. The app will first verify that the MSFS memory locations being used are still valid and if not, likely because of an MSFS version change, will attempt to find where they have been relocated. If it does find the new memory locations and they pass validation tests, the app will update itself automatically and will function as normal. If it can't find or validate MSFS memory locations at any time when starting up, the app will self-restrict to read only mode to prevent the app making changes to unknown MSFS memory locations.
 - As such, I believe the app to be robust in its interaction with validated MSFS memory locations and to be responsible in disabling itself if it can't guarantee that. Nonetheless, this app is offered as is and no responsibility will be taken for unintended negative side effects. Use at your own risk!<br/><br/>
 
 
@@ -39,7 +35,7 @@ I am new to this app/MSFS, or I don't care for all this technical jargon. What i
 - Leave Use Expert Settings unchecked,
 - Pick what type of flight you are doing via the radio buttons ie. either VFR (GA aircraft) or IFR (airliners),
 - Enter a realistic target FPS (or click on auto target FPS for the app to pick it for you),
-- Click back on MSFS and wait until any FPS settle timer has finished (20 seconds max), then
+- Click back on MSFS and wait until any FPS settle or TLOD seek events have finished (60 seconds max), then
 - Go fly!
 
 I am getting major stuttering, freezes or CTDs in MSFS using this app. What can I do to stop them?
@@ -61,9 +57,11 @@ Which app should I use? DynamicLOD_ResetEdition or MSFS2020_AutoFPS?:
 - Both apps can be installed concurrently, but only one can be running at a time.
 
 How does this app work for Frame Generation (FG) users?
-- The app does detect correct FG FPS when FG is enabled in MSFS, however FG is only active when MSFS is the focused window and becomes inactive when not, through your graphics driver not this app.
-- To see correct FG FPS, use the app's "On Top" option to overlay this app over MSFS and give MSFS the focus.
-- If FG is being incorrectly reported as enabled by the app, the likely reason is that either the FG mod had been installed and removed or you have disabled Hardware Accelerated Graphics Scheduling under Windows settings and the now the now greyed out MSFS FG setting may show that it is off but it is still set to on internally to MSFS. To fix, change the DLSSG line in your UserCfg.opt file to be DLSSG 0.
+- The app does detect correct FG FPS when FG (native nVidia or FG mod) is enabled in MSFS, however FG is only active when MSFS is the focused window and becomes inactive when not, through your graphics driver not this app.
+- To see correct MSFS FG FPS, use the app's "On Top" option to overlay this app over MSFS and give MSFS the focus.
+- If MSFS FG is being incorrectly reported as enabled by the app, the likely reason is that either the FG mod had been installed and removed or you have disabled Hardware Accelerated Graphics Scheduling under Windows settings and the now the now greyed out MSFS FG setting may show that it is off but it is still set to on internally to MSFS. To fix, change the DLSSG line in your UserCfg.opt file to be DLSSG 0.
+- Lossless Scaling (LS) FG, including the scaling muliplier used, is also detected and the correct LSFG multiplied FPS is displayed.
+- Detection of FG is normally only performed upon starting a flight. If FG is enabled or LS is started after this detection is normally performed, press the Reset button for it to be detected.
 
 Why am I getting a dangerous/Unsafe program warning when trying to download or install?
 - This app is unsigned because I am a hobbyist and the cost of obtaining certification is prohibitive to me, so you may get a warning message of a potentially dangerous app when you download it in a web browser like Chrome or from your antivirus program, including Windows Defender.
@@ -84,13 +82,13 @@ The Installer will install the following Software:
 <br/><br/>
 
 ## Installation / Update / Uninstall
-Basically: Just run the Installer to either install, update or uninstall.<br/>
+Basically: Just run the Installer to either install, update or uninstall the app.<br/>
 
 Some Notes:
-- MSFS2020_AutoFPS has to be stopped before installing.
+- Your current MSFS2020_AutoFPS has to be exited before updating.
 - If the MobiFlight Module is not installed or outdated, MSFS also has to be stopped.
 - If you have duplicate MobiFlight Modules installed, in either your official or community folders, the app may display 0 value Sim Values and otherwise not function. Remove the duplicate versions, rerun the app installer and it should now work.
-- Do not run the Installer as Admin!
+- Do not run the Installer as Admin unless it will not install otherwise due to a permissions issue!
 - If the installer will not run at all, Windows SmartScreen is potentially blocking it because the app is so new. The solution to try is:
   - Right-click on the Installer and select properties
   - Check the option "Unblock"
@@ -133,7 +131,7 @@ Some Notes:
 ## Usage / Configuration
 
 - General
-  - The app can be started anytime, but preferably before MSFS or in the Main Menu to minimise sudden MSFS settings changes when the app is initialising. The app will stop itself when MSFS closes. 
+  - The app can be started anytime, but preferably before MSFS or in the Main Menu to minimise sudden MSFS settings changes when the app is initialising. The app will exit itself when MSFS closes. 
   - Closing the Window does not close the app, use the Context Menu of the SysTray Icon.
   - Clicking on the SysTray Icon opens the Window (again).
   - If you wish to have the app window always open to the SysTray, close the app and manually change the openWindow key state in the config file to false.
@@ -153,17 +151,19 @@ Some Notes:
     - Before loading a flight - whether a newer version of the app is available to download and install,
     - Loading in to a flight  - whether MSFS memory integrity test have failed, and
     - Flight is loaded
-      - Shows detected DX version, Graphics Mode (PC, FG, or VR), app pause, FPS settling time, and/or app priority mode as applicable.
-      - The FPS settling timer runs for up to 20 seconds to allow FPS to settle between pausing/unpausing, auto target FPS calibration, TLOD Min + transitions and VR/PC/FG mode transitions. This allows the FPS to stabilise before engaging automatic functions and should lead to much smaller TLOD changes when seeking the target FPS on such transitions.
-      - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected. 
+      - Shows detected Graphics Mode (PC, FG, LSFG or VR) and DX version, app pause, FPS settle, TLOD+ seek, Mtn+, app priority mode and/or TLOD range as applicable.
+      - The FPS settle timer runs for up to 20 seconds to allow FPS to settle between pausing/unpausing, auto target FPS calibration, TLOD Min + transitions and VR/PC/FG/LSFG mode transitions. This allows the FPS to stabilise before engaging automatic functions and should lead to much smaller TLOD changes when seeking the target FPS on such transitions.
+      - App priority shows whether FPS or TLOD are the current automation priority. A + next to TLOD indicates that TLOD Min + has been activated and that a higher TLOD Min should be expected. Similarly, a + next to ATLOD indicates that TLOD Base + has been activated and that a higher TLOD offset across the entire altitude schedule should be expected. 
       - Bonus GPU load display if the optional GPU-Z companion app, downloadable separately [here](https://www.techpowerup.com/download/techpowerup-gpu-z/), is installed and detected running when starting any flight session. Note, the GPU-Z companion app is required to be running if the Decrease Cloud Quality option is selected in conjunction with the GPU Load activation method, as GPU-Z provides the necessary GPU load information to the app for this method to function.
       - Auto pause will activate if in flight and either MSFS is in active pause or the MSFS settings menu is being accessed.
-  - Target FPS - The most important setting in this app.
+  - Target FPS - The most important setting in this app. (10 - 200 allowable)
     - Set it to what FPS you want the app to target while running, noting that this value should be at the mid to lower end of what your system is capable of otherwise the app will be unlikely to achieve it.
-    - There is a setting for each graphics mode (PC, FG and VR) and each flight mode (VFR and IFR), which you can only change while in those mode pairs. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR.
-    - If using FG, the target FPS you set is your desired FG Active FPS, not the FG Inactive FPS you see when this app has the focus instead of MSFS. 
-    - If you use an FPS cap, or Vsync for the same purpose, you will need to set your target FPS to be a few FPS lower than that cap. This allows the automated TLOD increase logic to function properly because it needs FPS to get above the target FPS to activate an increase in TLOD. If doing so causes unacceptable tearing of the image on your monitor, or breaks motion reprojection if you use it with VR, then try using Auto TLOD automation method, available under expert settings, which is FPS-independent and works well in such instances. 
+    - There is a setting for each graphics mode (PC, FG, LSFG and VR) and each flight mode (VFR and IFR), which you can only change while in those mode pairs. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR.
+    - If using MSFS FG, the target FPS you set is your desired FG Active FPS, not the FG Inactive FPS you see when this app has the focus instead of MSFS. 
+    - If using an FPS cap, or Vsync for the same purpose, it is strongly recommended you use the Auto TLOD automation method, available under expert settings, which can be used either FPS-independently or, when TLOD Base + is used, with an FPS target matching your FPS cap and works well in such instances.
+    - If using such an FPS cap with either FPS Sensitivity or Tolerance automation methods you will need to set your target FPS to be a few FPS lower than that cap to allow the automation logic to function correctly. This potentially introduces screen tearing, or breaks motion reprojection in VR, hence why Auto TLOD is preferred.
   - Auto Target FPS
+    - Cannot be enabled at the same time as TLOD Min + due to automation control ambiguity. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
     - When checked, a target FPS will automatically be calculated, following any initial FPS settling, when stationary on the ground or any time you are in the air.
     - Automatically recalulated if performance conditions are too low for the calculated target FPS, on the ground after arriving at a new destination, if you change graphics mode or if you uncheck then check the option again for a quick recalibration.
     - With IFR it will range from 95% of your current average FPS on the ground to 85% at or above 3000 ft, the latter being lower to give head room for Max TLOD.
@@ -172,6 +172,10 @@ Some Notes:
     - Allows the app to overlay your MSFS session if desired, with MSFS having the focus.
     - Mainly useful for adjusting settings and seeing the outcome over the top of your flight as it progresses.
     - Should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
+  - Reset button
+    - Resets TLOD, Clouds, Auto Target FPS and graphics mode detection to initial state.
+    - Useful to reintialise and recommence the seek process for TLOD Min/Top + should conditions change significantly from what they were on initial startup.
+    - Can be activated by pressing ALT-R while the app has the focus, making it suitable to be assigned as a VR-friendly voice command with an app like VoiceAttack.
   - Flight type - VFR or IFR
     - In non-expert mode, VFR will use higher minimum and maximum TLODs and a lower TLOD base altitude than IFR to account for the greater performance expectation that GA flights in rural areas will have.
     - Expert mode will default to similar settings differences, however the settings for each flight type are fully customisable and will save to and restore from separate profiles for VFR and IFR.
@@ -180,46 +184,70 @@ Some Notes:
     - Once above a calculated altitude band above the the TLOD base altitude, the app priority will change from TLOD to FPS.
     - On descent your TLOD will progressively work its way down to TLOD Min by the TLOD base altitude. 
   - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
-    - Auto Target FPS - user selectable 
+    - Auto Target FPS - user selectable. Enabling automatically disables TLOD Min + due to automation control ambiguity
     - FPS Sensitivity - 5%
     - VFR or IFR flight type - user selectable
     - Alt TLOD Base - VFR 100 ft, IFR 1000 ft
     - Avg Descent Rate - VFR 1000 fpm, IFR 2000 fpm
     - TLOD Minimum - VFR 100% of your current MSFS TLOD setting, IFR 50%
     - TLOD Maximum - VFR 300% of your current MSFS TLOD setting, IFR 200%
-    - TLOD Min + - enabled
-    - Decrease Cloud Quality - enabled and with TLOD activation method
+    - TLOD Min + - enabled, unless Auto Target FPS is enabled then disabled
+    - TLOD Max + - disabled
+    - Decrease Cloud Quality
+      - enabled by default and uses TLOD activation method
+      - can be disabled by setting DecCloudQNonExpert to false in the app config file
     - Cloud Recovery TLOD
       - 2/5 between TLOD Minimum and TLOD Maximum or + 50 over TLOD Min, whichever is lower.
       - If excessive changing of cloud quality levels are detected, the app will automatically increase its calculated cloud recovery TLOD.
     - Auto OLOD - enabled and VFR 150% of your current MSFS OLOD setting, IFR 100%
-    - Pause when MSFS loses focus - disabled, unless using FG then enabled
+    - Pause when MSFS loses focus - disabled, unless using MSFS FG then enabled
 - Expert Settings
-  - Auto Method - FPS Sensitivity generally gives better results and hence is the default. Use FPS Tolerance if you experience stuttering issues. Use Auto TLOD if you are using an FPS cap and it interferes with setting a suitable target FPS.
+  - Auto Method - FPS Sensitivity generally gives the best results for most users and hence is the default. Use FPS Tolerance if you experience stuttering issues. Use Auto TLOD if you want a DynamicLOD-like experience or are using an FPS cap.
     - FPS Sensitivity (v0.4.2 and later) - smaller changes more often.
       - Determines how sensitive the app will be to the variance between your current and target FPS.
       - Also determines the largest TLOD step size you will see, being double the FPS sensitivity number.
-      - The lower the setting the smaller the changes will be, which is useful if you are experiencing stuttering with the default value of 5. Vice versa for higher settings.
+      - The lower the setting the smaller the changes will be, which is useful if you are experiencing stuttering with the default value of 5. Vice versa for higher settings. (1 - 20 allowable)
     - FPS Tolerance (all versions except 0.4.2) - larger changes less often.
       - Determines how much variance from your target FPS must occur before the app will adjust MSFS settings to achieve the target FPS and what nominal magnitude those changes will be.
-      - The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller.
-      - TLOD changes are allowable on the ground in this mode with the VFR flight type, so be aware of potential ground texture tearing/flashing issues because of it.
-    - Auto TLOD - functions the same way that Auto OLOD does ie. independent of FPS.
+      - The lower the setting, the more reactive the app will be, the more MSFS settings changes will occur and the changes will be smaller. (1% - 20% allowable)
+    - Auto TLOD - functions similar to Auto OLOD by using an altitude schedule and is best for when using system FPS caps.
       - TLOD will adjust based on an altitude band with a base and top level and with TLOD values defined for each of these altitudes.
-      - The app will set TLOD @ Base at or below the Alt TLOD Base (AGL), set the TLOD @ Top at or above Alt TLOD Top (AGL) and interpolate in between.
-      - The nominal LOD Step Size can be set to allow users experiencing stuttering issues to try different LOD step sizes to help resolve the issue. The default value is 5. 
-      - As this function completely ignores FPS, all FPS-related settings are removed from the UI when using this method. These are Target FPS, Auto Target FPS, TLOD Min + and Pause on MSFS losing Focus.
-      - FPS settling time is also disabled as it does not apply to this automation method.
+      - The app will set TLOD Base at or below the Alt TLOD Base (AGL), set the TLOD Top at or above Alt TLOD Top (AGL) and interpolate in between.
+      - The nominal LOD Step Size can be set to allow users experiencing stuttering issues to try different LOD step sizes to help resolve the issue. The default value is 5. (1 - 20 allowable)
+      - When TLOD Base + is unchecked, this method completely ignores FPS hence all FPS-related settings are removed from the UI.
+      - TLOD Base + - additional TLOD with favourable performance conditions.
+        - When enabled, a target FPS will be required for the logic to work, which you should preferably set to your FPS cap if you use one or, if not, slightly lower than your normally achievable FPS.
+        - The TLOD Base + seek process will automatically start when commencing a flight, regardless of your aircraft's position, and at the conclusion of a flight when on the ground and stopped.
+        - This seek process can be manually restarted by pressing the Reset button, should flight conditions change such that the original TLOD Base + is no longer valid.
+        - When seeking, TLOD Base + will increase in steps of the original TLOD Base until either TLOD Top is achieved or the FPS cannot consistently achieve the target FPS. If the the latter, TLOD Base + will backtrack to the previous TLOD Base +, where the FPS target was easily achieved.
+        - At any time, if the 10 second FPS trend drops below a small threshold under the target FPS then TLOD Base + will automatically reduce by a step of the original TLOD base, down to zero if necessary. In external view, this threshold is greater to account for anticipated temporary FPS dips when scenery gets cached when panning.
+        - Avoid rapidly changing views or panning your external view too quickly, especially intially as uncached scenery loads in, as you will induce temporary FPS drops that may trigger an unnecessary TLOD Top + reduction.    
+        - If the FPS drops temporarily below the target FPS when taking off and TLOD automatically decreases, an attempt will be made to progressive restorely the lost TLOD should conditions return to being favourable after climbing through Alt TLOD Top.
+        - The calculated TLOD Base + will be applied as an offset that increasies the entire TLOD altitude schedule by that amount.
+        - Cannot be enabled with TLOD Top + due to conflicting control over TLOD Top. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
+      - TLOD Top + - additional TLOD Top in high elevation areas.
+        - Operates the same as TLOD Max + except that it cannot be enabled with TLOD Base + due to conflicting control over TLOD Top. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
   - Pause when MSFS loses focus
     - Will stop LODs and, if applicable, cloud quality from changing while you are focused on another app and not MSFS.
-    - Particularly useful for when using FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. 
-  - TLOD Min with optional +
-    - Sets the minimum TLOD the automation algorithm will use. 
-    - When + is checked and your system is achieving 15% or greater FPS than your target FPS, then your TLOD Min will increase by 50 - giving you additional graphics quality. 
-    - TLOD Min + will only activate on the ground or when descending and transitioning from FPS to TLOD priority mode. Once activated on the ground, it will remain set so as not to tempt ground texture corruption occurring. On descent, if minimum performance can not be maintained for TLOD Min +, it will self-cancel before landing without any sudden TLOD changes.
-  -  TLOD Max - Sets the maximum TLOD the automation algorithm will use. 
-  - Alt TLOD Base - Altitude (AGL) at or below which TLOD will be at TLOD Min.
-  - Avg Descent Rate- Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude.
+    - Particularly useful for when using MSFS FG as the FG active and inactive frame rate can vary quite considerably and because FG is not always an exact doubling of non-FG FPS. 
+  - TLOD Min - Sets the minimum TLOD the automation algorithm will use. (10 - TLOD Max-10 allowable)
+  - TLOD Min + - additional TLOD Min with favourable performance conditions.
+    - Requires at least 15% FPS headroom above target FPS to work at all. If you use an FPS cap, set your target FPS to at least 15% below it, preferably more.
+    - When enabled, the TLOD Min + seek process will automatically start when commencing a flight, regardless of your aircraft's position, and at the conclusion of a flight when on the ground and stopped.
+    - This seeking process can be manually restarted by pressing the Reset button, should flight conditions change such that the original TLOD Min + is no longer valid.
+    - When seeking on the ground, TLOD Min + will progressively increase, in larger steps at first, until a higher TLOD Min with less than 15% FPS headroom is available.
+    - On climb out, TLOD Min + will remain set until your aircraft passes the calculated altitude threshold for the app priority mode to transition from TLOD to FPS priority.
+    - While in FPS priority mode, TLOD Min + will calculate to be 50% of the lower of either whatever TLOD you are currently getting or TLOD Max without TLOD Mtn Amt, but no lower than TLOD Min.
+    - On descent through the calculated TLOD priority mode transition altitude, TLOD Min + will lock until landed to give the app time to reduce TLOD to Min at a moderate rate.
+    - If at any time conditions deteriorate after TLOD Min + is set, there is an automatic 20% reduction of TLOD Min + in order to maintain target FPS. 
+    - Avoid rapidly changing views or panning your external view too quickly, especially initially as un-cached scenery loads in, as you will induce temporary FPS drops that may trigger an unnecessary TLOD Min + reduction.    
+    - Cannot be enabled at the same time as Auto Target FPS due to automation control ambiguity. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
+  - TLOD Max - Sets the maximum TLOD the automation algorithm will use. (TLOD Min+10 - 1000 allowable)
+  - TLOD Max + - additional TLOD Max in high elevation areas. 
+    - When enabled, extends TLOD Max in areas where the terrain is higher than Mtn Alt Min (100ft - 100000ft allowable) by the TLOD Mtn Amt amount (10 - 1000 allowable).
+    - If terrain drops below Mtn Alt Min, TLOD Max + will remain fixed for 5 minutes then progressively reduce by the TLOD step size per second until completely deactivated.
+  - Alt TLOD Base - Altitude (AGL) at or below which TLOD will be at TLOD Min. (100ft - 100000ft allowable)
+  - Avg Descent Rate- Used in combination with FPS sensitivity to determine the altitude band in which TLOD will be interpolated between TLOD Min at the Alt TLOD base starting point and the lower of TLOD Max and the maximum TLOD your system can achieve while achieving at least your desired FPS target at a calculated top altitude. (200fpm - 10000fpm allowable)
     - This band ensures that, if you descend at your set Avg Descent Rate or less, that the app can decrement TLOD from TLOD Max to TLOD Min by the Alt TLOD Base without exceeding the LOD Step rate associated with the FPS sensitivity level you have set.
   - Decrease Cloud Quality - When enabled, will reduce/restore cloud quality by one level if the activation condition is met.
     - Activation Methods
@@ -228,18 +256,18 @@ Some Notes:
       - IFR and VFR flight modes will use the same cloud reduction method.
     - TLOD (FPS Sensitivity and FPS Tolerance TLOD Automation Methods)
       - Decreases when TLOD has already auto reduced to TLOD Min and FPS is still below target FPS by more than the FPS tolerance.
-      - Cloud Recovery TLOD with optional +
+      - Cloud Recovery TLOD with optional + (resultant TLOD must fall within TLOD Min+5 and TLOD Max-5)
         - The TLOD level required to cancel an active cloud quality reduction state and restore cloud quality back to its initial higher quality level.
         - Ideally set to 50 TLOD or more above TLOD Min to provide a TLOD buffer to minimise the chance that cloud quality will constantly change down and up.
         - When + is checked, Cloud Recovery TLOD becomes relative to TLOD Min instead of absolute.
     - GPU Load (All TLOD Automation Methods)
       - Requires the GPU-Z companion app to be installed and running for this method to work. If GPU-Z is not running, the user will be alerted to start it in on the app status line in the General section.
-      - Decreases when the GPU load, as measured by the GPU-Z companion app, is higher than the user-defined Decrease GPU Load percentage.
-      - Cloud Recovery GPU load
+      - Decreases when the GPU load, as measured by the GPU-Z companion app, is higher than the user-defined Decrease GPU Load percentage. (50% - 100% allowable)
+      - Cloud Recovery GPU load (5% - 90% and at least 10% less than Decrease GPU Load allowable)
         - Recovers when the GPU load is lower than the user-defined Recover GPU Load percentage.
         - Ideally set to at least 15% lower than the Decrease GPU Load percentage to provide a GPU load buffer to minimise the chance that cloud quality will constantly change down and up.
   -  Auto OLOD
      -  When enabled, four user definable parameters relating to this feature will be revealed on the UI.
-     -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base and top level and with OLOD values defined for each of these altitudes.
+     -  Rather than the automation being FPS based, which would cause contention with TLOD changes at the same time, OLOD will adjust based on an altitude band with a base (1000ft minimum and less than top) and top level (2000ft minimum, 100000ft maximum and greater than base) and with OLOD values defined for each of these altitudes (10 - 1000 allowable).
      -  The app will set OLOD @ Base at or below the Alt OLOD Base (AGL), set the OLOD @ Top at or above Alt OLOD Top (AGL) and interpolate in between. Note that OLOD @ Base can be higher, lower or the same value as the OLOD @ Top, depending on whether you want OLOD to decrease, increase or stay the same respectively as you ascend. 
 <br/><br/>

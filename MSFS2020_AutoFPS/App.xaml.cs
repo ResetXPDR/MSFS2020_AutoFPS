@@ -55,6 +55,7 @@ namespace MSFS2020_AutoFPS
                 Application.Current.Shutdown();
                 return;
             }
+
             Directory.SetCurrentDirectory(AppDir);
 
             if (!File.Exists(ConfigFile))
@@ -151,7 +152,7 @@ namespace MSFS2020_AutoFPS
             Log.Information($"-----------------------------------------------------------------------");
             string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             //assemblyVersion = assemblyVersion[0..assemblyVersion.LastIndexOf('.')];
-            Logger.Log(LogLevel.Information, "App:InitLog", $"MSFS2020_AutoFPS v{assemblyVersion} started! Log Level: {logLevel} Log File: {logFilePath}");
+            Logger.Log(LogLevel.Information, "App:InitLog", $"MSFS2020_AutoFPS v{assemblyVersion}{(ServiceModel.TestVersion ? ServiceModel.TestVariant : "")} started! Log Level: {logLevel} Log File: {logFilePath}");
         }
 
         protected void InitSystray()

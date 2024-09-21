@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Threading;
 
@@ -108,39 +109,50 @@ namespace MSFS2020_AutoFPS
                 Model.DefaultOLOD = Convert.ToSingle(Model.ConfigurationFile.GetSetting("defaultOLOD", Model.MemoryAccess.GetOLOD_PC().ToString("F0")));
                 Model.DefaultOLOD_VR = Convert.ToSingle(Model.ConfigurationFile.GetSetting("defaultOLOD_VR", Model.MemoryAccess.GetOLOD_VR().ToString("F0")));
                 Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Initial LODs PC {Model.DefaultTLOD} / {Model.DefaultOLOD} and VR {Model.DefaultTLOD_VR} / {Model.DefaultOLOD_VR}");
-                Model.DefaultCloudQ = Convert.ToInt32(Model.ConfigurationFile.GetSetting("defaultCloudQ", Model.MemoryAccess.GetCloudQ_PC().ToString("F0")));
-                Model.DefaultCloudQ_VR = Convert.ToInt32(Model.ConfigurationFile.GetSetting("defaultCloudQ_VR", Model.MemoryAccess.GetCloudQ_VR().ToString("F0")));
+                Model.DefaultCloudQ = Model.cloudQ = Convert.ToInt32(Model.ConfigurationFile.GetSetting("defaultCloudQ", Model.MemoryAccess.GetCloudQ_PC().ToString("F0")));
+                Model.DefaultCloudQ_VR = Model.cloudQ_VR = Convert.ToInt32(Model.ConfigurationFile.GetSetting("defaultCloudQ_VR", Model.MemoryAccess.GetCloudQ_VR().ToString("F0")));
                 Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Initial cloud quality PC {Model.CloudQualityText(Model.DefaultCloudQ)} / VR {Model.CloudQualityText(Model.DefaultCloudQ_VR)}");
+                Model.VrModeActive = Model.MemoryAccess.IsVrModeActive();
+                Model.FgModeEnabled = Model.MemoryAccess.IsFgModeEnabled();
+                if (Process.GetProcessesByName("LosslessScaling").Length > 0)
+                {
+                    Model.LsModeEnabled = true;
+                    Model.LsModeMultiplier = Model.GetLSModeMultiplier();
+                }
+                else Model.LsModeEnabled = false;
                 if (!Model.UseExpertOptions)
                 {
                     if (Model.VrModeActive)
                     {
                         float MinTLOD = Math.Max(Model.DefaultTLOD_VR * 0.5f, 10.0f);
-                        Model.MemoryAccess.SetTLOD(MinTLOD);
+                        Model.MemoryAccess.SetTLOD(Model.tlod = MinTLOD);
                         Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Setting TLOD Min on ground " + $"{MinTLOD}");
                     }
                     else
                     {
                         float MinTLOD = Math.Max(Model.DefaultTLOD * 0.5f, 10.0f);
-                        Model.MemoryAccess.SetTLOD(MinTLOD);
+                        Model.MemoryAccess.SetTLOD(Model.tlod = MinTLOD);
                         Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Setting TLOD Min on ground " + $"{MinTLOD}");
                     }
                 }
                 else
                 {
-                    Model.MemoryAccess.SetTLOD(Model.MinTLOD[Model.activeProfile]);
+                    Model.MemoryAccess.SetTLOD(Model.tlod = Model.MinTLOD[Model.activeProfile]);
                     Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Setting TLOD Min on ground " + $"{Model.MinTLOD[Model.activeProfile]}");
                 }
                 if (Model.CustomAutoOLOD[Model.activeProfile] && Model.UseExpertOptions)
                 {
-                    Model.MemoryAccess.SetOLOD(Model.OLODAtBase[Model.activeProfile]);
+                    Model.MemoryAccess.SetOLOD(Model.olod = Model.OLODAtBase[Model.activeProfile]);
                     Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Setting OLOD @ Base on ground " + $"{Model.OLODAtBase[Model.activeProfile]}");
                 }
-                Model.FPSSettleCounter = ServiceModel.FPSSettleSeconds * 2;
-                Model.MinTLODExtraActive = false;
-                Model.DecCloudQActive = false;
+                else
+                {
+                    if (Model.VrModeActive) Model.olod = Model.DefaultOLOD_VR;
+                    else Model.olod = Model.DefaultOLOD;
+                }
+                Model.FPSSettleInitial = true;
                 Model.DefaultSettingsRead = true;
-                if (!NormalStartup) Model.ResetCloudsTLOD(false);
+                Model.ResetCloudsTLOD(true, true);
                 while (!Model.CancellationRequested && IPCManager.IsSimRunning() && IPCManager.IsCamReady())
                 {
                     try
