@@ -60,7 +60,7 @@ How does this app work for Frame Generation (FG) users?
 - The app does detect correct FG FPS when FG (native nVidia or FG mod) is enabled in MSFS, however FG is only active when MSFS is the focused window and becomes inactive when not, through your graphics driver not this app.
 - To see correct MSFS FG FPS, use the app's "On Top" option to overlay this app over MSFS and give MSFS the focus.
 - If MSFS FG is being incorrectly reported as enabled by the app, the likely reason is that either the FG mod had been installed and removed or you have disabled Hardware Accelerated Graphics Scheduling under Windows settings and the now the now greyed out MSFS FG setting may show that it is off but it is still set to on internally to MSFS. To fix, change the DLSSG line in your UserCfg.opt file to be DLSSG 0.
-- Lossless Scaling (LS) FG, including the scaling muliplier used, is also detected and the correct LSFG multiplied FPS is displayed.
+- Lossless Scaling (LS) FG, including the scaling muliplier used (must be default profile), is also detected and the correct LSFG multiplied FPS is displayed.
 - Detection of FG is normally only performed upon starting a flight. If FG is enabled or LS is started after this detection is normally performed, press the Reset button for it to be detected.
 
 Why am I getting a dangerous/Unsafe program warning when trying to download or install?
