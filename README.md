@@ -1,7 +1,7 @@
 # MSFS2020_AutoFPS
 
 ## Notice
-Following MSFS2020_AutoFPS version 0.4.3.0 formal release, my development efforts on this app will be limited to maintenance of existing functionalty only until the release of MSFS 2024 in Nov 24. When MSFS 2024 is released I hope that much of the functionality of this app becomes native to MSFS and hence this app will no longer be required. If this is not largely the case, I will attempt to update this app to work with MSFS 2024, but since MSFS 2024 is currently an unknown entity, I make no promises that this will be successful or even possible.
+Following MSFS2020_AutoFPS version 0.4.3.1 formal release, my development efforts on this app will be limited to maintenance of existing functionalty only until the release of MSFS 2024 in Nov 24. When MSFS 2024 is released I hope that much of the functionality of this app becomes native to MSFS and hence this app will no longer be required. If this is not largely the case, I will attempt to update this app to work with MSFS 2024, but since MSFS 2024 is currently an unknown entity, I make no promises that this will be successful or even possible.
 
 ## Summary
 Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
