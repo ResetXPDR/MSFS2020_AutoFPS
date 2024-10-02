@@ -21,7 +21,8 @@ namespace MSFS2020_AutoFPS
 
         public bool IsSimRunning { get; set; } = false;
         public bool IsSessionRunning { get; set; } = false;
-
+        public bool NightTime {  get; set; } = false;
+        public bool NightTimeTransiton { get; set; } = false;
         public MemoryManager MemoryAccess { get; set; } = null;
         public int VerticalTrend { get; set; }
         public bool OnGround { get; set; } = true;
@@ -78,6 +79,7 @@ namespace MSFS2020_AutoFPS
         public bool[] MinTLODExtra { get; set; } = new bool[3];
         public float MinTLODExtraAmount { get; set; } = 0;
         public float[] MaxTLOD { get; set; } = new float[3];
+        public bool [] MaxTLODHalvedNight { get; set; } = new bool [3];
         public float[] AltTLODBase { get; set; } = new float[3];
         public float[] AltTLODTop { get; set; } = new float[3];
         public float[] AvgDescentRate { get; set; } = new float [3];
@@ -117,6 +119,7 @@ namespace MSFS2020_AutoFPS
 
         public const int MinTLODExtraIterationsMax = 8;
         public int MinTLODExtraIterations { get; set; } = MinTLODExtraIterationsMax;
+        public float MinTLODFPSDropAmount { get; set; }
         public float activeMinTLOD { get; set; }
         public float activeMaxTLOD { get; set; }
         public float rangeMinTLOD { get; set; }
@@ -170,7 +173,9 @@ namespace MSFS2020_AutoFPS
             AltOLODBase[(int)appProfiles.NonExpert] = 2000;
             AltOLODTop[(int)appProfiles.NonExpert] = 10000;
             DecCloudQMethod[(int)appProfiles.NonExpert] = 0;
+
             TLODExtraMtns[(int)appProfiles.NonExpert] = false;
+            MaxTLODHalvedNight[(int)appProfiles.NonExpert] = true;
 
             if (!TestVersion && File.GetLastWriteTime(App.ConfigFile) > DateTime.Now.AddSeconds(-10)) resetWindowPosition = true;
             
@@ -206,6 +211,7 @@ namespace MSFS2020_AutoFPS
             UseExpertOptions = Convert.ToBoolean(ConfigurationFile.GetSetting("useExpertOptions", "false"));
             LogSimValues = Convert.ToBoolean(ConfigurationFile.GetSetting("LogSimValues", "false"));
             AutoTargetFPS = Convert.ToBoolean(ConfigurationFile.GetSetting("AutoTargetFPS", "false"));
+            MinTLODFPSDropAmount = Convert.ToSingle(ConfigurationFile.GetSetting("MinTLODFPSDropAmount", "1"));
             if (AutoTargetFPS)
             {
                 ConfigurationFile.SetSetting("MinTLODExtra", "false");
@@ -255,6 +261,7 @@ namespace MSFS2020_AutoFPS
             FPSTolerance[(int)appProfiles.IFR_Expert] = Convert.ToInt32(ConfigurationFile.GetSetting("FpsTolerance", "5"));
             MinTLOD[(int)appProfiles.IFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("minTLod", "50"));
             MaxTLOD[(int)appProfiles.IFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("maxTLod", "200"));
+            MaxTLODHalvedNight[(int)appProfiles.IFR_Expert] = Convert.ToBoolean(ConfigurationFile.GetSetting("MaxTLODHalvedNight", "false"));
             if (MinTLODExtra[(int)appProfiles.IFR_Expert] && TLODAutoMethod[(int)appProfiles.IFR_Expert] == 2)
             {
                 ConfigurationFile.SetSetting("TLODExtraMtns", "false");
@@ -281,6 +288,7 @@ namespace MSFS2020_AutoFPS
             FPSTolerance[(int)appProfiles.VFR_Expert] = Convert.ToInt32(ConfigurationFile.GetSetting("FpsTolerance_VFR", FPSTolerance[(int)appProfiles.IFR_Expert].ToString()));
             MinTLOD[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("minTLod_VFR", (MinTLOD[(int)appProfiles.IFR_Expert] * 2).ToString()));
             MaxTLOD[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("maxTLod_VFR", (Math.Round(MaxTLOD[(int)appProfiles.IFR_Expert] * 1.5)).ToString()));
+            MaxTLODHalvedNight[(int)appProfiles.VFR_Expert] = Convert.ToBoolean(ConfigurationFile.GetSetting("MaxTLODHalvedNight_VFR", "false"));
             if (MinTLODExtra[(int)appProfiles.VFR_Expert] && TLODAutoMethod[(int)appProfiles.VFR_Expert] == 2)
             {
                 ConfigurationFile.SetSetting("TLODExtraMtns_VFR", "false");
@@ -302,7 +310,7 @@ namespace MSFS2020_AutoFPS
             OLODAtTop[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("OLODAtTop_VFR", OLODAtTop[(int)appProfiles.IFR_Expert].ToString()));
             AltOLODBase[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("AltOLODBase_VFR", AltOLODBase[(int)appProfiles.IFR_Expert].ToString()));
             AltOLODTop[(int)appProfiles.VFR_Expert] = Convert.ToSingle(ConfigurationFile.GetSetting("AltOLODTop_VFR", AltOLODTop[(int)appProfiles.IFR_Expert].ToString()));
-            CloudDecreaseGPUPct = Convert.ToSingle(ConfigurationFile.GetSetting("CloudDecreaseGPUPct", "95"));
+            CloudDecreaseGPUPct = Convert.ToSingle(ConfigurationFile.GetSetting("CloudDecreaseGPUPct", "98"));
             CloudRecoverGPUPct = Convert.ToSingle(ConfigurationFile.GetSetting("CloudRecoverGPUPct", "80"));
 
             if (ConfigVersion < BuildConfigVersion)
@@ -325,21 +333,28 @@ namespace MSFS2020_AutoFPS
                 LoadConfiguration();
         }
 
-        public int GetLSModeMultiplier()
+        public static int GetLSModeMultiplier()
         {
             string xmlFilePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Lossless Scaling\Settings.xml";
             XDocument xmlDoc = XDocument.Load(xmlFilePath);
-            XElement frameGenerationElement = xmlDoc.Descendants("Profile").Elements("FrameGeneration").FirstOrDefault();
-            if (frameGenerationElement != null)
+            var profile = xmlDoc.Descendants("Profile")
+                        .FirstOrDefault(p => p.Element("Title")?.Value == "MSFS2020");
+            if (profile == null) profile = xmlDoc.Descendants("Profile")
+                        .FirstOrDefault(p => p.Element("Title")?.Value == "Default");
+            if (profile != null)
             {
-                if (frameGenerationElement.Value != "Off")
+                XElement frameGenerationElement = profile.Elements("FrameGeneration").FirstOrDefault();
+                if (frameGenerationElement != null)
                 {
-                    XElement lsfgModeElement = xmlDoc.Descendants("Profile").Elements("LSFGMode").FirstOrDefault();
-                    if (lsfgModeElement != null)
+                    if (frameGenerationElement.Value != "Off")
                     {
-                        int LSFGMode = Convert.ToInt32(lsfgModeElement.Value.Substring(1, 1));
-                        if (LSFGMode < 2 || LSFGMode > 4) LSFGMode = 1;
-                        return LSFGMode;
+                        XElement lsfgModeElement = profile.Elements("LSFGMode").FirstOrDefault();
+                        if (lsfgModeElement != null)
+                        {
+                            int LSFGMode = Convert.ToInt32(lsfgModeElement.Value.Substring(1, 1));
+                            if (LSFGMode < 2 || LSFGMode > 4) LSFGMode = 1;
+                            return LSFGMode;
+                        }
                     }
                 }
             }
@@ -373,6 +388,7 @@ namespace MSFS2020_AutoFPS
                     ForceAutoFPSCal = true;
                     FPSSettleActive = true;
                 }
+                if (TLODExtraMtns[activeProfile]) TLODExtraMtnsAmountResidual = 0;
                 if ((ResetTLOD && OnGround) || ResetAll) 
                 {
                     float newTLOD;
@@ -383,6 +399,7 @@ namespace MSFS2020_AutoFPS
                         MinTLODExtraAmount = 0;
                         MinTLODExtraIterations = MinTLODExtraIterationsMax;
                         MinTLODExtraPreTakeoff = false;
+                        NightTimeTransiton = false;
                     }
 
                     if (TLODAutoMethod[activeProfile] == 2)
@@ -399,16 +416,12 @@ namespace MSFS2020_AutoFPS
                     else if (UseExpertOptions) newTLOD = MinTLOD[activeProfile];
                     else newTLOD = (Math.Max((VrModeActive ? DefaultTLOD_VR : DefaultTLOD) * (FlightTypeIFR ? 0.5f : 1.0f), 10.0f));
                     FPSSettleActiveLast = false;
-                    if (TLODAutoMethod[activeProfile] != 2 || MinTLODExtra[activeProfile]) FPSSettleActive = true;
-                    if (newTLOD != tlod)
-                    {
-                        if (TLODAutoMethod[activeProfile] != 2 || MinTLODExtra[activeProfile]) FPSSettleInitial = true;
-                        MemoryAccess.SetTLOD(tlod = newTLOD);
-                    }
+                    FPSSettleActive = true;
+                    if (newTLOD != tlod) MemoryAccess.SetTLOD(tlod = newTLOD);
                 }
             }
         }
-            public string CloudQualityText(int CloudQuality)
+        public static string CloudQualityText(int CloudQuality)
         {
             if (CloudQuality == 0) return "Low";
             else if (CloudQuality == 1) return "Medium";
@@ -416,6 +429,5 @@ namespace MSFS2020_AutoFPS
             else if (CloudQuality == 3) return "Ultra";
             else return "n/a";
         }
-
     }
 }

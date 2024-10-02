@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media.Media3D;
+using static MSFS2020_AutoFPS.ServiceModel;
 
 namespace MSFS2020_AutoFPS
 {
@@ -40,6 +41,8 @@ namespace MSFS2020_AutoFPS
         private long TotalTicks = 0;
         private float altAboveGndLast = 0;
         private float groundSpeedLast = 0;
+        private bool NightTimeLast = false;
+        private int DecCloudQActiveLast = 0;
         private float longitudinalAccel;
         private float throttlePosition;
         private float TLODStep;
@@ -53,7 +56,7 @@ namespace MSFS2020_AutoFPS
         private float deltaFPSRange;
         private float deltaFPSRangeLowest;
         private float deltaFPSHighest;
-        private float deltaFPSTrendMin = -1f;
+        private float deltaFPSTrendMin;
         private float newTLOD = 0f;
         private float TLODMinAltBand;
         private float MinTLODNoExtra;
@@ -68,6 +71,7 @@ namespace MSFS2020_AutoFPS
         private bool logDecCloudQActiveLast = true;
         private bool logIsAppPriorityFPSLast = false;
         private float logRangeMinTLODLast = -1;
+        private bool logNightTimeLast = false;
 
         GpuzWrapper gpuz = new GpuzWrapper();
         int gpuzGPULoadSensorIndex = -1;
@@ -85,6 +89,7 @@ namespace MSFS2020_AutoFPS
             SimConnect.SubscribeSimVar("PLANE ALTITUDE", "feet");
             SimConnect.SubscribeSimVar("ACCELERATION BODY Z", "feet per second squared");
             SimConnect.SubscribeSimVar("GENERAL ENG THROTTLE LEVER POSITION:1", "percent");
+            SimConnect.SubscribeSimVar("GLASSCOCKPIT AUTOMATIC BRIGHTNESS", "percent");
             GetMSFSState();
             if (!gpuzRunning())
             {
@@ -119,7 +124,8 @@ namespace MSFS2020_AutoFPS
             Model.altitude = SimConnect.ReadSimVar("PLANE ALTITUDE", "feet");
             longitudinalAccel = SimConnect.ReadSimVar("ACCELERATION BODY Z", "feet per second squared");
             throttlePosition = SimConnect.ReadSimVar("GENERAL ENG THROTTLE LEVER POSITION:1", "percent");
-  
+            if (SimConnect.ReadSimVar("GLASSCOCKPIT AUTOMATIC BRIGHTNESS", "percent") > 25) Model.NightTime = false;
+            else Model.NightTime = true;
 
             GetMSFSState();
             if (gpuzRunning())
@@ -135,14 +141,14 @@ namespace MSFS2020_AutoFPS
             if ((!Model.ActiveWindowMSFS && ((Model.UseExpertOptions && Model.PauseMSFSFocusLost) || (!Model.UseExpertOptions && Model.FgModeEnabled))) || Model.SimPaused) Model.AppPaused = true;
             else Model.AppPaused = false;
 
-            deltaFPSTrendMin = -(Model.VrModeActive ? 1 : (Model.LsModeEnabled ? Model.LsModeMultiplier : (Model.FgModeEnabled && Model.ActiveWindowMSFS ? 2 : 1)));
-            if (SimConnect.ReadSimVar("CAMERA STATE", "Enum") == 3) deltaFPSTrendMin *= 1.5f;
+            deltaFPSTrendMin = (Model.VrModeActive ? 1.0f : (Model.LsModeEnabled ? Model.LsModeMultiplier : (Model.FgModeEnabled && Model.ActiveWindowMSFS ? 2.0f : 1.0f))) * -Model.MinTLODFPSDropAmount;
+            if (SimConnect.ReadSimVar("CAMERA STATE", "Enum") == 3) deltaFPSTrendMin -= 1.0f;
 
             SetActiveLODs();
 
-            if ((ServiceModel.TestVersion || Model.LogSimValues) && logTimer == 0 && (!Model.FPSSettleActive || Model.TLODAutoMethod[Model.activeProfile] == 2) && (Math.Round(Model.altAboveGnd) != Math.Round(logAltAboveGndLast) || Math.Round(Model.tlod) != Math.Round(logTlodLast) || Math.Round(Model.olod) != Math.Round(logOlodLast) || logDecCloudQActiveLast != Model.DecCloudQActive || logIsAppPriorityFPSLast != Model.IsAppPriorityFPS || Math.Round(Model.rangeMinTLOD) != Math.Round(logRangeMinTLODLast)) && !(!Model.ActiveWindowMSFS && Model.UseExpertOptions && Model.PauseMSFSFocusLost))
+            if ((ServiceModel.TestVersion || Model.LogSimValues) && logTimer == 0 && (!Model.FPSSettleActive || Model.TLODAutoMethod[Model.activeProfile] == 2) && (Math.Round(Model.altAboveGnd) != Math.Round(logAltAboveGndLast) || Math.Round(Model.tlod) != Math.Round(logTlodLast) || Math.Round(Model.olod) != Math.Round(logOlodLast) || logDecCloudQActiveLast != Model.DecCloudQActive || logNightTimeLast != Model.NightTime || logIsAppPriorityFPSLast != Model.IsAppPriorityFPS || Math.Round(Model.rangeMinTLOD) != Math.Round(logRangeMinTLODLast)) && !(!Model.ActiveWindowMSFS && Model.UseExpertOptions && Model.PauseMSFSFocusLost))
             {
-                Logger.Log(LogLevel.Information, "LODController:UpdateVariables", $"FPS: {GetAverageFPS()}" + (Model.FgModeEnabled ? " FGAct: " + Model.ActiveWindowMSFS : "") + $" Pri: {(Model.TLODAutoMethod[Model.activeProfile] == 2 ? "ATLOD" : (Model.IsAppPriorityFPS ? "FPS" : "TLOD"))}{(Model.MinTLODExtraActive ? "+ " + Model.MinTLODExtraAmount : "")} TLOD: {Math.Round(Model.tlod)} TLODRng: {Model.rangeMinTLOD}{(Model.rangeMinTLOD == Model.rangeMaxTLOD ? "" : "-" + Model.rangeMaxTLOD)} Mtns+: {Model.TLODExtraMtnsAmountResidual} OLOD: {Math.Round(Model.olod)} AGL: {Math.Round(Model.altAboveGnd)} FPM: {Math.Round(vs * 60.0f)} Clouds: {(Model.VrModeActive ? Model.CloudQualityText(Model.cloudQ_VR) : Model.CloudQualityText(Model.cloudQ))}" + (Model.gpuUsage >= 0 ? $" GPU: {Math.Round(Model.gpuUsage)}%" : ""));
+                Logger.Log(LogLevel.Information, "LODController:UpdateVariables", $"FPS: {GetAverageFPS()}" + (Model.FgModeEnabled ? " FGAct: " + Model.ActiveWindowMSFS : "") + $" Pri: {(Model.TLODAutoMethod[Model.activeProfile] == 2 ? "ATLOD" : (Model.IsAppPriorityFPS ? "FPS" : "TLOD"))}{(Model.MinTLODExtraActive ? "+ " + Model.MinTLODExtraAmount : "")} Night: {Model.NightTime} TLOD: {Math.Round(Model.tlod)} TLODRng: {Model.rangeMinTLOD}{(Model.rangeMinTLOD == Model.rangeMaxTLOD ? "" : "-" + Model.rangeMaxTLOD)} Mtns+: {Model.TLODExtraMtnsAmountResidual} OLOD: {Math.Round(Model.olod)} AGL: {Math.Round(Model.altAboveGnd)} FPM: {Math.Round(vs * 60.0f)} Clouds: {(Model.VrModeActive ? ServiceModel.CloudQualityText(Model.cloudQ_VR) : ServiceModel.CloudQualityText(Model.cloudQ))}" + (Model.gpuUsage >= 0 ? $" GPU: {Math.Round(Model.gpuUsage)}%" : ""));
                 logTimer = logTimerInterval;
                 logAltAboveGndLast = Model.altAboveGnd;
                 logTlodLast = Model.tlod;
@@ -150,7 +156,7 @@ namespace MSFS2020_AutoFPS
                 logDecCloudQActiveLast = Model.DecCloudQActive;
                 logIsAppPriorityFPSLast = Model.IsAppPriorityFPS;
                 logRangeMinTLODLast = Model.rangeMinTLOD;
-
+                logNightTimeLast = Model.NightTime;
             }
             else if (--logTimer < 0) logTimer = 0;
         }
@@ -175,7 +181,7 @@ namespace MSFS2020_AutoFPS
 
             if (Model.MinTLODExtra[Model.activeProfile])
             {
-                if (Model.TLODAutoMethod[Model.activeProfile] == 2)
+                if (Model.TLODAutoMethod[Model.activeProfile] == 2 && !Model.NightTime && !Model.NightTimeTransiton)
                 {
                     if (!Model.MinTLODExtraPreTakeoff && Model.OnGround && Model.groundSpeed > 10 && longitudinalAccel > 5 && throttlePosition > 75 && Model.MinTLODExtraAmount > 0)
                     {
@@ -198,7 +204,7 @@ namespace MSFS2020_AutoFPS
                     }
                 }
 
-                if (Model.OnGround && Model.groundSpeed == 0 && MinTLODExtraInFlightPhase)
+                if (Model.OnGround && Model.groundSpeed == 0 && MinTLODExtraInFlightPhase && !Model.NightTime && !Model.NightTimeTransiton)
                 {
                     MinTLODExtraInFlightPhase = false;
                     Model.ResetCloudsTLOD(true, true);
@@ -218,14 +224,13 @@ namespace MSFS2020_AutoFPS
                 }
                 deltaFPSTrend[deltaFPSTrendIndex] = deltaFPS;
 
-                if (Model.MinTLODExtraSeeking)
+                if (Model.MinTLODExtraSeeking && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS))
                 {
                     if (Model.TLODAutoMethod[Model.activeProfile] == 2 && Model.MinTLODExtra[Model.activeProfile])
                     {
-                        if (deltaFPSTrendIndex >= 4 && deltaFPSTrend.Skip(deltaFPSTrendIndex - 4).Take(5).Min() > deltaFPSTrendMin)
+                        if (deltaFPSTrendIndex >= (Model.VrModeActive ? 9 : 4) && deltaFPSTrend.Skip(deltaFPSTrendIndex - 4).Take(5).Min() > deltaFPSTrendMin)
                         {
                             Model.MinTLODExtraSeeking = false;
-                            Model.FPSSettleActive = false;
                             if (Model.MinTLODExtraIterations == 1) Model.MinTLODExtraIterations = 0;
                         }
                         else if (deltaFPSTrendIndex >= (Model.MinTLODExtraIterations > 1 ? 14 : 9))
@@ -236,7 +241,6 @@ namespace MSFS2020_AutoFPS
                             }
                             else if (Model.MinTLODExtraIterations == 1) Model.MinTLODExtraIterations = 0;
                             Model.MinTLODExtraSeeking = false;
-                            Model.FPSSettleActive = false;
                         }
                     }
                     else if (deltaFPSTrendIndex >= 1)
@@ -295,37 +299,40 @@ namespace MSFS2020_AutoFPS
 
                 if (Model.TLODAutoMethod[Model.activeProfile] == 2)
                 {
-                    if (Model.MinTLODExtra[Model.activeProfile] && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && (Model.DecCloudQMethod[Model.activeProfile] == 1 || !Model.DecCloudQActive) && (deltaFPSTrendShort.Average() <= deltaFPSTrendMin || Model.MinTLODExtraIterations == 1) && Model.MinTLODExtraAmount > 0)
+                    if (!Model.MaxTLODHalvedNight[Model.activeProfile] || !Model.NightTime)
                     {
-                        Model.MinTLODExtraAmount -= Model.MinTLOD[Model.activeProfile];
-                        if (Model.MinTLODExtraAmount > 0)
+                        if (Model.MinTLODExtra[Model.activeProfile] && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && (Model.DecCloudQMethod[Model.activeProfile] == 1 || !Model.DecCloudQActive) && (deltaFPSTrendShort.Average() <= deltaFPSTrendMin || Model.MinTLODExtraIterations == 1) && Model.MinTLODExtraAmount > 0)
                         {
+                            Model.MinTLODExtraAmount -= Model.MinTLOD[Model.activeProfile];
+                            if (Model.MinTLODExtraAmount > 0)
+                            {
+                                Model.FPSSettleActive = true;
+                                if (Model.MinTLODExtraIterations != 1) Model.MinTLODExtraSeeking = true;
+                            }
+                            else Model.MinTLODExtraAmount = 0;
+                            Model.MinTLODExtraIterations = 0;
+                            Logger.Log(LogLevel.Information, "LODController:RunTick", "TLOD Base + auto-reduced to " + $"{Model.MinTLODExtraAmount}");
+                            SetActiveLODs(true);
+                        }
+                        else if (Model.MinTLODExtra[Model.activeProfile] && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && (Model.DecCloudQMethod[Model.activeProfile] == 1 || !Model.DecCloudQActive) && !Model.MinTLODExtraActive && Model.MinTLODExtraIterations > 1 && deltaFPS >= 0 && (Math.Ceiling(Model.tlod) < Model.activeMaxTLOD || !Model.OnGround))
+                        {
+                            Model.MinTLODExtraAmount += Math.Min(Model.MinTLOD[Model.activeProfile], 50.0f);
+                            if (Model.MinTLODExtraAmount + MinTLODNoExtra >= Model.MaxTLOD[Model.activeProfile])
+                            {
+                                Model.MinTLODExtraAmount = Model.MaxTLOD[Model.activeProfile] - MinTLODNoExtra;
+                            }
+                            else
+                            {
+                                Model.MinTLODExtraIterations--;
+                                Model.MinTLODExtraSeeking = true;
+                            }
                             Model.FPSSettleActive = true;
-                            if (Model.MinTLODExtraIterations != 1) Model.MinTLODExtraSeeking = true;
-                        }
-                        else Model.MinTLODExtraAmount = 0;
-                        Model.MinTLODExtraIterations = 0;
-                        Logger.Log(LogLevel.Information, "LODController:RunTick", "TLOD Base + auto-reduced to " + $"{Model.MinTLODExtraAmount}");
-                        SetActiveLODs(true);
-                    }
-                    else if (Model.MinTLODExtra[Model.activeProfile] && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && (Model.DecCloudQMethod[Model.activeProfile] == 1 || !Model.DecCloudQActive) && !Model.MinTLODExtraActive && Model.MinTLODExtraIterations > 1 && deltaFPS >= 0 && (Math.Ceiling(Model.tlod) < Model.activeMaxTLOD || !Model.OnGround))
-                    {
-                        Model.MinTLODExtraAmount += Model.MinTLOD[Model.activeProfile];
-                        if (Model.MinTLODExtraAmount + MinTLODNoExtra >= Model.MaxTLOD[Model.activeProfile])
-                        {
-                            Model.MinTLODExtraAmount = Model.MaxTLOD[Model.activeProfile] - MinTLODNoExtra;
-                        }
-                        else
-                        {
-                            Model.MinTLODExtraIterations--;
-                            Model.FPSSettleActive = true;
-                            Model.MinTLODExtraSeeking = true;
-                        }
-                        SetActiveLODs(true);
-                        Logger.Log(LogLevel.Information, "LODController:RunTick", "TLOD Base + auto-increased to " + $"{Model.MinTLODExtraAmount}");
+                            SetActiveLODs(true);
+                            Logger.Log(LogLevel.Information, "LODController:RunTick", "TLOD Base + auto-increased to " + $"{Model.MinTLODExtraAmount}");
 
+                        }
+                        else if (!(Model.FgModeEnabled && !Model.ActiveWindowMSFS)) Model.MinTLODExtraIterations = 0;
                     }
-                    else Model.MinTLODExtraIterations = 0;
                     if (Model.MinTLODExtra[Model.activeProfile] && Model.MinTLODExtraAmount > 0 && !Model.MinTLODExtraSeeking) Model.MinTLODExtraActive = true;
                     else Model.MinTLODExtraActive = false;
                     if (Model.altAboveGnd < Model.AltTLODBase[Model.activeProfile]) newTLOD = Model.activeMinTLOD;
@@ -351,7 +358,7 @@ namespace MSFS2020_AutoFPS
                         }
                     }
                 }
-                else if (Model.MinTLODExtra[Model.activeProfile] && Model.MinTLODExtraActive && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && (Model.DecCloudQMethod[Model.activeProfile] == 1 || !Model.DecCloudQActive) && Math.Round(Model.tlod) == Model.activeMinTLOD && deltaFPS <= -FPSToleranceAmount && Model.MinTLODExtraAmount > 0)
+                else if (Model.MinTLODExtra[Model.activeProfile] && Model.MinTLODExtraActive && !Model.IsAppPriorityFPS && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && (Model.DecCloudQMethod[Model.activeProfile] == 1 || !Model.DecCloudQActive) && Math.Round(Model.tlod) == Model.activeMinTLOD && deltaFPS <= -FPSToleranceAmount && Model.MinTLODExtraAmount > 0)
                 {
                         Model.MinTLODExtraAmount = (float)Math.Floor(Model.MinTLODExtraAmount * 0.8 / 10) * 10;
                         Model.FPSSettleActive = true;
@@ -362,7 +369,7 @@ namespace MSFS2020_AutoFPS
                         Logger.Log(LogLevel.Information, "LODController:RunTick", "TLOD Min + auto-reduced to " + $"{Model.MinTLODExtraAmount}");
 
                 }
-                else if (Model.MinTLODExtra[Model.activeProfile] && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && (Model.DecCloudQMethod[Model.activeProfile] == 1 || !Model.DecCloudQActive) && !Model.MinTLODExtraActive && Model.MinTLODExtraIterations > 1 && deltaFPS >= Model.TargetFPS * MinTLODExtraActiveTolerance && Math.Ceiling(Model.tlod) < Model.activeMaxTLOD)
+                else if (Model.MinTLODExtra[Model.activeProfile] && !Model.MinTLODExtraActive && !Model.IsAppPriorityFPS && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS) && (Model.DecCloudQMethod[Model.activeProfile] == 1 || !Model.DecCloudQActive) && Model.MinTLODExtraIterations > 1 && deltaFPS >= Model.TargetFPS * MinTLODExtraActiveTolerance && Math.Ceiling(Model.tlod) < Model.activeMaxTLOD)
                 {
                     Model.MinTLODExtraAmount += 10.0f * (float)Math.Floor(Math.Pow(deltaFPS, 0.9f) * MinTLODExtraSensitivity / (Model.TargetFPS * MinTLODExtraActiveTolerance));
                     if (Model.MinTLODExtraAmount + MinTLODNoExtra >= Model.MaxTLOD[Model.activeProfile])
@@ -370,11 +377,8 @@ namespace MSFS2020_AutoFPS
                         Model.MinTLODExtraAmount = Model.MaxTLOD[Model.activeProfile] - MinTLODNoExtra;
                         Model.MinTLODExtraIterations = 1;
                     }
-                    else
-                    {
-                        Model.MinTLODExtraIterations--;
-                        Model.FPSSettleActive = true;
-                    }
+                    else Model.MinTLODExtraIterations--;
+                    Model.FPSSettleActive = true;
                     Model.MinTLODExtraSeeking = true;
                     SetActiveLODs(true);
                     newTLOD = Model.activeMinTLOD;
@@ -382,20 +386,22 @@ namespace MSFS2020_AutoFPS
                 }
                 else
                 {
-                    if (Model.MinTLODExtraSeeking)
+                    if (Model.MinTLODExtraSeeking && !(Model.FgModeEnabled && !Model.ActiveWindowMSFS))
                     {
                         Model.MinTLODExtraActive = true;
                         Model.MinTLODExtraSeeking = false;
                         Model.MinTLODExtraIterations = ServiceModel.MinTLODExtraIterationsMax;
                     }
-                    else if (Model.altAboveGnd >= AltTLODBase + TLODMinAltBand && Model.MinTLODExtra[Model.activeProfile] && Math.Sign(deltaFPS) == 1)
+                    else if (Model.MinTLODExtra[Model.activeProfile] && Model.IsAppPriorityFPS && !Model.NightTimeTransiton && (!Model.MaxTLODHalvedNight[Model.activeProfile] || !Model.NightTime))
                     {
-                        Model.MinTLODExtraAmount = (float)Math.Floor((Math.Min((Model.tlod * MinTLODExtraDecentReduction), (Model.activeMaxTLOD - Model.TLODExtraMtnsAmountResidual) / 2) - MinTLODNoExtra) / 10) * 10;
-                        Model.MinTLODExtraAmount += 10.0f * (float)Math.Floor(Math.Pow(deltaFPS, 0.85) * MinTLODExtraSensitivity * 4 / (Model.TargetFPS * MinTLODExtraActiveTolerance));
-                        if (Model.MinTLODExtraAmount < 0) Model.MinTLODExtraAmount = 0;
-                        if (Model.MinTLODExtraAmount + MinTLODNoExtra > Model.activeMaxTLOD - Model.TLODExtraMtnsAmountResidual) Model.MinTLODExtraAmount = Model.activeMaxTLOD - Model.TLODExtraMtnsAmountResidual - MinTLODNoExtra;
+                        float MinTLODExtraAmountTemp;
+                        MinTLODExtraAmountTemp = (float)Math.Floor((Math.Min(Model.tlod - 2 * TLODStep, Model.MaxTLOD[Model.activeProfile]) * (1 - (Model.FlightTypeIFR ? MinTLODExtraDecentReduction : MinTLODExtraDecentReduction / 2)) - MinTLODNoExtra) / 10) * 10;
+                        if (deltaFPS >= 0) MinTLODExtraAmountTemp += 10.0f * (float)Math.Floor(Math.Pow(deltaFPS, 0.85) * MinTLODExtraSensitivity * 4 / (Model.TargetFPS * MinTLODExtraActiveTolerance));
+                        if (MinTLODExtraAmountTemp + MinTLODNoExtra > Model.activeMaxTLOD - Model.TLODExtraMtnsAmountResidual) MinTLODExtraAmountTemp = Model.activeMaxTLOD - Model.TLODExtraMtnsAmountResidual - MinTLODNoExtra;
+                        Model.MinTLODExtraAmount = Math.Max(Math.Min(MinTLODExtraAmountTemp, Model.tlod - 2 * TLODStep - MinTLODNoExtra), 0);
+                        if (Model.MinTLODExtraAmount == 0) Model.MinTLODExtraActive = false;
+                        else Model.MinTLODExtraActive = true;
                         SetActiveLODs(true);
-                        Model.MinTLODExtraActive = true;
                     }
                     if (Model.TLODAutoMethod[Model.activeProfile] == 0) newTLOD = Math.Sign(deltaFPS) * (Math.Min((float)Math.Pow(Math.Abs(deltaFPS) / (GetAverageFPS() > 1 ? GetAverageFPS() : 1) * TLODStepAdjusted * 10, 1.4f), TLODStepAdjusted * 2));
                     else if (FPSToleranceExceeded) newTLOD = Math.Sign(deltaFPS) * TLODStepAdjusted * (Math.Abs(deltaFPS) >= FPSToleranceAmount * 2 ? 2 : 1);
@@ -412,7 +418,7 @@ namespace MSFS2020_AutoFPS
                 }
                 else Model.tlod_step = false;
 
-                if (Model.DecCloudQ[Model.activeProfile] && !Model.DecCloudQActive && !Model.MinTLODExtraSeeking && ((Model.TLODAutoMethod[Model.activeProfile] != 2 && Model.DecCloudQMethod[Model.activeProfile] != 1 && Model.tlod == Model.activeMinTLOD && deltaFPS <= -FPSToleranceAmount) || ((Model.TLODAutoMethod[Model.activeProfile] == 2 || Model.DecCloudQMethod[Model.activeProfile] == 1) && Model.gpuUsage > Model.CloudDecreaseGPUPct)))
+                if (Model.DecCloudQ[Model.activeProfile] && !Model.DecCloudQActive && !(Model.MinTLODExtra[Model.activeProfile] &&  Model.MinTLODExtraIterations > 0) && ((Model.TLODAutoMethod[Model.activeProfile] != 2 && Model.DecCloudQMethod[Model.activeProfile] != 1 && Model.tlod == Model.activeMinTLOD && deltaFPS <= -FPSToleranceAmount) || ((Model.TLODAutoMethod[Model.activeProfile] == 2 || Model.DecCloudQMethod[Model.activeProfile] == 1) && Model.gpuUsage > Model.CloudDecreaseGPUPct)))
                 {
                     if (Model.VrModeActive && Model.DefaultCloudQ_VR >= 1)
                     {
@@ -480,6 +486,7 @@ namespace MSFS2020_AutoFPS
             TotalTicks++;
             altAboveGndLast = Model.altAboveGnd;
             groundSpeedLast = Model.groundSpeed;
+            NightTimeLast = Model.NightTime;
         }
         public int VerticalAverage()
         {
@@ -509,43 +516,121 @@ namespace MSFS2020_AutoFPS
         }
         public void SetActiveLODs(bool SetTLODMinAltBand = false)
         {
+            float defaultTLOD = Model.VrModeActive ? Model.DefaultTLOD_VR : Model.DefaultTLOD;
+            float defaultOLOD = Model.VrModeActive ? Model.DefaultOLOD_VR : Model.DefaultOLOD;
+            float defaultTLODMaxDay = Model.UseExpertOptions ? Model.MaxTLOD[Model.activeProfile] : defaultTLOD * (Model.FlightTypeIFR ? 2.0f : 3.0f);
+            float defaultTLODMaxNight = Model.UseExpertOptions ? Model.MaxTLOD[Model.activeProfile] / 2 : defaultTLOD * (Model.FlightTypeIFR ? 1.0f : 1.5f);
+            TLODStep = TLODStepAdjusted = Math.Max(2.0f, Model.FPSTolerance[Model.activeProfile]);
             if (Model.UseExpertOptions)
             {
                 MinTLODNoExtra = Model.MinTLOD[Model.activeProfile];
-                Model.activeMinTLOD = MinTLODNoExtra + Model.MinTLODExtraAmount;
-                Model.activeMaxTLOD = Model.MaxTLOD[Model.activeProfile];
-                if (Model.TLODExtraMtns[Model.activeProfile] && Model.altitude - Model.altAboveGnd >= Model.TLODExtraMtnsTriggerAlt[Model.activeProfile])
-                {
-                    Model.TLODExtraMtnsAmountResidual = Model.TLODExtraMtnsAmount[Model.activeProfile];
-                    Model.TLODExtraMtnsActive = true;
-                    TLODExtraMtnsTimer = 300;
-                }
-                else if (Model.TLODExtraMtnsActive && --TLODExtraMtnsTimer < 0) Model.TLODExtraMtnsActive = false;
-                else if (!Model.TLODExtraMtnsActive && Model.TLODExtraMtnsAmountResidual > 0)
-                {
-                    Model.TLODExtraMtnsAmountResidual -= 5;
-                    if (Model.TLODExtraMtnsAmountResidual < 0) Model.TLODExtraMtnsAmountResidual = 0;
-                }
-                if (Model.TLODAutoMethod[Model.activeProfile] == 2 && Model.MinTLODExtra[Model.activeProfile])Model.activeMaxTLOD += Model.MinTLODExtraAmount;
-                else Model.activeMaxTLOD += Model.TLODExtraMtnsAmountResidual;
+                AltTLODBase = Model.AltTLODBase[Model.activeProfile];
                 Model.activeOLODAtBase = Model.OLODAtBase[Model.activeProfile];
                 Model.activeOLODAtTop = Model.OLODAtTop[Model.activeProfile];
-                AltTLODBase = Model.AltTLODBase[Model.activeProfile];
             }
             else
             {
-                float defaultTLOD = Model.VrModeActive ? Model.DefaultTLOD_VR : Model.DefaultTLOD;
-                float defaultOLOD = Model.VrModeActive ? Model.DefaultOLOD_VR : Model.DefaultOLOD;
                 MinTLODNoExtra = Math.Max(defaultTLOD * (Model.FlightTypeIFR ? 0.5f : 1.0f), 10.0f);
-                Model.activeMaxTLOD = Model.MaxTLOD[(int)ServiceModel.appProfiles.NonExpert] = defaultTLOD * (Model.FlightTypeIFR ? 2.0f : 3.0f);
-                Model.activeMinTLOD = Model.MinTLOD[(int)ServiceModel.appProfiles.NonExpert] = MinTLODNoExtra + Model.MinTLODExtraAmount;
+                AltTLODBase = Model.AltTLODBase[(int)ServiceModel.appProfiles.NonExpert] = Model.FlightTypeIFR ? 1000.0f : 100.0f;
                 Model.activeOLODAtBase = Model.OLODAtBase[(int)ServiceModel.appProfiles.NonExpert] = Model.FlightTypeIFR ? defaultOLOD : defaultOLOD * 1.5f;
                 Model.activeOLODAtTop = Model.OLODAtTop[(int)ServiceModel.appProfiles.NonExpert] = Math.Max(Model.activeOLODAtBase * 0.1f, 10.0f);
-                AltTLODBase = Model.AltTLODBase[(int)ServiceModel.appProfiles.NonExpert] = Model.FlightTypeIFR ? 1000.0f : 100.0f;
-                Model.CloudRecoveryTLOD[Model.activeProfile] = (float)Math.Min(Math.Round(2 * (Model.activeMinTLOD + Model.activeMaxTLOD) / 5), Model.activeMinTLOD + 50.0f) + CloudRecoveryExtraNonExpert;
+                if (Model.gpuUsage > 0)
+                {
+                    Model.DecCloudQMethod[(int)appProfiles.NonExpert] = 1;
+                    Model.CloudDecreaseGPUPct = 98;
+                    Model.CloudRecoverGPUPct = 80;
+                }
+                else
+                {
+                    Model.DecCloudQMethod[(int)appProfiles.NonExpert] = 0;
+                    Model.CloudRecoveryTLOD[Model.activeProfile] = (float)Math.Min(Math.Round(2 * (Model.activeMinTLOD + Model.activeMaxTLOD) / 5), Model.activeMinTLOD + 50.0f) + CloudRecoveryExtraNonExpert;
+                }
+                if (Model.DecCloudQMethod[(int)appProfiles.NonExpert] != DecCloudQActiveLast) Model.ResetCloudsTLOD();
+                DecCloudQActiveLast = Model.DecCloudQMethod[(int)appProfiles.NonExpert];
             }
-            TLODStep = TLODStepAdjusted = Math.Max(2.0f, Model.FPSTolerance[Model.activeProfile]);
-            if (SetTLODMinAltBand) TLODMinAltBand = Math.Max(Model.AvgDescentRate[Model.activeProfile] / 60 * ((Model.activeMaxTLOD - Model.activeMinTLOD) / TLODStep), 1);
+            if (Model.MaxTLODHalvedNight[Model.activeProfile] && Model.NightTime != NightTimeLast)
+            {
+                Model.NightTimeTransiton = true;
+                Model.MinTLODExtraIterations = 0;
+            }
+            if (Model.NightTimeTransiton)
+            {
+                if (Model.NightTime)
+                {
+                    if (Model.activeMinTLOD <= MinTLODNoExtra && (Model.activeMaxTLOD <= Math.Max(defaultTLODMaxNight, MinTLODNoExtra) || Model.altAboveGnd <= AltTLODBase)) Model.NightTimeTransiton = false;
+                    if (Model.activeMinTLOD > MinTLODNoExtra) Model.activeMinTLOD -= TLODStep;
+                    if (Model.activeMaxTLOD > Math.Max(defaultTLODMaxNight, MinTLODNoExtra)) Model.activeMaxTLOD = (Model.activeMaxTLOD -= TLODStep);
+                    if (Model.activeMinTLOD < MinTLODNoExtra) Model.activeMinTLOD = MinTLODNoExtra;
+                    if (Model.activeMaxTLOD < Math.Max(defaultTLODMaxNight, MinTLODNoExtra)) Model.activeMaxTLOD = Math.Max(defaultTLODMaxNight, MinTLODNoExtra);                }
+                else
+                {
+                    if (Model.activeMaxTLOD >= defaultTLODMaxDay || Model.altAboveGnd <= AltTLODBase)
+                    {
+                        if (Model.altAboveGnd >= AltTLODBase || (Model.OnGround && Model.groundSpeed <= 5))
+                        {
+                            Model.MinTLODExtraIterations = ServiceModel.MinTLODExtraIterationsMax;
+                            Model.FPSSettleActive = true;
+                        }
+                        Model.NightTimeTransiton = false;
+                    }
+                    if (Model.activeMaxTLOD < defaultTLODMaxDay) Model.activeMaxTLOD += TLODStep;
+                    if (Model.activeMaxTLOD > defaultTLODMaxDay) Model.activeMaxTLOD = defaultTLODMaxDay;
+                }
+                CalcTLODMinAltBand();
+            }
+            else if (Model.MaxTLODHalvedNight[Model.activeProfile] && Model.NightTime)
+            {
+                if (Model.UseExpertOptions)
+                {
+                    Model.activeMinTLOD = MinTLODNoExtra;
+                    Model.activeMaxTLOD = defaultTLODMaxNight;
+                }
+                else
+                {
+                    Model.activeMinTLOD = Model.MinTLOD[(int)ServiceModel.appProfiles.NonExpert] = MinTLODNoExtra;
+                    Model.activeMaxTLOD = defaultTLODMaxNight;
+                }
+                Model.MinTLODExtraAmount = 0;
+                Model.MinTLODExtraActive = false;
+                Model.MinTLODExtraSeeking = false;
+                Model.MinTLODExtraIterations = 0;
+                Model.MinTLODExtraPreTakeoff = false;
+                Model.TLODExtraMtnsActive = false;
+                Model.TLODExtraMtnsAmountResidual = 0;
+            }
+            else
+            {
+                if (Model.UseExpertOptions)
+                {
+                    Model.activeMinTLOD = MinTLODNoExtra + Model.MinTLODExtraAmount;
+                    Model.activeMaxTLOD = Model.MaxTLOD[Model.activeProfile];
+                    if (Model.TLODExtraMtns[Model.activeProfile] && Model.altitude - Model.altAboveGnd >= Model.TLODExtraMtnsTriggerAlt[Model.activeProfile] - 000)
+                    {
+                        Model.TLODExtraMtnsAmountResidual = Math.Min(Model.TLODExtraMtnsAmountResidual + Math.Max(TLODStep, 5), Model.TLODExtraMtnsAmount[Model.activeProfile]);
+                        Model.TLODExtraMtnsActive = true;
+                        TLODExtraMtnsTimer = 300;
+                    }
+                    else if (Model.TLODExtraMtnsActive && --TLODExtraMtnsTimer < 0) Model.TLODExtraMtnsActive = false;
+                    else if (!Model.TLODExtraMtnsActive && Model.TLODExtraMtnsAmountResidual > 0)
+                    {
+                        Model.TLODExtraMtnsAmountResidual -= Math.Max(TLODStep, 5);
+                        if (Model.TLODExtraMtnsAmountResidual < 0) Model.TLODExtraMtnsAmountResidual = 0;
+                    }
+                    if (Model.TLODAutoMethod[Model.activeProfile] == 2 && Model.MinTLODExtra[Model.activeProfile]) Model.activeMaxTLOD += Model.MinTLODExtraAmount;
+                    else Model.activeMaxTLOD += Model.TLODExtraMtnsAmountResidual;
+                }
+                else
+                {
+                    Model.activeMinTLOD = Model.MinTLOD[(int)ServiceModel.appProfiles.NonExpert] = MinTLODNoExtra + Model.MinTLODExtraAmount;
+                    Model.activeMaxTLOD = Model.MaxTLOD[(int)ServiceModel.appProfiles.NonExpert] = defaultTLODMaxDay;
+                }
+            }
+            if (SetTLODMinAltBand) CalcTLODMinAltBand();
+        }
+
+        public void CalcTLODMinAltBand()
+        {
+            TLODMinAltBand = Math.Max(Model.AvgDescentRate[Model.activeProfile] / 60 * ((Model.activeMaxTLOD - Model.activeMinTLOD) / TLODStep), 1);
         }
         public float GetAverageFPS()
         {

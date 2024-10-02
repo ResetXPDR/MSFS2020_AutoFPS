@@ -105,7 +105,7 @@ namespace MSFS2020_AutoFPS
                     Model.MemoryAccess.SetTLOD_VR(Model.DefaultTLOD_VR);
                     Model.MemoryAccess.SetOLOD_PC(Model.DefaultOLOD);
                     Model.MemoryAccess.SetOLOD_VR(Model.DefaultOLOD_VR);
-                    Logger.Log(LogLevel.Information, "App:OnExit", $"Resetting cloud quality to {Model.CloudQualityText(Model.DefaultCloudQ)} / VR {Model.CloudQualityText(Model.DefaultCloudQ_VR)}");
+                    Logger.Log(LogLevel.Information, "App:OnExit", $"Resetting cloud quality to {ServiceModel.CloudQualityText(Model.DefaultCloudQ)}  / VR  {ServiceModel.CloudQualityText(Model.DefaultCloudQ_VR)}");
                     Model.MemoryAccess.SetCloudQ(Model.DefaultCloudQ);
                     Model.MemoryAccess.SetCloudQ_VR(Model.DefaultCloudQ_VR);
                     if (Model.MemoryAccess.GetTLOD_PC() == Model.DefaultTLOD) // As long as one setting restoration stuck

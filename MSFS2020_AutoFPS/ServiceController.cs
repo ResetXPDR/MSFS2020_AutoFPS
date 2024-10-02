@@ -94,14 +94,12 @@ namespace MSFS2020_AutoFPS
         {
             Model.MemoryAccess = new MemoryManager(Model);
             var lodController = new LODController(Model);
-            bool NormalStartup = true;
             if (Model.MemoryAccess.MemoryWritesAllowed())
             {
                 Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", "Starting Service Loop");
                 if (Model.ConfigurationFile.SettingExists("defaultTLOD"))
                 {
                     Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", "MSFS or MSFS2020_AutoFPS did not exit properly last session. Getting default MSFS settings from MSFS2020_AutoFPS config file.");
-                    NormalStartup = false;
                 }
                 else Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", "Normal startup detected. Getting default MSFS settings from MSFS."); 
                 Model.DefaultTLOD = Convert.ToSingle(Model.ConfigurationFile.GetSetting("defaultTLOD", Model.MemoryAccess.GetTLOD_PC().ToString("F0")));
@@ -111,15 +109,9 @@ namespace MSFS2020_AutoFPS
                 Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Initial LODs PC {Model.DefaultTLOD} / {Model.DefaultOLOD} and VR {Model.DefaultTLOD_VR} / {Model.DefaultOLOD_VR}");
                 Model.DefaultCloudQ = Model.cloudQ = Convert.ToInt32(Model.ConfigurationFile.GetSetting("defaultCloudQ", Model.MemoryAccess.GetCloudQ_PC().ToString("F0")));
                 Model.DefaultCloudQ_VR = Model.cloudQ_VR = Convert.ToInt32(Model.ConfigurationFile.GetSetting("defaultCloudQ_VR", Model.MemoryAccess.GetCloudQ_VR().ToString("F0")));
-                Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Initial cloud quality PC {Model.CloudQualityText(Model.DefaultCloudQ)} / VR {Model.CloudQualityText(Model.DefaultCloudQ_VR)}");
+                Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Initial cloud quality PC {ServiceModel.CloudQualityText(Model.DefaultCloudQ)} / VR {ServiceModel.CloudQualityText(Model.DefaultCloudQ_VR)}");
                 Model.VrModeActive = Model.MemoryAccess.IsVrModeActive();
                 Model.FgModeEnabled = Model.MemoryAccess.IsFgModeEnabled();
-                if (Process.GetProcessesByName("LosslessScaling").Length > 0)
-                {
-                    Model.LsModeEnabled = true;
-                    Model.LsModeMultiplier = Model.GetLSModeMultiplier();
-                }
-                else Model.LsModeEnabled = false;
                 if (!Model.UseExpertOptions)
                 {
                     if (Model.VrModeActive)
@@ -175,7 +167,7 @@ namespace MSFS2020_AutoFPS
                     Model.MemoryAccess.SetTLOD_VR(Model.DefaultTLOD_VR);
                     Model.MemoryAccess.SetOLOD_PC(Model.DefaultOLOD);
                     Model.MemoryAccess.SetOLOD_VR(Model.DefaultOLOD_VR);
-                    Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Sim still running, resetting cloud quality to {Model.CloudQualityText(Model.DefaultCloudQ)} / VR {Model.CloudQualityText(Model.DefaultCloudQ_VR)}");
+                    Logger.Log(LogLevel.Information, "ServiceController:ServiceLoop", $"Sim still running, resetting cloud quality to {ServiceModel.CloudQualityText(Model.DefaultCloudQ)} / VR {ServiceModel.CloudQualityText(Model.DefaultCloudQ_VR)}");
                     Model.MemoryAccess.SetCloudQ(Model.DefaultCloudQ);
                     Model.MemoryAccess.SetCloudQ_VR(Model.DefaultCloudQ_VR);
                     if (Model.MemoryAccess.GetTLOD_PC() == Model.DefaultTLOD) // As long as one setting restoration stuck

@@ -158,6 +158,9 @@
                                 <CheckBox x:Name="chkTLODExtraMtns" VerticalContentAlignment="Center"  ToolTip="+ extra TLOD Max in high terrain areas" Click="chkTLODExtraMtns_Click" Margin="0,0,7,0" Background="#7FFFFFFF">
                                 </CheckBox>
                                 <TextBox x:Name="txtMaxTLod" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="24" MaxHeight="24" MinHeight="24" Width="42" LostFocus="TextBox_LostFocus" KeyUp="TextBox_KeyUp" Margin="5,0,0,0" Background="#7FFFFFFF"/>
+                                <Label Name="lblMaxTLODHalvedNight" Content=" -"/>
+                                <CheckBox x:Name="chkMaxTLODHalvedNight" VerticalContentAlignment="Center"  ToolTip="Halve TLOD Max at night" Click="chkMaxTLODHalvedNight_Click" Margin="0,0,7,0" Background="#7FFFFFFF">
+                                </CheckBox>
                             </StackPanel>
                             <StackPanel Name="stkpnlTLODExtraMtns" Orientation="Vertical" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="1" Margin="0,0,0,0" Grid.RowSpan="2">
                                 <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
