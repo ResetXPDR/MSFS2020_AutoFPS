@@ -228,6 +228,7 @@ Some Notes:
         - If the FPS drops temporarily below the target FPS when taking off and TLOD automatically decreases, an attempt will be made to progressive restorely the lost TLOD should conditions return to being favourable after climbing through Alt TLOD Top.
         - The calculated TLOD Base + will be applied as an offset that increasies the entire TLOD altitude schedule by that amount.
         - Cannot be enabled with TLOD Top + due to conflicting control over TLOD Top. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
+        - The default 10 second sustained FPS drop upon which TLOD Base + reductions are triggered can be changed in the config file by modifying the MinTLODFPSDropAmount key. The default is 1, which is suitable in most instances, and higher values will make the app require a greater sustained FPS drop before a TLOD Base + reduction is activated. I use a value of 2 for VR with the Quest 3.
       - TLOD Top + - additional TLOD Top in high elevation areas.
         - Operates the same as TLOD Max + except that it cannot be enabled with TLOD Base + due to conflicting control over TLOD Top. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
       - TLOD Top - reduced TLOD Top at night. Operates the same as TLOD Max -. 
