@@ -64,8 +64,8 @@ How does this app work for Frame Generation (FG) users?
 - Lossless Scaling (LS) FG, including the scaling muliplier used, is also detected and the correct LSFG multiplied FPS is displayed.
   - The app will first try to use an LS profile with the specific name MSFS2020 to obtain these settings.
   - If an MSFS2020 profile does not exist then the settings in the Default profile will be used.
-  - If you are using LSFG 1.1 in LS and AutoFPS is not showing a 2X mulitplier, temporarily select LSFG 2.3 in LS and select the 2X mulitplier, switch back to LSFG 1.1 then press the Reset button on AutoFPS.
-  - If you make changes to your LS settings after starting a flight, press the Reset button in AutoFPS so that AutoFPS can redetect them correctly.
+  - If you are using LSFG 1.1 in LS and AutoFPS is not showing a 2X mulitplier, temporarily select LSFG 2.3 in LS and select the 2X mulitplier, switch back to LSFG 1.1 then press the AutoFPS's Reset button.
+  - If you make changes to your LS settings after starting a flight, press AutoFPS's Reset button so that AutoFPS can redetect them correctly.
 - Detection of FG is normally only performed upon starting a flight. If FG is enabled or LS is started after this detection is normally performed, press the Reset button for it to be detected.
 
 Why am I getting a dangerous/Unsafe program warning when trying to download or install?
