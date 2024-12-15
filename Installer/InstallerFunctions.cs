@@ -12,8 +12,11 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows;
+using System.Windows.Shapes;
 using System.Xml;
+using Path = System.IO.Path;
 
 namespace Installer
 {
@@ -34,7 +37,7 @@ namespace Installer
         }
 
         #region Install Actions
-        public static bool AutoStartFsuipc(bool removeEntry = false)
+        public static bool AutoStartFsuipc(bool ConfigureForMSFS_AutoFPS, bool removeEntry = false)
         {
             bool result = false;
             string programParam = "READY";
@@ -54,7 +57,7 @@ namespace Installer
                     string fileContent = File.ReadAllText(regPath, Encoding.Default);
                     if (!fileContent.Contains("[Programs]") && !removeEntry)
                     {
-                        fileContent += $"\r\n[Programs]\r\nRunIf1={programParam},CLOSE,{Parameters.binPath}";
+                        fileContent += $"\r\n[Programs]\r\nRunIf1={programParam},CLOSE,{(ConfigureForMSFS_AutoFPS ? Parameters.binPath : Parameters.binPath2020)}";
                         File.WriteAllText(regPath, fileContent, Encoding.Default);
                         result = true;
                     }
@@ -71,21 +74,21 @@ namespace Installer
                         if (runIfMatches.Count > 0 && runIfMatches[runIfMatches.Count - 1].Groups.Count == 2)
                             lastRunIf = Convert.ToInt32(runIfMatches[runIfMatches.Count - 1].Groups[1].Value);
 
-                        if (Regex.IsMatch(fileContent, @"^[;]{0,1}Run(\d+).*" + Parameters.appName + "\\.exe", regOptions))
+                        if (Regex.IsMatch(fileContent, @"^[;]{0,1}Run(\d+).*" + (ConfigureForMSFS_AutoFPS ? Parameters.appName : Parameters.appName2020) + "\\.exe", regOptions))
                         {
                             if (!removeEntry)
-                                fileContent = Regex.Replace(fileContent, @"^[;]{0,1}Run(\d+).*" + Parameters.appName + "\\.exe", $"RunIf{lastRunIf + 1}={programParam},CLOSE,{Parameters.binPath}", regOptions);
+                                fileContent = Regex.Replace(fileContent, @"^[;]{0,1}Run(\d+).*" + (ConfigureForMSFS_AutoFPS ? Parameters.appName : Parameters.appName2020) + "\\.exe", $"RunIf{lastRunIf + 1}={programParam},CLOSE,{(ConfigureForMSFS_AutoFPS ? Parameters.binPath : Parameters.binPath2020)}", regOptions);
                             else
-                                fileContent = Regex.Replace(fileContent, @"^[;]{0,1}Run(\d+).*" + Parameters.appName + "\\.exe", $"", regOptions);
+                                fileContent = Regex.Replace(fileContent, @"^[;]{0,1}Run(\d+).*" + (ConfigureForMSFS_AutoFPS ? Parameters.appName : Parameters.appName2020) + "\\.exe", $"", regOptions);
                             File.WriteAllText(regPath, fileContent, Encoding.Default);
                             result = true;
                         }
-                        else if (Regex.IsMatch(fileContent, @"^[;]{0,1}RunIf(\d+).*" + Parameters.appName + "\\.exe", regOptions))
+                        else if (Regex.IsMatch(fileContent, @"^[;]{0,1}RunIf(\d+).*" + (ConfigureForMSFS_AutoFPS ? Parameters.appName : Parameters.appName2020) + "\\.exe", regOptions))
                         {
                             if (!removeEntry)
-                                fileContent = Regex.Replace(fileContent, @"^[;]{0,1}RunIf(\d+).*" + Parameters.appName + "\\.exe", $"RunIf$1={programParam},CLOSE,{Parameters.binPath}", regOptions);
+                                fileContent = Regex.Replace(fileContent, @"^[;]{0,1}RunIf(\d+).*" + (ConfigureForMSFS_AutoFPS ? Parameters.appName : Parameters.appName2020) + "\\.exe", $"RunIf$1={programParam},CLOSE,{(ConfigureForMSFS_AutoFPS ? Parameters.binPath : Parameters.binPath2020)}", regOptions);
                             else
-                                fileContent = Regex.Replace(fileContent, @"^[;]{0,1}RunIf(\d+).*" + Parameters.appName + "\\.exe", $"", regOptions);
+                                fileContent = Regex.Replace(fileContent, @"^[;]{0,1}RunIf(\d+).*" + (ConfigureForMSFS_AutoFPS ? Parameters.appName : Parameters.appName2020) + "\\.exe", $"", regOptions);
                             File.WriteAllText(regPath, fileContent, Encoding.Default);
                             result = true;
                         }
@@ -105,13 +108,13 @@ namespace Installer
 
                             if (index > 0 && !removeEntry)
                             {
-                                fileContent = fileContent.Insert(index + 1, $"RunIf{lastRunIf + 1}={programParam},CLOSE,{Parameters.binPath}\r\n");
+                                fileContent = fileContent.Insert(index + 1, $"RunIf{lastRunIf + 1}={programParam},CLOSE,{(ConfigureForMSFS_AutoFPS ? Parameters.binPath : Parameters.binPath2020)}\r\n");
                                 File.WriteAllText(regPath, fileContent, Encoding.Default);
                                 result = true;
                             }
                             else if (!removeEntry)
                             {
-                                fileContent = Regex.Replace(fileContent, @"^\[Programs\]\r\n", $"[Programs]\r\nRunIf{lastRunIf + 1}={programParam},CLOSE,{Parameters.binPath}\r\n", regOptions);
+                                fileContent = Regex.Replace(fileContent, @"^\[Programs\]\r\n", $"[Programs]\r\nRunIf{lastRunIf + 1}={programParam},CLOSE,{(ConfigureForMSFS_AutoFPS ? Parameters.binPath : Parameters.binPath2020)}\r\n", regOptions);
                                 File.WriteAllText(regPath, fileContent, Encoding.Default);
                                 result = true;
                             }
@@ -130,18 +133,111 @@ namespace Installer
         public static bool AutoStartExe(bool removeEntry = false)
         {
             bool result = false;
+            bool ConfigureForMSFS2024 = false;
+            bool MSFSInstalled = File.Exists(Parameters.msConfigStore) || File.Exists(Parameters.msConfigSteam);
+            bool MSFS2024Installed = File.Exists(Parameters.msConfigStore2024) || File.Exists(Parameters.msConfigSteam2024);
+            bool MSFSSteam = File.Exists(Parameters.msConfigSteam);
+            bool MSFS2024Steam = File.Exists(Parameters.msConfigSteam2024);
+
+            try
+            {
+                do
+                {
+                    // If the MSFS version being configured is installed
+                    if (ConfigureForMSFS2024 ? MSFS2024Installed : MSFSInstalled)
+                    {
+                        // Identify where the exe.xml file should be located 
+                        string path = ConfigureForMSFS2024 ? (MSFS2024Steam ? Parameters.msExeSteam2024 : Parameters.msExeStore2024) : (MSFSSteam ? Parameters.msExeSteam : Parameters.msExeStore);
+                        // Create a blank template if it doesn't currently exist
+                        if (!File.Exists(path))
+                            File.Copy(Parameters.ExeFileDefault, path);
+
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.LoadXml(File.ReadAllText(path));
+
+                        bool found = false;
+                        XmlNode simbase = xmlDoc.ChildNodes[1];
+                        List<XmlNode> removeList = new List<XmlNode>();
+                        foreach (XmlNode outerNode in simbase.ChildNodes)
+                        {
+                            if (outerNode.Name == "Launch.Addon" && outerNode.InnerText.Contains(Parameters.appBinary))
+                            {
+                                found = true;
+
+                                if (!removeEntry)
+                                {
+                                    foreach (XmlNode innerNode in outerNode.ChildNodes)
+                                    {
+                                        if (innerNode.Name == "Disabled")
+                                            innerNode.InnerText = "False";
+                                        else if (innerNode.Name == "Path")
+                                            innerNode.InnerText = Parameters.binPath;
+                                        else if (innerNode.Name == "CommandLine")
+                                            innerNode.InnerText = "";
+                                        else if (innerNode.Name == "ManualLoad")
+                                            innerNode.InnerText = "False";
+                                    }
+                                }
+                                else
+                                    removeList.Add(outerNode);
+                            }
+                        }
+                        foreach (XmlNode node in removeList)
+                            xmlDoc.ChildNodes[1].RemoveChild(node);
+
+                        if (!found && !removeEntry)
+                        {
+                            XmlNode outerNode = xmlDoc.CreateElement("Launch.Addon");
+
+                            XmlNode innerNode = xmlDoc.CreateElement("Disabled");
+                            innerNode.InnerText = "False";
+                            outerNode.AppendChild(innerNode);
+
+                            innerNode = xmlDoc.CreateElement("ManualLoad");
+                            innerNode.InnerText = "False";
+                            outerNode.AppendChild(innerNode);
+
+                            innerNode = xmlDoc.CreateElement("Name");
+                            innerNode.InnerText = Parameters.appName;
+                            outerNode.AppendChild(innerNode);
+
+                            innerNode = xmlDoc.CreateElement("Path");
+                            innerNode.InnerText = Parameters.binPath;
+                            outerNode.AppendChild(innerNode);
+
+                            xmlDoc.ChildNodes[1].AppendChild(outerNode);
+                        }
+
+                        xmlDoc.Save(path);
+                        result = true;
+                    }
+                    ConfigureForMSFS2024 = !ConfigureForMSFS2024;
+                } while (ConfigureForMSFS2024);
+            }
+            catch (XmlException ex) { MessageBox.Show($"XML Exception: {ex.Message}\nLine: {ex.LineNumber}, Position: {ex.LinePosition}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"General Exception during AutoStartExe: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            //catch (Exception e)
+            //{
+            //    MessageBox.Show($"Exception '{e.GetType()}' during AutoStartExe", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
+
+            return result;
+        }
+
+        public static bool AutoStartExe2020(bool removeEntry = false)
+        {
+            bool result = false;
 
             try
             {
                 string path = Parameters.msExeSteam;
                 if (!File.Exists(path))
                     path = Parameters.msExeStore;
-                if (!File.Exists(path))
-                {
-                    MessageBox.Show($"Required EXE.xml file not found for AutoStartExe. See readme for resolution.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }
-
+                if (!File.Exists(path)) return false;
+ 
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(File.ReadAllText(path));
 
@@ -150,7 +246,7 @@ namespace Installer
                 List<XmlNode> removeList = new List<XmlNode>();
                 foreach (XmlNode outerNode in simbase.ChildNodes)
                 {
-                    if (outerNode.Name == "Launch.Addon" && outerNode.InnerText.Contains(Parameters.appBinary))
+                    if (outerNode.Name == "Launch.Addon" && outerNode.InnerText.Contains(Parameters.appBinary2020))
                     {
                         found = true;
 
@@ -161,7 +257,7 @@ namespace Installer
                                 if (innerNode.Name == "Disabled")
                                     innerNode.InnerText = "False";
                                 else if (innerNode.Name == "Path")
-                                    innerNode.InnerText = Parameters.binPath;
+                                    innerNode.InnerText = Parameters.binPath2020;
                                 else if (innerNode.Name == "CommandLine")
                                     innerNode.InnerText = "";
                                 else if (innerNode.Name == "ManualLoad")
@@ -188,11 +284,11 @@ namespace Installer
                     outerNode.AppendChild(innerNode);
 
                     innerNode = xmlDoc.CreateElement("Name");
-                    innerNode.InnerText = Parameters.appName;
+                    innerNode.InnerText = Parameters.appName2020;
                     outerNode.AppendChild(innerNode);
 
                     innerNode = xmlDoc.CreateElement("Path");
-                    innerNode.InnerText = Parameters.binPath;
+                    innerNode.InnerText = Parameters.binPath2020;
                     outerNode.AppendChild(innerNode);
 
                     xmlDoc.ChildNodes[1].AppendChild(outerNode);
@@ -201,10 +297,15 @@ namespace Installer
                 xmlDoc.Save(path);
                 result = true;
             }
-            catch (Exception e)
+            catch (XmlException ex) { MessageBox.Show($"XML Exception: {ex.Message}\nLine: {ex.LineNumber}, Position: {ex.LinePosition}", "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            catch (Exception ex)
             {
-                MessageBox.Show($"Exception '{e.GetType()}' during AutoStartExe", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"General Exception during AutoStartExe: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            //catch (Exception e)
+            //{
+            //    MessageBox.Show($"Exception '{e.GetType()}' during AutoStartExe", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
 
             return result;
         }
@@ -230,6 +331,40 @@ namespace Installer
             }
 
             return result;
+        }
+
+        public static bool RemoveDesktopLink(string appName)
+        {
+            bool result = false;
+            try
+            {
+                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                string shortcutPath = Path.Combine(desktopPath, $"{appName}.lnk");
+
+                // Check if the file exists before attempting to delete it
+                if (File.Exists(shortcutPath))
+                {
+                    File.Delete(shortcutPath);
+                    RefreshDesktop();
+                    result = true;
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Exception '{e.GetType()}' during RemoveDesktopLink", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            return result;
+        }
+
+        [DllImport("shell32.dll", CharSet = CharSet.Auto)] 
+        private static extern void SHChangeNotify(uint wEventId, uint uFlags, IntPtr dwItem1, IntPtr dwItem2); 
+        private const uint SHCNE_UPDATEITEM = 0x00002000; 
+        private const uint SHCNF_PATHA = 0x0001; 
+        // Helper method to refresh the desktop
+        private static void RefreshDesktop() 
+        { 
+            IntPtr pPath = Marshal.StringToHGlobalAnsi(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)); SHChangeNotify(SHCNE_UPDATEITEM, SHCNF_PATHA, pPath, IntPtr.Zero); Marshal.FreeHGlobal(pPath); 
         }
 
         public static bool DeleteOldFiles()
@@ -445,18 +580,18 @@ namespace Installer
             return "";
         }
 
-        public static bool CheckInstalledMSFS(out string packagePath)
+        public static bool CheckInstalledMSFS(bool isMSFS2024, out string packagePath)
         {
             try
             {
-                if (File.Exists(Parameters.msConfigStore))
+                if (File.Exists(isMSFS2024 ? Parameters.msConfigStore2024 : Parameters.msConfigStore))
                 {
-                    packagePath = FindPackagePath(Parameters.msConfigStore);
+                    packagePath = FindPackagePath(isMSFS2024 ? Parameters.msConfigStore2024 : Parameters.msConfigStore);
                     return !string.IsNullOrWhiteSpace(packagePath) && Directory.Exists(packagePath);
                 }
-                else if (File.Exists(Parameters.msConfigSteam))
+                else if (File.Exists(isMSFS2024 ? Parameters.msConfigSteam2024 : Parameters.msConfigSteam))
                 {
-                    packagePath = FindPackagePath(Parameters.msConfigSteam);
+                    packagePath = FindPackagePath(isMSFS2024 ? Parameters.msConfigSteam2024 : Parameters.msConfigSteam);
                     return !string.IsNullOrWhiteSpace(packagePath) && Directory.Exists(packagePath);
                 }
 

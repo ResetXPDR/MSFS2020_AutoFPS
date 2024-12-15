@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Installer
@@ -7,12 +8,18 @@ namespace Installer
     {
         public static readonly string fileName = "AppPackage.zip";
 
-        public static readonly string appName = "MSFS2020_AutoFPS";
+        public static readonly string appName = "MSFS_AutoFPS";
+        public static readonly string appName2020 = "MSFS2020_AutoFPS";
         public static readonly string appBinary = $"{appName}.exe";
-        public static readonly string appDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\MSFS2020_AutoFPS";
+        public static readonly string appBinary2020 = $"{appName2020}.exe";
+        public static readonly string appDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\MSFS_AutoFPS";
+        public static readonly string appDir2020 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\MSFS2020_AutoFPS";
         public static readonly string binDir = appDir + @"\bin";
-        public static readonly string binPath = binDir + @"\MSFS2020_AutoFPS.exe";
+        public static readonly string binDir2020 = appDir2020 + @"\bin";
+        public static readonly string binPath = binDir + @"\MSFS_AutoFPS.exe";
+        public static readonly string binPath2020 = binDir2020 + @"\MSFS2020_AutoFPS.exe";
         public static readonly string confFile = appDir + @"\MSFS2020_AutoFPS.config";
+        public static readonly string confFile2020 = appDir2020 + @"\MSFS2020_AutoFPS.config";
 
         public static readonly Regex netDesktop = new Regex(@"Microsoft.WindowsDesktop.App ((\d+)\.(\d+)\.(\d+)).+", RegexOptions.Compiled);
 
@@ -34,10 +41,20 @@ namespace Installer
         public static readonly string wasmUrl = "https://github.com/MobiFlight/MobiFlight-WASM-Module/releases/download/1.0.1/mobiflight-event-module.1.0.1.zip";
         public static readonly string wasmUrlFile = "mobiflight-event-module.1.0.1.zip";
 
+        public static readonly string msStore = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalCache";
+        public static readonly string msSteam = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Microsoft Flight Simulator";
+        public static readonly string msStore2024 = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.Limitless_8wekyb3d8bbwe\LocalCache";
+        public static readonly string msSteam2024 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Microsoft Flight Simulator 2024";
         public static readonly string msConfigStore = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalCache\UserCfg.opt";
         public static readonly string msConfigSteam = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Microsoft Flight Simulator\UserCfg.opt";
+        public static readonly string msConfigStore2024 = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.Limitless_8wekyb3d8bbwe\LocalCache\UserCfg.opt";
+        public static readonly string msConfigSteam2024 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Microsoft Flight Simulator 2024\UserCfg.opt";
         public static readonly string msStringPackage = "InstalledPackagesPath ";
         public static readonly string msExeStore = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.FlightSimulator_8wekyb3d8bbwe\LocalCache\EXE.xml";
         public static readonly string msExeSteam = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Microsoft Flight Simulator\EXE.xml";
+        public static readonly string msExeStore2024 = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Packages\Microsoft.Limitless_8wekyb3d8bbwe\LocalCache\EXE.xml";
+        public static readonly string msExeSteam2024 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Microsoft Flight Simulator 2024\EXE.xml";
+        public static readonly string ExeFileDefault = binDir + @"\exe.xml";
+
     }
 }

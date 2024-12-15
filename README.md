@@ -1,12 +1,14 @@
-# MSFS2020_AutoFPS
+# MSFS_AutoFPS
 
 ## Notice
-Following MSFS2020_AutoFPS version 0.4.3.0 formal release, my development efforts on this app will be limited to maintenance of existing functionalty only until the release of MSFS 2024 in Nov 24. When MSFS 2024 is released I hope that much of the functionality of this app becomes native to MSFS and hence this app will no longer be required. If this is not largely the case, I will attempt to update this app to work with MSFS 2024, but since MSFS 2024 is currently an unknown entity, I make no promises that this will be successful or even possible.
+Following MSFS_AutoFPS version 0.4.4.0 formal release, my development efforts on this app will be limited to maintenance of existing functionality only. If you wish to request functionality improvements for MSFS 2024, there is now an MSFS 2024 specific version of this app, based on my MSFS2020_AutoFPS version 0.4.3.1, developed by kayjay1c6b here https://github.com/kayjay1c6b/MSFS2024_AutoFPS-by-kayJay_1c6 where you should direct such requests. 
 
 ## Summary
-Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition.<br/><br/>
+Based on muumimorko's idea and code in MSFS_AdaptiveLOD, as further developed by Fragtality in DynamicLOD and myself in DynamicLOD_ResetEdition and MSFS2020_AutoFPS.<br/><br/>
 
-This app aims to improve the MSFS user experience by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use UI and provides features such as:<br/>
+Now fully compatible with MSFS 2020 and 2024 in the one app, this app aims to improve the MSFS user experience by automatically changing key MSFS settings that impact MSFS performance and smoothness the most. It has an easy to use UI and provides features such as:<br/>
+- Automatically detects and displays the MSFS version in use and keeps separate settings for each MSFS version and a single log file for both.
+- Remembers which MSFS version you last used the app with and will start up next time with the settings for that MSFS version.
 - Automatic TLOD adjustment when in the air to either achieve and maintain a target FPS or to an altitude schedule, the latter as an expert option,
 - Improved target FPS tracking for all modes by having much smaller TLOD changes the closer you are to your target FPS, giving more consistent FPS for a better flight experience.    
 - A choice between VFR (GA) and IFR (Airliner) flight types, which defaults to settings suitable to each flight type and is fully customisable in Expert mode. 
@@ -15,9 +17,10 @@ This app aims to improve the MSFS user experience by automatically changing key 
 - Auto target FPS option, which is useful if you don't know what target FPS to choose or if your flight types are so varied that a single target FPS value is not always appropriate,
 - Cloud quality decrease option for when either FPS can't be achieved at the lowest desired TLOD or when the GPU load is too high,
 - Automatic OLOD adjustment option based on an automatic or user-definable OLOD range and altitude band (AGL),
-- Simultaneous PC, FG (native nVidia, FG mod and Lossless Scaling) and VR mode compatibilty, including correct FG FPS display, and separate FPS targets for each mode,
+- Simultaneous PC, FG (native nVidia, FG mod and Lossless Scaling) and VR mode compatibility, including correct FG FPS display, and separate FPS targets for each mode,
 - A greatly simplified non-expert default UI option that uses pre-defined settings for an automated experience suited to most user scenarios,
-- Auto detection and protection from known similar apps already running or incompatibilities with newer MSFS versions, and
+- Auto detection and protection from known similar apps already running or incompatibilities with newer MSFS versions, 
+- Auto disabling of Dynamic Settings in MSFS 2024 while this app is active, to prevent settings contention, and
 - Auto restoration of original MSFS settings changed by the app, recently enhanced to withstand MSFS CTDs.<br><br>
 
 **Really, really important:**
@@ -45,23 +48,29 @@ I am getting major stuttering, freezes or CTDs in MSFS using this app. What can 
 - Rerun the app and try non-expert mode with IFR flight type and Auto Target FPS checked.
 - If this doesn't resolve it, try enabling expert options and reducing the FPS Sensitivity setting to 2, to allow smaller TLOD changes.
 - If still not resolved, try the FPS Tolerance mode, which was the automation method in the original release version that had larger TLOD changes but they occurred less often, with a setting of 5.
-- Finally, if still not resolved, raise an issue here on github and I will do my best to help you, provided you have completed all of the aforementioned steps first.
 
 My default MSFS TLOD, OLOD and/or cloud settings are messed up and each time I try to change them back they get messed up again. How do I fix this?
 - You are likely trying to change these default MSFS settings while the app is still running and you are in an active flight, where the app will override any such changes you try to make.
 - Either exit the app completely from the System Tray or be in the MSFS main menu (ie. NOT in a flight), then you can go to the MSFS settings screen and change your default MSFS settings to what you want and the app will restore these upon exiting.
 
-Which app should I use? DynamicLOD_ResetEdition or MSFS2020_AutoFPS?:
-- Essentially both apps are intended to give you better overall performance but with different priorities to achieve it that result in a slightly different experience.  They both allow a lower TLOD down low and on the ground, when your viewing distance reduced anyway so the visual impact is minimal, and a higher TLOD when at higher altitude and not in close proximity to complex scenery or traffic. They also adjust OLOD and Cloud Quality but TLOD is usually the most important determiner of performance at these two extremes.
-- Where they differ is that DynamicLOD provides user set tables for LOD changes at specific altitudes, giving the user precise control over when and where these changes take place such that they can optimise them to their particular flight activity they normally do, and can set a specific profile for each one. The price of such precise control is that the user must be intimately familiar with LODs to be able to tune a variety of settings in the app for the best outcome and this can be a bit daunting for more casual and non-technical users.
-- Alternatively, AutoFPS seeks to automate these changes as much as possible based on a target FPS and a minimum and maximum LOD range within which to automatically adjust. This results in a much simpler and generally similarly acceptable user experience compared to DynamicLOD. Nonetheless, the automation algorithm does require FPS headroom to function correctly, so can conflict in cases where an FPS cap is being used, such as with Vsync or motion reprojection in VR, however the new Auto TLOD automation method now available in AutoFPS is FPS-independent and works well in such instances. Additionally, AutoFPS tends to make constant small changes to TLOD, much more than DynamicLOD does, and this can induce stuttering on older hardware as it struggles to manage even small scenery changes. In these cases, the user would be better off using DynamicLOD in a more manually tuned approach.
-- Both apps can be installed concurrently, but only one can be running at a time.
+What's with all these AutoFPS apps out now? Which one should I be using?:
+- As of Dec 24, there are three commonly used AutoFPS apps out there, all of which install to separate directories but each has a different starting name that IMO is reasonably intuitive as to what MSFS sim versions they are applicable to, namely:
+  - MSFS2020_AutoFPS - my original app that works only with MSFS 2020.
+  - MSFS2024_AutoFPS by kayJay_1c6b - kayJay_1c6b's app that works only with MSFS 2024.
+  - MSFS_AutoFPS - this app that works with both MSFS 2020 and 2024, hence the dropping of the sim version from the name and thus making MSFS2020_AutoFPS obsolete.
+ - If you like the functionality MSFS2020_AutoFPS provided for MSFS 2020 and are happy with the same functionality for MSFS 2024, regardless of which MSFS version you are currently using, then MSFS_AutoFPS is the one for you.
+ - If you want newer features for MSFS 2024 than what MSFS2020_AutoFPS offered, but no MSFS 2020 compatibility, then MSFS2024_AutoFPS by kayJay_1c6b is what you need.
+ - You can have MSFS2024_AutoFPS by kayJay_1c6b and either MSFS2020_AutoFPS or MSFS_AutoFPS installed at the same time, but you can only run one of them at a time.
 
 How does this app work for Frame Generation (FG) users?
 - The app does detect correct FG FPS when FG (native nVidia or FG mod) is enabled in MSFS, however FG is only active when MSFS is the focused window and becomes inactive when not, through your graphics driver not this app.
 - To see correct MSFS FG FPS, use the app's "On Top" option to overlay this app over MSFS and give MSFS the focus.
 - If MSFS FG is being incorrectly reported as enabled by the app, the likely reason is that either the FG mod had been installed and removed or you have disabled Hardware Accelerated Graphics Scheduling under Windows settings and the now the now greyed out MSFS FG setting may show that it is off but it is still set to on internally to MSFS. To fix, change the DLSSG line in your UserCfg.opt file to be DLSSG 0.
-- Lossless Scaling (LS) FG, including the scaling muliplier used, is also detected and the correct LSFG multiplied FPS is displayed. The app will first try to use an LS profile with the specific name MSFS2020 to obtain these settings. If an MSFS2020 profile does not exist then the settings in the Default profile will be used.
+- Lossless Scaling (LS) FG, including the scaling multiplier used, is also detected and the correct LSFG multiplied FPS is displayed.
+  - The app will first try to use an LS profile with the specific name MSFS2020 or MSFS2024, depending on which MSFS version is currently in use, to obtain these settings.
+  - If such an MSFS2020 or MSFS2024 profile does not exist then the settings in the Default profile will be used.
+  - If you are using LSFG 1.1 in LS and AutoFPS is not showing a 2X multiplier, temporarily select LSFG 2.3 in LS and select the 2X multiplier, switch back to LSFG 1.1 then press the AutoFPS's Reset button.
+  - If you make changes to your LS settings after starting a flight, press AutoFPS's Reset button so that AutoFPS can redetect them correctly.
 - Detection of FG is normally only performed upon starting a flight. If FG is enabled or LS is started after this detection is normally performed, press the Reset button for it to be detected.
 
 Why am I getting a dangerous/Unsafe program warning when trying to download or install?
@@ -76,9 +85,9 @@ The Installer will install the following Software:
 
 <br/>
 
-[Download here](https://github.com/ResetXPDR/MSFS2020_AutoFPS/releases/latest)
+[Download here](https://github.com/ResetXPDR/MSFS_AutoFPS/releases/latest)
 
-(Under Assests, the MSFS2020_AutoFPS-Installer-vXYZ.exe File)
+(Under Assests, the MSFS_AutoFPS-Installer-vXYZ.exe File)
 
 <br/><br/>
 
@@ -86,8 +95,9 @@ The Installer will install the following Software:
 Basically: Just run the Installer to either install, update or uninstall the app.<br/>
 
 Some Notes:
-- Your current MSFS2020_AutoFPS has to be exited before updating.
-- If the MobiFlight Module is not installed or outdated, MSFS also has to be stopped.
+- The installer uninstalls MSFS2020_AutoFPS if currently installed but preserves its MSFS 2020 config for use in this new app beforehand if desired or applicable.
+- Your current MSFS_AutoFPS has to be exited before updating.
+- - If the MobiFlight Module is not installed or outdated, MSFS also has to be stopped.
 - If you have duplicate MobiFlight Modules installed, in either your official or community folders, the app may display 0 value Sim Values and otherwise not function. Remove the duplicate versions, rerun the app installer and it should now work.
 - Do not run the Installer as Admin unless it will not install otherwise due to a permissions issue!
 - If the installer will not run at all, Windows SmartScreen is potentially blocking it because the app is so new. The solution to try is:
@@ -99,10 +109,10 @@ Some Notes:
 - For Auto-Start either your FSUIPC7.ini or EXE.xml (MSFS) is modified. The Installer does not create a Backup.
 - If you wish to remove an Auto-Start option from a previous installation, rerun the installer and select Remove Auto-Start and the click Update.
 - The app may be blocked by Windows Security or your AV-Scanner, if so try to unblock or set an exception (for the whole Folder)
-- The Installation-Location is fixed to %appdata%\MSFS2020_AutoFPS (your Users AppData\Roaming Folder) and can't be changed.
-  - Binary in %appdata%\MSFS2020_AutoFPS\bin
-  - Logs in %appdata%\MSFS2020_AutoFPS\log
-  - Config: %appdata%\MSFS2020_AutoFPS\MSFS2020_AutoFPS.config
+- The Installation-Location is fixed to %appdata%\MSFS_AutoFPS (your Users AppData\Roaming Folder) and can't be changed.
+  - Binary in %appdata%\MSFS_AutoFPS\bin
+  - Logs in %appdata%\MSFS_AutoFPS\log
+  - Config: %appdata%\MSFS_AutoFPS\MSFS2020_AutoFPS.config and MSFS2024_AutoFPS.config
 - If after installing and running the app your simconnect always stays red:
   - Try downloading and installing a Microsoft official version of “Microsoft Visual C++ 2015 - 2022 Redistributable”, which may be missing from your Windows installation.
   - If still not resolved and the error code in your AutoFPS log file is Exception 31, you most likely have a corrupt MSFS installation so you can choose to either not run this app or to reinstall MSFS completely.
@@ -111,22 +121,7 @@ Some Notes:
   - You may have changed MSFS settings in your usercfg.opt file beyond what is possible to set in the MSFS settings menu. To rectify, go into MSFS settings at the main menu and reset to default (F12) the graphics settings for both PC and VR mode, then make all changes to MSFS within the MSFS settings menu.
   - A new version of MSFS has come out that has a different memory map to what the app expects, which has happened only once since MSFS 2020 was released, and the app can't auto adjust to the new memory location for MSFS settings. If so, I will likely be already aware of it and working on a solution, but if you may be one of the first to encounter it (eg. on an MSFS beta) then please do let me know.
 - If you get a message when starting the app that you need to install .NET desktop runtime, manually download it from [here](https://dotnet.microsoft.com/en-us/download/dotnet/7.0).
-- If you get an error message saying "Required EXE.xml file not found for AutoStartExe" when trying to install with the autostart option for MSFS, it usually means that your MSFS installation is missing the required EXE.xml file in which to place the autostart entry. To resolve, you need to  go to your MSFS root user directory (MS Store Version: "C:\Users\YOUR_USERNAME\AppData\Local\Packages\Microsoft. FlightSimulator_8wekyb3d8bbwe\LocalCache\ or Steam Version: "C:\Users\YOUR_USERNAME\AppData\Roaming\Microsoft Flight Simulator\") and manually create an EXE.xml file and save it there. You can use the following EXE.xml template, inserting your Windows username where shown:
-```
-<?xml version="1.0" encoding="Windows-1252"?>
-<SimBase.Document Type="Launch" version="1,0">
-  <Descr>Launch</Descr>
-  <Filename>EXE.xml</Filename>
-  <Disabled>False</Disabled>
-  <Launch.ManualLoad>False</Launch.ManualLoad>
-  <Launch.Addon>
-    <Disabled>False</Disabled>
-    <ManualLoad>False</ManualLoad>
-    <Name>MSFS2020_AutoFPS</Name>
-    <Path>C:\Users\<username>\AppData\Roaming\MSFS2020_AutoFPS\bin\MSFS2020_AutoFPS.exe</Path>
-  </Launch.Addon>
-</SimBase.Document>
-```
+- If you get an error message saying "XML Exception: Unexpected XML declaration" or "Exception: 'System.Xml.XMlException' during AutostartExe" when trying to install with the auto-start option for MSFS, it usually means your EXE.xml file has a corrupted data structure. To resolve, copy the content of your EXE.xml into MS Copilot and ask it to check and correct it for you. Paste the fixed structure back into your EXE.xml file, save it, then try reinstalling again.
 - To uninstall, ensure you have completely exited the app (ie. it is not hiding still running in your SysTray), run the installer and select remove on the first window. This will remove all traces of the app, including the desktop icon, MSFS or FSUIPC autostart entries if you used them, and the entire app folder, including your configuration file.
 
 <br/><br/>
@@ -138,13 +133,15 @@ Some Notes:
   - Closing the Window does not close the app, use the Context Menu of the SysTray Icon.
   - Clicking on the SysTray Icon opens the Window (again).
   - If you wish to have the app window always open to the SysTray, close the app and manually change the openWindow key state in the config file to false.
-  - The app's window position will be remembered between sessions, except movements to it made while in VR due to window restoration issues. If there are issues with the window not displaying correctly on startup, as can happen when auto-starting the app through MSFS of FSUIPC, either don't use auto-start, restart the app within 10 seconds of last closing it to auto reset the window position, or manually permanently disable this feature in the config file by setting the RememberWindowPos line to be false.
+  - The app's window position will be remembered between sessions, except movements to it made while in VR due to window restoration issues. If there are issues with the window not displaying correctly on start-up, as can happen when auto-starting the app through MSFS or FSUIPC, either don't use auto-start, restart the app within 10 seconds of last closing it to auto reset the window position, or manually permanently disable this feature in the config file by setting the RememberWindowPos line to be false.
   - The user can progressively hide parts of the UI when the app window is double clicked anywhere that is not a control. The first double click will hide the expert settings section (if applicable), the second will hide the general settings section and a third double click will restore all hidden settings sections. The last state in use will be restored when next starting the app. 
-  - Runnning as Admin NOT usually required (BUT: It is required to be run under the same User/Elevation as MSFS).
+  - Running as Admin NOT usually required (BUT: It is required to be run under the same User/Elevation as MSFS).
   - Do not change TLOD, OLOD and Cloud Quality MSFS settings manually while in a flight with this app running as it will conflict with what the app is managing and they will not restore to what you set when you exit your flight. If you wish to change the defaults for these MSFS settings, you must do so either without this app running or, if it is, only while you are in the MSFS main menu (ie not in a flight).
   - If you wish to activate additional logging of settings changes and sim values, as currently happens automatically in test versions, you need to manually edit your config file and add a LogSimValues key, if it doesn't already exist, and set its value to true ie.  ```<add key="LogSimValues" value="true" />```
 - Connection Status
   - Red values indicate not connected, green is connected.
+  - Automatically identifies which MSFS version is in use as either MSFS2020 or MSFS2024. 
+  - If the sim version is showing in red and is not the MSFS version you wish to configure before starting that MSFS version, click the 20>24 or 24>20 button, as applicable, and it will change to that.
 - Sim Values
   - Will not show valid values unless all three connections are green. n/a means not available right now.
   - Green means the sim value is at or better than target value being sought, red means at lowest level or worse than target value being sought, orange means TLOD or OLOD is auto adjusting, black is shown otherwise.
@@ -164,7 +161,7 @@ Some Notes:
     - There is a setting for each graphics mode (PC, FG, LSFG and VR) and each flight mode (VFR and IFR), which you can only change while in those mode pairs. This is particularly useful if regularly switching between FG mode and VR mode in your flights as the FG FPS target can be significantly higher than the one for VR.
     - If using MSFS FG, the target FPS you set is your desired FG Active FPS, not the FG Inactive FPS you see when this app has the focus instead of MSFS. 
     - If using an FPS cap, or Vsync for the same purpose, it is strongly recommended you use the Auto TLOD automation method, available under expert settings, which can be used either FPS-independently or, when TLOD Base + is used, with an FPS target matching your FPS cap and works well in such instances.
-    - If using such an FPS cap with either FPS Sensitivity or Tolerance automation methods you will need to set your target FPS to be a few FPS lower than that cap to allow the automation logic to function correctly. This potentially introduces screen tearing, or breaks motion reprojection in VR, hence why Auto TLOD is preferred.
+    - If using such an FPS cap with either FPS Sensitivity or Tolerance automation methods you will need to set your target FPS to be at least 5% lower than that cap to allow the automation logic to function correctly. This potentially introduces screen tearing, or breaks motion reprojection in VR, hence why Auto TLOD is preferred.
   - Auto Target FPS
     - Cannot be enabled at the same time as TLOD Min + due to automation control ambiguity. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
     - When checked, a target FPS will automatically be calculated, following any initial FPS settling, when stationary on the ground or any time you are in the air.
@@ -177,7 +174,7 @@ Some Notes:
     - Should also satisfy single monitor users utilising the FG capability of MSFS as they now see the true FG FPS the app is reading when MSFS has the focus.
   - Reset button
     - Resets TLOD, Clouds, Auto Target FPS and graphics mode detection to initial state.
-    - Useful to reintialise and recommence the seek process for TLOD Min/Top + should conditions change significantly from what they were on initial startup.
+    - Useful to reinitialise and recommence the seek process for TLOD Min/Top + should conditions change significantly from what they were on initial start-up.
     - Can be activated by pressing ALT-R while the app has the focus, making it suitable to be assigned as a VR-friendly voice command with an app like VoiceAttack.
   - Flight type - VFR or IFR
     - In non-expert mode, VFR will use higher minimum and maximum TLODs and a lower TLOD base altitude than IFR to account for the greater performance expectation that GA flights in rural areas will have.
@@ -186,7 +183,7 @@ Some Notes:
     - Once in the air and above either a pre-determined (non-expert) or user-selectable (expert) TLOD base altitude, TLOD will be allowed to change to the lower of either the schedule based on your TLODs, FPS sensitivity/tolerance and average descent rate settings or what your current performance dictates.
     - Once above a calculated altitude band above the the TLOD base altitude, the app priority will change from TLOD to FPS.
     - On descent your TLOD will progressively work its way down to TLOD Min by the TLOD base altitude. 
-  - Use Expert Options - When disabled allows the app to use default settings in conjuction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
+  - Use Expert Options - When disabled allows the app to use default settings in conjunction with your chosen target FPS that should produce good automated FPS tracking, provided you have set a realistic FPS target within your system's performance capability. When enabled, the UI expands to show additional MSFS settings to adjust. If you do not understand these settings and their impact on MSFS performance and graphics quality, it is strongly recommended that you do not use these expert options and you should uncheck this option. When Use Expert Setting is unchecked, the following internal settings are used by the app:
     - Auto Target FPS - user selectable. Enabling automatically disables TLOD Min + due to automation control ambiguity
     - FPS Sensitivity - 5%
     - VFR or IFR flight type - user selectable
@@ -224,10 +221,11 @@ Some Notes:
         - This seek process can be manually restarted by pressing the Reset button, should flight conditions change such that the original TLOD Base + is no longer valid.
         - When seeking, TLOD Base + will increase in steps of the original TLOD Base until either TLOD Top is achieved or the FPS cannot consistently achieve the target FPS. If the the latter, TLOD Base + will backtrack to the previous TLOD Base +, where the FPS target was easily achieved.
         - At any time, if the 10 second FPS trend drops below a small threshold under the target FPS then TLOD Base + will automatically reduce by a step of the original TLOD base, down to zero if necessary. In external view, this threshold is greater to account for anticipated temporary FPS dips when scenery gets cached when panning.
-        - Avoid rapidly changing views or panning your external view too quickly, especially intially as uncached scenery loads in, as you will induce temporary FPS drops that may trigger an unnecessary TLOD Top + reduction.    
-        - If the FPS drops temporarily below the target FPS when taking off and TLOD automatically decreases, an attempt will be made to progressive restorely the lost TLOD should conditions return to being favourable after climbing through Alt TLOD Top.
-        - The calculated TLOD Base + will be applied as an offset that increasies the entire TLOD altitude schedule by that amount.
+        - Avoid rapidly changing views or panning your external view too quickly, especially initially as un-cached scenery loads in, as you will induce temporary FPS drops that may trigger an unnecessary TLOD Top + reduction.    
+        - If the FPS drops temporarily below the target FPS when taking off and TLOD automatically decreases, an attempt will be made to progressive restore the lost TLOD should conditions return to being favourable after climbing through Alt TLOD Top.
+        - The calculated TLOD Base + will be applied as an offset that increases the entire TLOD altitude schedule by that amount.
         - Cannot be enabled with TLOD Top + due to conflicting control over TLOD Top. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
+        - The default 10 second sustained FPS drop upon which TLOD Base + reductions are triggered can be changed in the config file by modifying the MinTLODFPSDropAmount key. The default is 1, which is suitable in most instances, and I personally use a value of 2 for VR with the Quest 3 so it doesn't trigger as easily.
       - TLOD Top + - additional TLOD Top in high elevation areas.
         - Operates the same as TLOD Max + except that it cannot be enabled with TLOD Base + due to conflicting control over TLOD Top. Selecting both will result in the most recent selection being enabled and the other disabled, with a dialog box to advise this.
       - TLOD Top - reduced TLOD Top at night. Operates the same as TLOD Max -. 

@@ -5,11 +5,11 @@ using System.Windows;
 // Allgemeine Informationen über eine Assembly werden über die folgenden
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
-[assembly: AssemblyTitle("MSFS2020_AutoFPS Installer")]
-[assembly: AssemblyDescription("Installer App for MSFS2020_AutoFPS")]
+[assembly: AssemblyTitle("MSFS_AutoFPS Installer")]
+[assembly: AssemblyDescription("Installer App for MSFS_AutoFPS")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ResetXPDR")]
-[assembly: AssemblyProduct("MSFS2020_AutoFPS Installer")]
+[assembly: AssemblyProduct("MSFS_AutoFPS Installer")]
 [assembly: AssemblyCopyright("Copyright © 2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -49,5 +49,5 @@ using System.Windows;
 // Sie können alle Werte angeben oder Standardwerte für die Build- und Revisionsnummern verwenden,
 // indem Sie "*" wie unten gezeigt eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.4.3.1")]
-[assembly: AssemblyFileVersion("0.4.3.1")]
+[assembly: AssemblyVersion("0.4.4")]
+[assembly: AssemblyFileVersion("0.4.4")]
