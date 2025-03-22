@@ -110,7 +110,6 @@ Some Notes:
 - If after installing and running the app your simconnect always stays red:
   - Try downloading and installing a Microsoft official version of “Microsoft Visual C++ 2015 - 2022 Redistributable”, which may be missing from your Windows installation.
   - If still not resolved and the error code in your AutoFPS log file is Exception 31, you most likely have a corrupt MSFS installation so you can choose to either not run this app or to reinstall MSFS completely.
-  - If reinstalling MSFS 2024, you need to do a clean install, as outlined for your MSFS version [here](https://flightsimulator.zendesk.com/hc/en-us/articles/17335196046108-How-to-clean-install-the-simulator-on-PC), which only takes around 15 minutes to complete and all your settings, controller assignments, career progression and your pilot profile are retained.
 - If you get an "MSFS compatibility test failed - app disabled." message there are three possible causes:
   - There is an issue with permissions and you may need to run the app as Administrator. This is by far the most likely cause and resolution.
   - You may have changed MSFS settings in your usercfg.opt file beyond what is possible to set in the MSFS settings menu. To rectify, go into MSFS settings at the main menu and reset to default (F12) the graphics settings for both PC and VR mode, then make all changes to MSFS within the MSFS settings menu.
